@@ -1,8 +1,9 @@
 /**********************
 File name: ws1.c
 author: Ido Finkelstein
-reviewer:
+reviewer: Rita Lempert
 date: 3/5/20
+status: Approved
 ***********************/
 
 #include <stdio.h> /* printf() */
