@@ -6,33 +6,33 @@ date: 3/5/20
 status: Approved
 ***********************/
 
-#include <stdio.h> /* printf() */
-#include <stdlib.h>/* abs() */
+#include <stdio.h> /* printf */
+#include <stdlib.h>/* abs */
 
 void PrintHelloWorld()
 {
 	/* presentation of helloworld with hexadecimal numbers */
-	char str[] = {0x22, 0x48, 0x65, 0x6c, 0x6c, 0x6f,
-				  0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21, 0x22, '\0'};
+	const char str[] = {0x22, 0x48, 0x65, 0x6c, 0x6c, 0x6f,
+				  		0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64, 0x21, 0x22, '\0'};
 	
 	printf("%s\n", str);
 }
 
-float TenPower(int n)
+double TenPower(int n)
 {
-	float res = 1.0; /* saving the result*/
-	float pow = 10.0;
+	double res = 1.0; /* saving the result*/
+	double base = 10.0;
 	int i;
 
 	if (n < 0)
 	{
 		n = -n;
-		pow = 1 / pow;
+		base = 1 / base;
 	}
 
-	for (i = 0; i < n; i++)
+	for (i = 0; i < n; ++i)
 	{
-		res = res * pow;
+		res = res * base;
 	}
 
 	return (res);
@@ -41,24 +41,27 @@ float TenPower(int n)
 int ReverseDigits(int num)
 {
     int reversed_num = 0;
+	int sign = num < 0;
+	
+	sign = -1 * sign + !sign; /* for handling negative numbers */
     
-    /* Every iteration the smallest digit in num becomes the largest in reversed_num */
+    /* Every iteration reversed_num multiplied by 10 and the smallest digit
+	   of num added to it.*/
     while (abs(num) > 0)
     {
-        reversed_num = reversed_num * 10 + (num % 10);
+        reversed_num = reversed_num * 10 + abs(num) % 10;
         num /= 10;
     }
     
-    return (reversed_num);
+    return (reversed_num * sign);
 }
 
 
 
 void SwapValues(int *ptr_num1, int *ptr_num2)
 {
-	int temp = 0;
+	int temp = *ptr_num1;
 
-	temp = *ptr_num1;
 	*ptr_num1 = *ptr_num2;
 	*ptr_num2 = temp;
 }
