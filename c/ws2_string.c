@@ -66,9 +66,11 @@ char *StrnCpy(char *dest, const char *src, size_t n)
 
 int StrCaseCmp(const char *str1, const char *str2)
 {
+	int upper_lower_difference = 32;	
+
 	while ('\0' != *str1 || '\0' != *str2)
 	{
-		if ((abs(*str1 - *str2) == 32) &&
+		if ((abs(*str1 - *str2) == upper_lower_difference) &&
 		   ((*str1 <= 'Z' && *str1 >= 'A') || (*str1 <= 'z' && *str1 >= 'a')) &&
 		   ((*str2 <= 'Z' && *str2 >= 'A') || (*str2 <= 'z' && *str2 >= 'a')))
 		{
@@ -82,6 +84,16 @@ int StrCaseCmp(const char *str1, const char *str2)
 		}
 		else 
 		{
+			if ((*str1 <= 'Z' && *str1 >= 'A') && (*str2 <= 'z' && *str2 >= 'a')) 
+			{
+				return(*str1 - *str2 + upper_lower_difference);
+			}
+
+			if ((*str1 <= 'z' && *str1 >= 'a') && (*str2 <= 'Z' && *str2 >= 'A'))
+			{
+				return(*str1 - *str2 - upper_lower_difference);
+			}
+
 			return(*str1 - *str2);
 		}
 	}
