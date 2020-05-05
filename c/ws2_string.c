@@ -6,6 +6,7 @@ date: 5/5/20
 reviewer: 
 ************************/
 #include <stdio.h> /* size_t */
+#include <stdlib.h> /* abs */
 
 size_t StrLen(const char *str)
 {
@@ -27,10 +28,6 @@ int StrCmp(const char *str1, const char *str2)
 		{
 			++str1;
 			++str2;
-		}
-		else if(*str1 < *str2)
-		{
-			return (*str1-*str2);
 		}
 		else
 		{
@@ -67,6 +64,30 @@ char *StrnCpy(char *dest, const char *src, size_t n)
 	return (dest);
 }
 
+int StrCaseCmp(const char *str1, const char *str2)
+{
+	while ('\0' != *str1 || '\0' != *str2)
+	{
+		if ((abs(*str1 - *str2) == 32) &&
+		   ((*str1 <= 'Z' && *str1 >= 'A') || (*str1 <= 'z' && *str1 >= 'a')) &&
+		   ((*str2 <= 'Z' && *str2 >= 'A') || (*str2 <= 'z' && *str2 >= 'a')))
+		{
+			++str1;
+			++str2;
+		}
+		else if (*str1 == *str2)
+		{
+			++str1;
+			++str2;
+		}
+		else 
+		{
+			return(*str1 - *str2);
+		}
+	}
+
+	return (*str1-*str2);
+}
 
 
 

@@ -8,6 +8,7 @@ reviewer:
 
 #include <stdio.h> /* printf */
 #include <string.h> /* all string library functions*/
+#include <strings.h>
 #include "ws2_string.h" /* my string functions */
 
 void StrLenTest(void)
@@ -109,12 +110,35 @@ void StrnCpyTest(void)
 
 }
 
+void StrCaseCmpTest(void)
+{
+	char str1[] = "aBcDeFgHiJkLmNoP";
+	char str2[] = "AbCdEfGhIjKlMnOp";
+	char str3[] = "hello world!";
+	char str4[] = "hello World!";
+	char str5[] = "hello World!";
+	char str6[] = "hello to you!";
+
+	printf("*** testing StrCaseCmp and compare to strcasecmp ***\n");
+	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCaseCmp's output: %d. strcasecmp's output: %d.\n",
+		    str1, str2, StrCaseCmp(str1, str2), strcasecmp(str1, str2));
+	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCaseCmp's output: %d. strcasecmp's output: %d.\n",
+		    str3, str4, StrCaseCmp(str3, str4), strcasecmp(str3, str4));
+	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCaseCmp's output: %d. strcasecmp's output: %d.\n",
+			str5, str6, StrCaseCmp(str5, str6), strcasecmp(str5, str6));
+	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCaseCmp's output: %d. strcasecmp's output: %d.\n",
+			str6, str5, StrCaseCmp(str6, str5), strcasecmp(str6, str5));
+	puts("");
+
+}
+
 int main()
 {
 	StrLenTest();
 	StrCmpTest();
 	StrCpyTest();
 	StrnCpyTest();
+	StrCaseCmpTest();
 
 	return 0;
 }
