@@ -69,26 +69,37 @@ void StrCpyTest(void)
 	char str10[] = "some text to delete and copy somthing else.";
 	char str11[] = "some text to delete and copy somthing else.";
 
-	printf("*** testing StrCpy and compare to strcmp ***\n");
+	printf("*** testing StrCpy and compare to strcpy ***\n");
 	printf("dest string is: [%s]\nsource string: is [%s]\n", str7, str1);
-	printf("StrCmp's output: [%s]. strcmp's output: [%s].\n",
+	printf("StrCmp's output: [%s]. strcpy's output: [%s].\n",
 		    StrCpy(str7, str1), strcpy(str7, str1));
 	printf("dest string is: [%s]\nsource string: is [%s]\n", str8, str2);
-	printf("StrCmp's output: [%s]. strcmp's output: [%s].\n",
+	printf("StrCpy's output: [%s]. strcpy's output: [%s].\n",
 		    StrCpy(str8, str2), strcpy(str8, str2));
 	printf("dest string is: [%s]\nsource string: is [%s]\n", str9, str3);
-	printf("StrCmp's output: [%s]. strcmp's output: [%s].\n",
+	printf("StrCpy's output: [%s]. strcpy's output: [%s].\n",
 		    StrCpy(str9, str3), strcpy(str9, str3));
 	printf("dest string is: [%s]\nsource string: is [%s]\n", str10, str4);
-	printf("StrCmp's output: [%s]. strcmp's output: [%s].\n",
+	printf("StrCpy's output: [%s]. strcpy's output: [%s].\n",
 		    StrCpy(str10, str4), strcpy(str10, str4));
 	printf("dest string is: [%s]\nsource string: is [%s]\n", str11, str5);
-	printf("StrCmp's output: [%s]. strcmp's output: [%s].\n",
+	printf("StrCpy's output: [%s]. strcpy's output: [%s].\n",
 		    StrCpy(str11, str5), strcpy(str11, str5));
 	printf("dest string is: [%s]\nsource string: is [%s]\n", str11, str6);
-	printf("StrCmp's output: [%s]. strcmp's output: [%s].\n",
+	printf("StrCpy's output: [%s]. strcpy's output: [%s].\n",
 		    StrCpy(str11, str6), strcpy(str11, str6));
 	puts("");	
+}
+
+void StrnCpyTest(void)
+{
+	char str1[] = "123456789";
+	char str2[] = "some text to delete and copy somthing else.";
+
+	printf("*** testing StrnCpy and compare to strncmp ***\n");
+	printf("dest string is: [%s]\nsource string: is [%s]\n", str2, str1);
+	printf("StrnCpy's output: [%s]. strcnpy's output: [%s].\n",
+		    StrnCpy(str2, str1, 4), strncpy(str2, str1, 4));
 }
 
 int main()
@@ -96,6 +107,7 @@ int main()
 	StrLenTest();
 	StrCmpTest();
 	StrCpyTest();
+	StrnCpyTest();
 
 	return 0;
 }
