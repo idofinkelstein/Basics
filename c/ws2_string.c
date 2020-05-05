@@ -21,8 +21,6 @@ size_t StrLen(const char *str)
 
 int StrCmp(const char *str1, const char *str2)
 {
-	/*char *current_str1 = (char*)str1, *current_str2 = (char*)str2;*/
-
 	while ('\0' != *str1 || '\0' != *str2)
 	{
 		if (*str1 == *str2)
@@ -41,5 +39,20 @@ int StrCmp(const char *str1, const char *str2)
 	}
 	
 	return (*str1-*str2);	
-
 }
+
+char *StrCpy(char *dest, const char *src)
+{
+	size_t i = 0, length = StrLen(src);
+
+	for(i = 0; i <= length; ++i)
+	{
+		*(dest + i) = *(src + i);
+	}	
+
+	return (dest);
+}
+
+
+
+
