@@ -71,7 +71,7 @@ void StrCpyTest(void)
 
 	printf("*** testing StrCpy and compare to strcpy ***\n");
 	printf("dest string is: [%s]\nsource string: is [%s]\n", str7, str1);
-	printf("StrCmp's output: [%s]. strcpy's output: [%s].\n",
+	printf("StrCpy's output: [%s]. strcpy's output: [%s].\n",
 		    StrCpy(str7, str1), strcpy(str7, str1));
 	printf("dest string is: [%s]\nsource string: is [%s]\n", str8, str2);
 	printf("StrCpy's output: [%s]. strcpy's output: [%s].\n",
@@ -95,11 +95,18 @@ void StrnCpyTest(void)
 {
 	char str1[] = "123456789";
 	char str2[] = "some text to delete and copy somthing else.";
+	char str3[] = "";
+	char str4[] = "copy empty string with random n to here";
 
 	printf("*** testing StrnCpy and compare to strncmp ***\n");
-	printf("dest string is: [%s]\nsource string: is [%s]\n", str2, str1);
+	printf("dest string is: [%s]\nsource string: is [%s], n = %d.\n", str2, str1, 4);
 	printf("StrnCpy's output: [%s]. strcnpy's output: [%s].\n",
 		    StrnCpy(str2, str1, 4), strncpy(str2, str1, 4));
+	printf("dest string is: [%s]\nsource string: is [%s], n = %d.\n", str4, str3, 0);
+	printf("StrnCpy's output: [%s]. strcnpy's output: [%s].\n",
+		    StrnCpy(str4, str3, 0), strncpy(str4, str3, 0));
+	puts("");
+
 }
 
 int main()
