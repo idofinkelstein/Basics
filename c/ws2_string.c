@@ -135,6 +135,7 @@ char *StrDup(const char *str)
 	char *dest = (char*)malloc(sizeof(char) * length + 1);
 
 	assert(str);
+	assert(dest);
 
 	for (i = 0; i <= length; ++i)
 	{
