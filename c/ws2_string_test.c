@@ -164,6 +164,7 @@ void StrDupTest(void)
 {
 	char str1[] = "hello world!";
 	char *dest = StrDup(str1);
+	printf("*** testing StrDup ***\n");
 	printf("%s\n", dest);
 	free(dest);
 }
@@ -174,7 +175,8 @@ void StrCatTest(void)
 	char str2[20] = "hello ";
 	char str3[] = "hello world!";
 	char str4[20] = "";
-
+	
+	printf("*** testing StrCat and compare to strcat ***\n");
 	printf("src = [%s]\n", str1);
 	printf("dest = [%s]\n", str2);
 	printf("StrCat's output = [%s]\n", StrCat(str2, str1));
@@ -189,6 +191,74 @@ void StrCatTest(void)
 	puts("");
 }
 
+void StrnCatTest(void)
+{
+	char str1[] = "world!";
+	char str2[20] = "hello ";
+	char str3[] = "hello world!";
+	char str4[20] = "";
+	
+	printf("*** testing StrnCat and compare to strncat ***\n");
+	printf("n = 3\n");
+	printf("src = [%s]\n", str1);
+	printf("dest = [%s]\n", str2);
+	printf("StrnCat's output = [%s]\n", StrnCat(str2, str1, 3));
+	sprintf(str2, "hello ");
+	printf("strncat's output = [%s]\n", strncat(str2, str1, 3));
+
+	printf("n = 5\n");
+	printf("src = [%s]\n", str1);
+	printf("dest = [%s]\n", str2);
+	sprintf(str2, "hello ");
+	printf("StrnCat's output = [%s]\n", StrnCat(str2, str1, 5));
+	sprintf(str2, "hello ");
+	printf("strncat's output = [%s]\n", strncat(str2, str1, 5));
+
+	printf("n = 7\n");
+	printf("src = [%s]\n", str1);
+	printf("dest = [%s]\n", str2);
+	sprintf(str2, "hello ");
+	printf("StrnCat's output = [%s]\n", StrnCat(str2, str1, 7));
+	sprintf(str2, "hello ");
+	printf("strncat's output = [%s]\n", strncat(str2, str1, 7));
+
+	printf("n = 9\n");
+	printf("src = [%s]\n", str3);
+	printf("dest = [%s]\n", str4);
+	sprintf(str4, "%s", "");
+	printf("StrnCat's output = [%s]\n", StrnCat(str4, str3, 9));
+	sprintf(str4, "%s", "");
+	printf("strncat's output = [%s]\n", strncat(str4, str3, 9));
+	puts("");
+
+	printf("n = 12\n");
+	printf("src = [%s]\n", str3);
+	printf("dest = [%s]\n", str4);
+	sprintf(str4, "%s", "");
+	printf("StrnCat's output = [%s]\n", StrnCat(str4, str3, 12));
+	sprintf(str4, "%s", "");
+	printf("strncat's output = [%s]\n", strncat(str4, str3, 12));
+	puts("");
+	
+	printf("n = 15\n");
+	printf("src = [%s]\n", str3);
+	printf("dest = [%s]\n", str4);
+	sprintf(str4, "%s", "");
+	printf("StrnCat's output = [%s]\n", StrnCat(str4, str3, 15));
+	sprintf(str4, "%s", "");
+	printf("strncat's output = [%s]\n", strncat(str4, str3, 15));
+	puts("");
+
+	printf("n = 0\n");
+	printf("src = [%s]\n", str3);
+	printf("dest = [%s]\n", str4);
+	sprintf(str4, "%s", "");
+	printf("StrnCat's output = [%s]\n", StrnCat(str4, str3, 0));
+	sprintf(str4, "%s", "");
+	printf("strncat's output = [%s]\n", strncat(str4, str3, 0));
+	puts("");
+}
+
 int main()
 {
 	StrLenTest();
@@ -199,6 +269,7 @@ int main()
 	StrDupTest();
 	StrChrTest();
 	StrCatTest();
+	StrnCatTest();
 
 	return 0;
 }

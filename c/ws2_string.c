@@ -184,4 +184,37 @@ char *StrCat(char *dest, const char *src)
 	return dest;
 }
 
+char *StrnCat(char *dest, const char *src, size_t n)
+{
+	size_t j = 0;  
+	size_t i = 0;
+	size_t src_length = StrLen(src);
+	size_t dest_length = StrLen(dest);
+
+	assert(src);
+	assert(dest);
+
+	/* appending the source string to dest string */
+
+	if (n > src_length)
+	{
+		for (i = dest_length, j = 0; i < (dest_length + src_length + 1); ++i, ++j)
+		{
+			*(dest + i) = *(src + j);
+		}
+	}
+	else
+	{
+		for (i = dest_length, j = 0; i < (dest_length + n + 1); ++i, ++j)
+		{
+			*(dest + i) = *(src + j);
+		}
+	
+		*(dest + dest_length + n) = '\0';
+	}
+	
+	return dest;
+}
+
+
 
