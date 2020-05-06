@@ -7,6 +7,7 @@ reviewer:
 ************************/
 
 #include <stdio.h> /* printf */
+#include <stdlib.h> /* free */
 #include <string.h> /* all string library functions*/
 #include <strings.h>
 #include "ws2_string.h" /* my string functions */
@@ -101,15 +102,14 @@ void StrnCpyTest(void)
 
 	printf("*** testing StrnCpy and compare to strncmp ***\n");
 	printf("dest string is: [%s]\nsource string: is [%s], n = %d.\n", str2, str1, 4);
-	printf("StrnCpy's output: [%s].", StrnCpy(str2, str1, 4));
+	printf("StrnCpy's output: [%s].\n", StrnCpy(str2, str1, 4));
 	sprintf(str2, "some text to delete and copy somthing else.");	    
-	printf(" strncpy's output: [%s].\n", strncpy(str2, str1, 4));
+	printf("strncpy's output: [%s].\n", strncpy(str2, str1, 4));
 
-	printf("*** testing StrnCpy and compare to strncmp ***\n");
 	printf("dest string is: [%s]\nsource string: is [%s], n = %d.\n", str4, str3, 4);
-	printf("StrnCpy's output: [%s].", StrnCpy(str4, str3, 4));
+	printf("StrnCpy's output: [%s].\n", StrnCpy(str4, str3, 4));
 	sprintf(str4, "copy empty string with random n to here");	    
-	printf(" strncpy's output: [%s].\n", strncpy(str4, str3, 4));
+	printf("strncpy's output: [%s].\n", strncpy(str4, str3, 4));
 	puts("");
 
 }
@@ -136,6 +136,59 @@ void StrCaseCmpTest(void)
 
 }
 
+void StrChrTest(void)
+{
+	char str[] = "hello world!";
+
+	printf("*** testing StrChr and compare to strchr ***\n");
+	printf("chr = [%c]\nStrChr's output is: ", 'l');
+	printf("[%s]\n", StrChr(str, 'l'));
+	printf("strchr's output is: [%s]\n", strchr(str, 'l'));
+	printf("chr = [%c]\nStrChr's output is: ", ' ');
+	printf("[%s]\n", StrChr(str, ' '));
+	printf("strchr's output is: [%s]\n", strchr(str, ' '));
+	printf("chr = [%c]\nStrChr's output is: ", '!');
+	printf("[%s]\n", StrChr(str, '!'));
+	printf("strchr's output is: [%s]\n", strchr(str, '!'));
+	printf("chr = [%c]\nStrChr's output is: ", '\0');
+	printf("[%s]\n", StrChr(str, '\0'));
+	printf("strchr's output is: [%s]\n", strchr(str, '\0'));
+	printf("chr = [%c]\nStrChr's output is: ", 'a');
+	printf("[%s]\n", StrChr(str, 'a'));
+	printf("strchr's output is: [%s]\n", strchr(str, 'a'));
+	puts("");
+
+}
+
+void StrDupTest(void)
+{
+	char str1[] = "hello world!";
+	char *dest = StrDup(str1);
+	printf("%s\n", dest);
+	free(dest);
+}
+
+void StrCatTest(void)
+{
+	char str1[] = "world!";
+	char str2[20] = "hello ";
+	char str3[] = "hello world!";
+	char str4[20] = "";
+
+	printf("src = [%s]\n", str1);
+	printf("dest = [%s]\n", str2);
+	printf("StrCat's output = [%s]\n", StrCat(str2, str1));
+	sprintf(str2, "hello ");
+	printf("strcat's output = [%s]\n", strcat(str2, str1));
+
+	printf("src = [%s]\n", str3);
+	printf("dest = [%s]\n", str4);
+	printf("StrCat's output = [%s]\n", StrCat(str4, str3));
+	sprintf(str4, "%s", "");
+	printf("strcat's output = [%s]\n", strcat(str4, str3));
+	puts("");
+}
+
 int main()
 {
 	StrLenTest();
@@ -143,6 +196,9 @@ int main()
 	StrCpyTest();
 	StrnCpyTest();
 	StrCaseCmpTest();
+	StrDupTest();
+	StrChrTest();
+	StrCatTest();
 
 	return 0;
 }
