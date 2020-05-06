@@ -60,7 +60,10 @@ char *StrnCpy(char *dest, const char *src, size_t n)
 		*(dest + i) = *(src + i);
 	}	
 	
-	*(dest + i) = '\0';
+	for (i = i; i <= n; ++i)
+	{
+		*(dest + i) = '\0';
+	}
 
 	return (dest);
 }
@@ -71,7 +74,7 @@ int StrCaseCmp(const char *str1, const char *str2)
 
 	while ('\0' != *str1 || '\0' != *str2)
 	{
-		/* let's check if *str1 and *str2 are the same letter diferrence case */ 
+		/* let's check if *str1 and *str2 are same letter diferrent case */ 
 		if ((abs(*str1 - *str2) == upper_lower_difference) &&
 		   ((*str1 <= 'Z' && *str1 >= 'A') || (*str1 <= 'z' && *str1 >= 'a')) &&
 		   ((*str2 <= 'Z' && *str2 >= 'A') || (*str2 <= 'z' && *str2 >= 'a')))

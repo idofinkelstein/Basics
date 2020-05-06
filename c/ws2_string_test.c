@@ -101,11 +101,15 @@ void StrnCpyTest(void)
 
 	printf("*** testing StrnCpy and compare to strncmp ***\n");
 	printf("dest string is: [%s]\nsource string: is [%s], n = %d.\n", str2, str1, 4);
-	printf("StrnCpy's output: [%s]. strcnpy's output: [%s].\n",
-		    StrnCpy(str2, str1, 4), strncpy(str2, str1, 4));
-	printf("dest string is: [%s]\nsource string: is [%s], n = %d.\n", str4, str3, 0);
-	printf("StrnCpy's output: [%s]. strcnpy's output: [%s].\n",
-		    StrnCpy(str4, str3, 0), strncpy(str4, str3, 0));
+	printf("StrnCpy's output: [%s].", StrnCpy(str2, str1, 4));
+	sprintf(str2, "some text to delete and copy somthing else.");	    
+	printf(" strncpy's output: [%s].\n", strncpy(str2, str1, 4));
+
+	printf("*** testing StrnCpy and compare to strncmp ***\n");
+	printf("dest string is: [%s]\nsource string: is [%s], n = %d.\n", str4, str3, 4);
+	printf("StrnCpy's output: [%s].", StrnCpy(str4, str3, 4));
+	sprintf(str4, "copy empty string with random n to here");	    
+	printf(" strncpy's output: [%s].\n", strncpy(str4, str3, 4));
 	puts("");
 
 }
