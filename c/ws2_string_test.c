@@ -259,6 +259,33 @@ void StrnCatTest(void)
 	puts("");
 }
 
+void StrStrTest(void)
+{
+	char str1[] = "dodododidodo";
+	char str2[] = "dododi";
+	char str3[] = "idoidoxidos";
+	char str4[] = "idox";
+	char str5[] = "hello world!";
+	char str6[] = "le";
+	
+	printf("*** testing StrStr and compare to strstr ***\n");
+	printf("haystack = [%s]\n", str1);
+	printf("needle = [%s]\n", str2);
+	printf("StrStr's output = [%s]\n", StrStr(str1, str2));
+	printf("strstr's output = [%s]\n", strstr(str1, str2));
+	puts("");
+	printf("haystack = [%s]\n", str3);
+	printf("needle = [%s]\n", str4);
+	printf("StrStr's output = [%s]\n", StrStr(str3, str4));
+	printf("strstr's output = [%s]\n", strstr(str3, str4));
+	puts("");
+	printf("haystack = [%s]\n", str5);
+	printf("needle = [%s]\n", str6);
+	printf("StrStr's output = [%s]\n", StrStr(str5, str6));
+	printf("strstr's output = [%s]\n", strstr(str5, str6));
+	puts("");
+}
+
 int main()
 {
 	StrLenTest();
@@ -270,6 +297,7 @@ int main()
 	StrChrTest();
 	StrCatTest();
 	StrnCatTest();
+	StrStrTest();
 
 	return 0;
 }

@@ -50,4 +50,9 @@ char *StrCat(char *dest, const char *src);
       bytes. */
 char *StrnCat(char *dest, const char *src, size_t n);
 
+/* The strstr() function finds the first occurrence of the substring nee‐
+   dle in the string haystack.  The terminating null bytes ('\0') are not
+   compared. */
+char *StrStr(const char *haystack, const char *needle);
+
 
