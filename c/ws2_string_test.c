@@ -70,6 +70,7 @@ void StrCpyTest(void)
 	char str9[] = "some text to delete and copy somthing else.";
 	char str10[] = "some text to delete and copy somthing else.";
 	char str11[] = "some text to delete and copy somthing else.";
+	char str12[] = "some text to delete and copy somthing else.";
 
 	printf("*** testing StrCpy and compare to strcpy ***\n");
 	printf("dest string is: [%s]\nsource string: is [%s]\n", str7, str1);
@@ -87,9 +88,9 @@ void StrCpyTest(void)
 	printf("dest string is: [%s]\nsource string: is [%s]\n", str11, str5);
 	printf("StrCpy's output: [%s]. strcpy's output: [%s].\n",
 		    StrCpy(str11, str5), strcpy(str11, str5));
-	printf("dest string is: [%s]\nsource string: is [%s]\n", str11, str6);
+	printf("dest string is: [%s]\nsource string: is [%s]\n", str12, str6);
 	printf("StrCpy's output: [%s]. strcpy's output: [%s].\n",
-		    StrCpy(str11, str6), strcpy(str11, str6));
+		    StrCpy(str12, str6), strcpy(str12, str6));
 	puts("");	
 }
 
@@ -207,6 +208,7 @@ void StrnCatTest(void)
 	printf("strncat's output = [%s]\n", strncat(str2, str1, 3));
 
 	printf("n = 5\n");
+	sprintf(str2, "hello ");
 	printf("src = [%s]\n", str1);
 	printf("dest = [%s]\n", str2);
 	sprintf(str2, "hello ");
@@ -215,6 +217,7 @@ void StrnCatTest(void)
 	printf("strncat's output = [%s]\n", strncat(str2, str1, 5));
 
 	printf("n = 7\n");
+	sprintf(str2, "hello ");
 	printf("src = [%s]\n", str1);
 	printf("dest = [%s]\n", str2);
 	sprintf(str2, "hello ");
@@ -232,6 +235,7 @@ void StrnCatTest(void)
 	puts("");
 
 	printf("n = 12\n");
+	sprintf(str4, "%s", "");
 	printf("src = [%s]\n", str3);
 	printf("dest = [%s]\n", str4);
 	sprintf(str4, "%s", "");
@@ -241,6 +245,7 @@ void StrnCatTest(void)
 	puts("");
 	
 	printf("n = 15\n");
+	sprintf(str4, "%s", "");
 	printf("src = [%s]\n", str3);
 	printf("dest = [%s]\n", str4);
 	sprintf(str4, "%s", "");
@@ -250,6 +255,7 @@ void StrnCatTest(void)
 	puts("");
 
 	printf("n = 0\n");
+	sprintf(str4, "%s", "");
 	printf("src = [%s]\n", str3);
 	printf("dest = [%s]\n", str4);
 	sprintf(str4, "%s", "");
