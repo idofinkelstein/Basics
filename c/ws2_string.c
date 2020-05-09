@@ -13,7 +13,7 @@ reviewer: Hen Shay Hassid
 
 size_t StrLen(const char *str)
 {
-	char *curr = (char*)str;
+	const char *curr = str;
 
 	assert(str);
 	
@@ -36,7 +36,7 @@ int StrCmp(const char *str1, const char *str2)
 		++str2;		
 	}
 	
-	return (*str1-*str2);	
+	return (*str1 - *str2);	
 }
 
 char *StrCpy(char *dest, const char *src)
@@ -106,7 +106,7 @@ char *StrDup(const char *str)
 	
 	assert(str);
 
-	dest = (char*)malloc(sizeof(char) * length + 1);
+	dest = (char*) malloc(sizeof(char) * length + 1);
 
 	if (!dest)
 	{
@@ -120,7 +120,7 @@ char *StrDup(const char *str)
 
 char *StrChr(const char *str, int chr)
 {
-	char *curr = (char*)str;
+	char *curr = (char*) str;
 	size_t length = StrLen(str);
 	
 	assert(str);
@@ -168,14 +168,20 @@ char *StrnCat(char *dest, const char *src, size_t n)
 
 char *StrStr(const char *haystack, const char *needle)
 {
-	size_t i = 0, j = 0, cnt = 0;
+	size_t i = 0;
+	size_t j = 0;
+	size_t cnt = 0;
 	size_t hay_length = StrLen(haystack);
 	size_t nee_length = StrLen(needle);
-	char *curr = (char*)haystack;
-	char *first = (char*)haystack;
+	char *curr = (char*) haystack;
+	char *first = (char*) haystack;
 
 	assert(haystack);
 	assert(needle);
+	
+	/* double loop for running on haystack and searching for needle
+	   by compring all chars, the inner loop is always starting
+	   from current i and this ensures any type of string can be found.*/
 
 	for (i = 0; i < hay_length; ++i)
 	{

@@ -1,3 +1,5 @@
+#ifndef __WS2_STRING_H__
+#define __WS2_STRING_H__
 
 #include <stdio.h> /* size_t */
 
@@ -5,9 +7,9 @@
    s, excluding the terminating null byte ('\0'). */ 
 size_t StrLen(const char *str);
 
-/* The  strcmp()  function compares the two strings s1 and s2.  It returns
-   an integer less than, equal to, or greater than zero if  s1  is  found,
-   respectively, to be less than, to match, or be greater than s2. */
+/* The  strcmp()  function compares the two strings str1 and str2.  It returns
+   an integer less than, equal to, or greater than zero if  str1  is  found,
+   respectively, to be less than, to match, or be greater than str2. */
 int StrCmp(const char *str1, const char *str2);
 
 /* The  strcpy()  function  copies the string pointed to by src, including
@@ -23,10 +25,10 @@ char *StrCpy(char *dest, const char *src);
 char *StrnCpy(char *dest, const char *src, size_t n);
 
 /* The  strcasecmp()  function  performs  a byte-by-byte comparison of the
-   strings s1 and s2, ignoring the case of the characters.  It returns  an
-   integer  less  than,  equal  to,  or  greater than zero if s1 is found,
-   respectively, to be less than, to match, or be greater than s2. */
-int StrCaseCmp(const char *s1, const char *s2);
+   strings str1 and str2, ignoring the case of the characters.  It returns  an
+   integer  less  than,  equal  to,  or  greater than zero if str1 is found,
+   respectively, to be less than, to match, or be greater than str2. */
+int StrCaseCmp(const char *str1, const char *str2);
 
 /* The  strdup()  function  returns  a  pointer to a new string which is a
    duplicate of the string s.  Memory for the new string is obtained  with
@@ -34,7 +36,7 @@ int StrCaseCmp(const char *s1, const char *s2);
 char *StrDup(const char *str);
 
 /* The  strchr() function returns a pointer to the first occurrence of the
-   character c in the string s. */
+   character c in the string str. */
 char *StrChr(const char *str, int chr);
 
 /* The  strcat() function appends the src string to the dest string, over‐
@@ -55,4 +57,4 @@ char *StrnCat(char *dest, const char *src, size_t n);
    compared. */
 char *StrStr(const char *haystack, const char *needle);
 
-
+#endif  /* __WS2_STRING_H__ */

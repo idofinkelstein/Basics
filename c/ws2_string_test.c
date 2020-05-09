@@ -37,19 +37,26 @@ void StrCmpTest(void)
 	char str4[] = "hello woold!";
 
 	printf("*** testing StrCmp and compare to strcmp ***\n");
-	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCmp's output: %d. strcmp's output: %d.\n",
+	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCmp's output:"
+		   "%d. strcmp's output: %d.\n",
 		    str1, str2, StrCmp(str1, str2), strcmp(str1, str2));
-	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCmp's output: %d. strcmp's output: %d.\n",
+	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCmp's output:"
+		   " %d. strcmp's output: %d.\n",
 		    str2, str1, StrCmp(str2, str1), strcmp(str2, str1));
-	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCmp's output: %d. strcmp's output: %d.\n",
+	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCmp's output:"
+		   " %d. strcmp's output: %d.\n",
 			str3, str2, StrCmp(str3, str2), strcmp(str3, str2));
-	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCmp's output: %d. strcmp's output: %d.\n",
+	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCmp's output:"
+		   " %d. strcmp's output: %d.\n",
 			str2, str3, StrCmp(str2, str3), strcmp(str2, str3));
-	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCmp's output: %d. strcmp's output: %d.\n",
+	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCmp's output:"
+		   " %d. strcmp's output: %d.\n",
 		    str2, str2, StrCmp(str2, str2), strcmp(str2, str2));
-	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCmp's output: %d. strcmp's output: %d.\n",
+	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCmp's output:"
+		   " %d. strcmp's output: %d.\n",
 		    str1, str1, StrCmp(str1, str1), strcmp(str1, str1));
-	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCmp's output: %d. strcmp's output: %d.\n",
+	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCmp's output:"
+		   " %d. strcmp's output: %d.\n",
 		    str3, str4, StrCmp(str3, str4), strcmp(str3, str4));
 	puts("");
 
@@ -125,13 +132,17 @@ void StrCaseCmpTest(void)
 	char str6[] = "hello to you!";
 
 	printf("*** testing StrCaseCmp and compare to strcasecmp ***\n");
-	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCaseCmp's output: %d. strcasecmp's output: %d.\n",
+	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCaseCmp's output: %d."
+		   "strcasecmp's output: %d.\n",
 		    str1, str2, StrCaseCmp(str1, str2), strcasecmp(str1, str2));
-	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCaseCmp's output: %d. strcasecmp's output: %d.\n",
+	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCaseCmp's output: %d."
+		   "strcasecmp's output: %d.\n",
 		    str3, str4, StrCaseCmp(str3, str4), strcasecmp(str3, str4));
-	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCaseCmp's output: %d. strcasecmp's output: %d.\n",
+	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCaseCmp's output: %d."
+		   "strcasecmp's output: %d.\n",
 			str5, str6, StrCaseCmp(str5, str6), strcasecmp(str5, str6));
-	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCaseCmp's output: %d. strcasecmp's output: %d.\n",
+	printf("string1 is: [%s]\nstring2 is: [%s]\nStrCaseCmp's output: %d."
+		   "strcasecmp's output: %d.\n",
 			str6, str5, StrCaseCmp(str6, str5), strcasecmp(str6, str5));
 	puts("");
 
