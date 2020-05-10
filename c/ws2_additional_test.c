@@ -1,6 +1,12 @@
+/**************************
+file name: ws2.additional_test.c
+author: Ido Finkelstein
+reviewer: Anna Poryadkov
+sanding date: 10/5/20
+***************************/
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdio.h> /* priintf */
+#include <stdlib.h> /* free */
 #include "ws2_additional.h"
 
 void IsPalindromeTest(void)

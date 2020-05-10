@@ -1,5 +1,12 @@
-#include <stdlib.h>
-#include "ws2_string.h"
+/**************************
+file name: ws2.additional.c
+author: Ido Finkelstein
+reviewer: Anna Poryadkov
+sanding date: 10/5/20
+***************************/
+
+#include <stdlib.h> /* printf */
+#include "ws2_string.h" 
 #include "ws2_string.c"
 
 int IsPalindrome(const char *str)
@@ -24,15 +31,13 @@ int IsPalindrome(const char *str)
 }
 
 
-int *SwapPointers(int *ptr1, int *ptr2)
+void SwapPointers(int *ptr1, int *ptr2)
 {
 	int *tmp_ptr = NULL;
 
 	tmp_ptr = ptr1;
 	ptr1 = ptr2;
 	ptr2 = tmp_ptr;
-
-	return (ptr1);
 }
 
 void SevenBoom(int from, int to)
@@ -40,7 +45,8 @@ void SevenBoom(int from, int to)
 	int is_seven = 0;
 	int num = 0;
 	size_t size = to - from + 1;
-	int *arr = (int*) malloc(sizeof(int) * size);
+	int *arr = (int*) malloc(sizeof(int) * size); /* creating array
+													 for the numbers */
 	int *curr = arr;
 	int *start = arr;
 	int *stop = arr + size - 1;
@@ -51,18 +57,18 @@ void SevenBoom(int from, int to)
 	num = *curr;
 
 	
-	while(arr <= stop)
+	while(arr <= stop) /* adding values to array */
 	{
 		*arr = num;
 		++arr;
 		++num;
 	}
 
-	while (curr <= stop)
+	while (curr <= stop) /* running on the array */
 	{
 		num = *curr;
-		is_negative = num < 0;
-		sign = -1 * is_negative + !is_negative;
+		is_negative = num < 0; /* for negative numbers */
+		sign = -1 * is_negative + !is_negative; /* for negative numbers */
 		
 		if (0 == (num * sign) % 7)
 		{
@@ -77,20 +83,23 @@ void SevenBoom(int from, int to)
 		
 		while (num != 0)
 		{
-			is_seven = ((num * sign) % 10);
+			is_seven = ((num * sign) % 10); /* extracting the least sagnificant
+											   digit from number */
 			
 
-			if (7 == is_seven)
+			if (7 == is_seven) /* checking if digit equals 7 */
 			{
 				printf("BOOM, ");
 
 				++curr;
 
-				break;
+				break; /* if it is, breaking the loop */
 			}
-			else
+			else /* checking if the number contains the digit 7 */
 			{
-				num = num / 10;
+				num = num / 10; /* if it is not, dividing the number in 10
+								   for extracting the least significant 
+								   digit in the next iteration */
 			}
 			
 			if (0 == num)
@@ -112,7 +121,9 @@ char *RemoveSpaces(char *str)
 	size_t length = StrLen(str);
 	char *curr = str + length - 1;
 
-	while ((*curr == ' ' || *curr == '\t'))
+	while ((*curr == ' ' || *curr == '\t')) /* removing white-spaces from the
+											   the end of the string and replacing
+											   them with '\0' */
 	{
 		*curr = '\0';
 		--curr;
@@ -120,7 +131,8 @@ char *RemoveSpaces(char *str)
 
 	curr = str;
 
-	while ((*curr == ' ' || *curr == '\t'))
+	while ((*curr == ' ' || *curr == '\t')) /* removing white-spaces from the
+											   beginning */
 	{
 		++curr;
 	}
@@ -128,6 +140,8 @@ char *RemoveSpaces(char *str)
 	StrCpy(str, curr);
 	curr = str;
 	
+	/* this loop checks if the current char and next one is white-space,
+	   if it is, it calls StrCpy() to fix it */
 	while (*curr)
 	{
 		if ((*curr == ' ' || *curr == '\t') &&
@@ -143,7 +157,8 @@ char *RemoveSpaces(char *str)
 
 	curr = str;
 
-	while (*curr)
+	/* i had some bugs with the '\t' char so i replaced them with ' ' */
+	while (*curr) 
 	{
 		if (*curr == '\t')
 		{
@@ -177,6 +192,15 @@ char *AddBigNumbers(char *num1, char *num2)
 	assert(num1);
 	assert(num2);
 
+	/* this if statement check which of the strings is longer and preper a
+	   new string in the length of the longer one for the shorter one.
+	   after the new string is ready, the short string goes to the new
+	   string from the end backward and the rest of the string padded with 
+	   zeros.
+	   after the new string is ready it adds the numbers by first converting them 
+	   to int according to ascii table, than adds them, saves the remainder,
+	   converts back to chars and places them in string sum.
+	   the else statement does the same for the case that num1_len < num2_len. */
 	if (num1_len > num2_len)
 	{
 		sum_len = num1_len + 1;
