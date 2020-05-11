@@ -11,6 +11,7 @@ date: 11.5.2020
 #include <ctype.h>  /* tolower      */
 #include <assert.h>
 
+/* the function EnvPrint prints all the enviorment variables */
 void EnvPrint(char **envp)
 {
 	assert(envp);
@@ -21,6 +22,7 @@ void EnvPrint(char **envp)
 	}
 }
 
+/* the function ToLower converts str to lower case letters */
 void ToLowerStr(char *str)
 {
 	assert(str);
@@ -32,6 +34,8 @@ void ToLowerStr(char *str)
 	}
 }
 
+/* the function EnvCopy copies all the enviorment variables to 
+   array of pointers of char type */
 char **EnvCopy(char **envp, size_t size)
 {
 	char **new_envp = NULL;
@@ -65,6 +69,7 @@ char **EnvCopy(char **envp, size_t size)
 	return (start);
 }
 
+/* the function EnvSize finds the size of an array of pointers */
 size_t EnvSize(char **envp)
 {
 	size_t size = 0;
@@ -79,6 +84,7 @@ size_t EnvSize(char **envp)
 	return size;
 }
 
+/* the function EnvFree frees the memory of an array of pointers */
 void EnvFree(char **envp, size_t size)
 {
 	size_t i = 0;
@@ -90,6 +96,7 @@ void EnvFree(char **envp, size_t size)
 		free(envp[i]);
 	}	
 }
+
 
 int main(int argc, char *argv[], char *envp[])
 {
