@@ -11,6 +11,14 @@ date: 11.5.2020
 #include <ctype.h>  /* tolower      */
 #include <assert.h>
 
+#define UNUSED (void)argc, (void)argv
+
+void EnvPrint(char **envp);
+void ToLowerStr(char *str);
+char **EnvCopy(char **envp, size_t size);
+size_t EnvSize(char **envp);
+void EnvFree(char **envp);
+
 /* the function EnvPrint prints all the enviorment variables */
 void EnvPrint(char **envp)
 {
@@ -54,10 +62,11 @@ char **EnvCopy(char **envp, size_t size)
 
 	while (0 != *envp)
 	{	
-		*new_envp = (char*) malloc(sizeof(char) * strlen(*envp) + 1); 
+		*new_envp = (char*) malloc(sizeof(char) * (strlen(*envp) + 1)); 
 
 		if(*new_envp == NULL)
 		{
+			EnvFree(new_envp);
 			return (NULL);
 		}
 
@@ -85,16 +94,16 @@ size_t EnvSize(char **envp)
 }
 
 /* the function EnvFree frees the memory of an array of pointers */
-void EnvFree(char **envp, size_t size)
+void EnvFree(char **envp)
 {
-	size_t i = 0;
-
 	assert(envp);
 
-	for (i = 0; i < size; ++i) 
+	while (0 != *envp)
 	{	
-		free(envp[i]);
-	}	
+		free(*envp++);
+	}
+	
+	free(*envp);
 }
 
 
@@ -103,11 +112,13 @@ int main(int argc, char *argv[], char *envp[])
 	char **new_envp = NULL;
 	size_t size = EnvSize(envp);
 
+	UNUSED;
+
 	new_envp = EnvCopy(envp, size);
 
 	EnvPrint(new_envp);
 
-	EnvFree(new_envp, size);
+	EnvFree(new_envp);
 
 	free(new_envp);
 
