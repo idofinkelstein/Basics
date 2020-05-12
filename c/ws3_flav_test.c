@@ -22,8 +22,10 @@ int main()
 	Flav(8);
 
 	Flav(9);
+	
+	Flav(20);
 
-	Flav(14);
+	Flav(100);
 		
 	return 0;	
 }

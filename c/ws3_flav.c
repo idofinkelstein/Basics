@@ -18,96 +18,69 @@ void InitArray(int arr[], unsigned n)
 	}	
 }
 
-void PrintArray(int arr[], unsigned n)
-{
-	size_t i =  0;
+/* The function kill checks for the last standing man and changes the value
+   of the varible winner:
+   If i just killed someone, i jump to the next one, kill flag is raised and
+   there are 2 options, if next one is dead, jump to the next one, if he is 
+   alive turn off the flag and jump to the next one,
+   now when the flag is down there are also 2 options, if the next man is dead
+   jump to the next one, if he is alive kill him raise the flag and jump to the
+   next one. we do this until we have 1 servivor left.
 
-	for (i = 0; i < n; ++i)
-	{
-		printf("%d ", arr[i]);
-	}
+   To know the position of the winner the varible winner saves the index of i
+   in the position of the man how is giong to do the next kill.*/
 
-	puts("");	
-}
-
-
-/* the function kill checks for the last standing man and changes the value
-   of the pointer *winner */
-int Kill(int arr[], unsigned n, int servivors, int *kill, int *winner)
+int Kill(int arr[], unsigned n)
 {
 	size_t i = 0;
+	int kill = 1; /* killing flag */
+	int winner = 0;
+	unsigned servivors = n;
 	
-	while (i < n)
+	
+	while (servivors > 1)
 	{
-		if (*kill == 1)
-		{			
-			
+		if (kill == 1)
+		{					
 			if(arr[i] == 1)
-			{
-				
-				*kill = 0;
-				*winner = i;
+			{		
+				kill = 0;
+				winner = i;
 
-				if(i == n - 1)
-				{	
-					break;
-				}
-
-				++i;
-				
+				i = (i + 1) % n;
 			}
 			else
 			{
-				if(i == n - 1)
-				{	
-					break;
-				}
-
-				++i;
+				i = (i + 1) % n;
 			}
 		}
 
-		if (*kill == 0)
+		if (kill == 0)
 		{
 			if(arr[i] == 0)
 			{
-				if(i == n - 1)
-				{	
-					break;
-				}
-
-				++i;
+				i = (i + 1) % n;
 			}
 			else
 			{
-				*kill = 1;
+				kill = 1;
 				arr[i] = 0;
 				
 				--servivors;
 
-				if(i == n - 1)
-				{
-					break;
-				}
-
-				++i;
+				i = (i + 1) % n;
 			}
 		}
 	}
 
-	
-	return (servivors);
+	return (winner);
 }
 
 int Flav(unsigned n)
 {
-	int servivors = n; /* for knowing how many servivors left each round */
-	int *arr = (int*) malloc(n * sizeof(int));
-	int kill = 1; /* kill flag */
-	int *ptr_kill = &kill; /* *kill pointer to send to function each iteration */
-	int winner = 0; /* this is winning man */
-	int *ptr_winner = &winner; /* also being sent to function each iteration */
-
+	int *arr = (int*) malloc(n * sizeof(int));	
+	int winner = 0; /* this is the winning man */
+	 
 	if (NULL == arr)
 	{
 		return (0);
@@ -115,15 +88,9 @@ int Flav(unsigned n)
 
 	InitArray(arr, n);
 
-	PrintArray(arr,n);
+	winner = Kill(arr, n);
 
-	while (servivors > 1)
-	{
-		servivors = Kill(arr, n, servivors, ptr_kill, ptr_winner);
-		PrintArray(arr,n);
-	}
-
-	printf("the winner is: %d\n", *ptr_winner);
+	printf("the winner for %d worriors is: %d (%d)\n", n, winner, winner + 1);
 	
 	free(arr);
 
