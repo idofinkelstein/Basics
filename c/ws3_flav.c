@@ -46,30 +46,22 @@ int Kill(int arr[], unsigned n)
 			{		
 				kill = 0;
 				winner = i;
+			}
 
-				i = (i + 1) % n;
-			}
-			else
-			{
-				i = (i + 1) % n;
-			}
+			i = (i + 1) % n;
 		}
 
 		if (kill == 0)
 		{
-			if(arr[i] == 0)
-			{
-				i = (i + 1) % n;
-			}
-			else
+			if(arr[i] == 1)
 			{
 				kill = 1;
 				arr[i] = 0;
 				
 				--servivors;
-
-				i = (i + 1) % n;
 			}
+
+			i = (i + 1) % n;
 		}
 	}
 
