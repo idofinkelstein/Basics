@@ -12,9 +12,8 @@ date: 14.5.2020
 #define TRUE 1
 #define FALSE 0
 
-static int A(void);
-static int T(void);
-static int Esc(void);
+static int CharPressed(char);
+static int Esc(char);
 
 static int If(void)
 {
@@ -71,49 +70,49 @@ static int Switch(void)
 
 static int LUT(void)
 {
-	int (*PtrLUT[256])(void);
+	static int (*PtrLUT[256])(char);
 	int i = 0;
-	unsigned char c = '\0';
-	int quit = TRUE;
+	char c = '\0';
+	char no_esc = ESC;
 	
 	for (i = 0; i < 256; ++i)
 	{
 		PtrLUT[i] = NULL;
 	}
 
-	PtrLUT['A'] = A;
-	PtrLUT['T'] = T;
+	PtrLUT['A'] = CharPressed;
+	PtrLUT['T'] = CharPressed;	
 	PtrLUT[ESC] = Esc;
 
 	system("stty -icanon -echo");	
 	
-	while (quit)
+	while (no_esc)
 	{
-		c = (unsigned char)getchar();
-		quit = (*PtrLUT[c])();
+		c = getchar();
+	
+		if (PtrLUT[(unsigned char)c] != NULL)
+		{
+			no_esc = PtrLUT[(unsigned char)c](c);
+		}	
 	}
 
 	return 0;
 }
 
-static int A(void)
+static int CharPressed(char c)
 {
-	puts("A pressed");
+	printf("%c pressed\n", c);
 	
 	return TRUE;
 }
 
-static int T(void)
-{	
-	puts("T pressed");
-	
-	return TRUE;
-}
-
-static int Esc(void)
+static int Esc(char c)
 {
+	c = FALSE;
+
 	system("stty icanon echo");
-	return FALSE;
+
+	return (c);
 }
 
 int main ()
