@@ -28,7 +28,7 @@ long Add(unsigned int x, unsigned int y)
 	return (result);
 }
 
-/* computes the value of x * (2 ^ y) and returns the result */
+/* computes the value of x * (2 ^ y) and returns the result (the hard way) */
 long Pow2(unsigned int x, unsigned int y)
 {
 	unsigned int result = 2;
@@ -63,6 +63,12 @@ long Pow2(unsigned int x, unsigned int y)
 	return (result);
 }
 
+/* computes the value of x * (2 ^ y) and returns the result (the easy way) */
+long PowTwo(unsigned int x, unsigned int y)
+{
+	return (x << y);
+}
+
 int IsPowerOf2(unsigned int num)
 {
 	unsigned int one = 1;
@@ -80,9 +86,7 @@ int IsPowerOf2(unsigned int num)
 		if (one == (num & one))
 		{
 			++is_pow_of_two;
-			
-			
-			
+					
 			if (1 < is_pow_of_two)
 			{
 				return 0;

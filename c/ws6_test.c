@@ -18,6 +18,14 @@ static void Pow2Test(void)
 	printf("%d * (2 ^ %d) = %ld\n", a, b, Pow2(a, b));
 }
 
+void PowTwoTest(void)
+{
+	unsigned int a = 5;
+	unsigned int b = 6;
+
+	printf("%d * (2 ^ %d) = %ld\n", a, b, PowTwo(a, b));
+}
+
 static void IsPowerOf2Test(void)
 {	
 	unsigned int num = 0;
@@ -68,6 +76,7 @@ void ByteMirrorTest(void)
 int main()
 {
 	Pow2Test();
+	PowTwoTest();
 	IsPowerOf2Test();
 	Add1Test();
 	HasOnly3BitsTest();

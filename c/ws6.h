@@ -22,4 +22,6 @@ int Are2Or6On(unsigned char c);
 
 unsigned char ByteMirror(unsigned char ch);
 
+long PowTwo(unsigned int x, unsigned int y);
+
 #endif /* __WS6_H__ */
