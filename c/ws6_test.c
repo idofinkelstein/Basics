@@ -77,13 +77,32 @@ static void Are2Or6OnTest(void)
 	printf("%d: %d\n", ch, Are2Or6On(ch));
 }
 
-void ByteMirrorTest(void)
+static void ByteMirrorTest(void)
 {
 	unsigned char ch = 116;
 
 	printf("%d is now %d\n", ch, ByteMirror(ch));
 }
 
+static void NearestDivisibleBy16Test(void)
+{
+	unsigned int num = 0;
+	
+	for(num = 10; num < 66 ; ++num)
+	{
+		printf("%d, ", NearestDivisibleBy16(num)); 
+	}
+
+	printf("\n");
+}
+
+void BitCounterTest()
+{
+	int num = 9345634;
+
+	BitCounter(num);
+}
+	
 int main()
 {
 	Pow2Test();
@@ -95,6 +114,8 @@ int main()
 	Are2And6OnTest();
 	Are2Or6OnTest();
 	ByteMirrorTest();
+	NearestDivisibleBy16Test();
+	BitCounterTest();
 	
 
 	return 0;

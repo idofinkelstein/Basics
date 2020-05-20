@@ -96,7 +96,7 @@ int IsPowerOf2NoLoop(unsigned int num)
 		return 0;
 	}
 
-	return (num == (num & ~(num - 1)));
+	return (num == (num & (~num + 1)));
 }
 
 /* adds 1 */
@@ -154,7 +154,7 @@ void HasOnly3Bits(unsigned int* arr, int size)
 /* checks if 2 and 6 bit are set */
 int Are2And6On(unsigned char c)
 {
-	unsigned char two_and_six_are_on = 34;
+	unsigned char two_and_six_are_on = 34; /* 00100010 */
 	unsigned char answer = 0;
 
 	answer = c & two_and_six_are_on;
@@ -176,17 +176,6 @@ int Are2Or6On(unsigned char c)
 
 	return (answer);	
 }
-/*
-int SwapBit3And5(unsigned char c)
-{
-	unsigned char bit3 = 4;
-	unsigned char bit5 = 16;
-	unsigned char swap3 = 0;
-	unsigned char swap5 = 0;
-
-	swap3 = bit5 & 
-}
-*/
 
 unsigned char ByteMirror(unsigned char ch)
 {
@@ -213,8 +202,45 @@ unsigned char ByteMirror(unsigned char ch)
 
 unsigned int NearestDivisibleBy16(unsigned int num)
 {
-	if (num < 16)
-		num = 1;
-	return 0;
+	unsigned int msb = 0x80000000;	
+
+	if(16 > num)
+	{
+		return (FALSE);
+	}
+
+	while (!(msb & num))
+	{
+		msb >>= 1;
+	}
+		
+	return (msb);
 
 }
+
+void BitCounter(unsigned int num)
+{
+	int bit_count = 0;
+	unsigned int lsb = 1;
+
+	while (num)
+	{
+		bit_count += lsb & num;
+
+		num >>= 1;
+	}
+
+	printf("nuber of set bits = %d\n", bit_count);
+}
+
+/*
+int SwapBit3And5(unsigned char c)
+{
+	unsigned char bit3 = 4;
+	unsigned char bit5 = 16;
+	unsigned char swap3 = 0;
+	unsigned char swap5 = 0;
+
+	swap3 = bit5 & 
+}
+*/
