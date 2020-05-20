@@ -12,6 +12,8 @@ unsigned long Pow2(unsigned int x, unsigned int y);
 
 int IsPowerOf2(unsigned int num);
 
+int IsPowerOf2NoLoop(unsigned int num);
+
 int Add1(int num);
 
 void HasOnly3Bits(unsigned int* arr, int size);

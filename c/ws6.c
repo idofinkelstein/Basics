@@ -75,31 +75,28 @@ long PowTwo(unsigned int x, unsigned int y)
 int IsPowerOf2(unsigned int num)
 {
 	unsigned int one = 1;
-	int is_pow_of_two = 0;
-	
-	if (0 == num)
-	{
-		return (FALSE);
-	}
+	unsigned int bit_count = 0;
 	
 	/* this loop compares the LSB of num and 1,
 	   if there is more than 1 match num is not power of two */
-	while (0 < num)
-	{
-		if (one == (num & one))
-		{
-			++is_pow_of_two;
-					
-			if (1 < is_pow_of_two)
-			{
-				return (FALSE);
-			}
-		}
-
+	while (num && 2 > bit_count)
+	{			
+		bit_count += num & one;		
+		
 		num >>= 1;
 	}
 
-	return (TRUE);	
+	return (bit_count == one);	
+}
+
+int IsPowerOf2NoLoop(unsigned int num)
+{
+	if(0 == num)
+	{
+		return 0;
+	}
+
+	return (num == (num & ~(num - 1)));
 }
 
 /* adds 1 */
@@ -136,13 +133,10 @@ void HasOnly3Bits(unsigned int* arr, int size)
 	{
 		num_to_check = arr[i];
 
-		while (0 < num_to_check)
+		while (0 < num_to_check && 4 > is_contain_3_bits)
 		{
-			if (one == (num_to_check & one))
-			{
-				++is_contain_3_bits;
-			}	
-						
+			is_contain_3_bits += num_to_check & one;
+									
 			num_to_check >>= 1;			
 		}
 
@@ -214,5 +208,13 @@ unsigned char ByteMirror(unsigned char ch)
 	}
 	
 	return (mirror_char);
+
+}
+
+unsigned int NearestDivisibleBy16(unsigned int num)
+{
+	if (num < 16)
+		num = 1;
+	return 0;
 
 }

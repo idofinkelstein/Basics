@@ -18,7 +18,7 @@ static void Pow2Test(void)
 	printf("%d * (2 ^ %d) = %ld\n", a, b, Pow2(a, b));
 }
 
-void PowTwoTest(void)
+static void PowTwoTest(void)
 {
 	unsigned int a = 5;
 	unsigned int b = 6;
@@ -32,9 +32,20 @@ static void IsPowerOf2Test(void)
 	
 	for(num = 0; num < 20; ++num)
 	{
-		printf("is %d power of two? %d\n", num, IsPowerOf2(num)); 
+		printf("is %d power of two? (with loop) %d\n", num, IsPowerOf2(num)); 
 	}
 }
+
+static void IsPowerOf2NoLoopTest(void)
+{
+	unsigned int num = 0;
+	
+	for(num = 0; num < 20; ++num)
+	{
+		printf("is %d power of two? (without loop) %d\n", num, IsPowerOf2NoLoop(num)); 
+	}
+}
+
 
 static void Add1Test(void)
 {
@@ -78,6 +89,7 @@ int main()
 	Pow2Test();
 	PowTwoTest();
 	IsPowerOf2Test();
+	IsPowerOf2NoLoopTest();
 	Add1Test();
 	HasOnly3BitsTest();
 	Are2And6OnTest();
