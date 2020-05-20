@@ -7,6 +7,9 @@ date: 19/5/2020
 
 #include <stdio.h> /* printf */
 
+#define TRUE 1
+#define FALSE 0 
+
 /* assistant function for adding */
 long Add(unsigned int x, unsigned int y)
 {
@@ -76,7 +79,7 @@ int IsPowerOf2(unsigned int num)
 	
 	if (0 == num)
 	{
-		return 0;
+		return (FALSE);
 	}
 	
 	/* this loop compares the LSB of num and 1,
@@ -89,14 +92,14 @@ int IsPowerOf2(unsigned int num)
 					
 			if (1 < is_pow_of_two)
 			{
-				return 0;
+				return (FALSE);
 			}
 		}
 
 		num >>= 1;
 	}
 
-	return 1;	
+	return (TRUE);	
 }
 
 /* adds 1 */
