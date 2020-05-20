@@ -95,7 +95,7 @@ int IsPowerOf2NoLoop(unsigned int num)
 	{
 		return 0;
 	}
-
+	/*  */
 	return (num == (num & (~num + 1)));
 }
 
@@ -233,14 +233,75 @@ void BitCounter(unsigned int num)
 	printf("nuber of set bits = %d\n", bit_count);
 }
 
-/*
-int SwapBit3And5(unsigned char c)
+unsigned CharBitCount(char ch)
 {
-	unsigned char bit3 = 4;
-	unsigned char bit5 = 16;
-	unsigned char swap3 = 0;
-	unsigned char swap5 = 0;
+	char dup = ch;
+	unsigned char mask = 1<<7;
+	unsigned count = 0;
 
-	swap3 = bit5 & 
+	while (ch)
+	{
+		ch &= (ch - 1);
+		
+		++count;	
+	}
+	while(mask)
+	{
+		printf("%d, ", (dup & mask) / mask);
+
+		mask >>=1;
+	}
+
+
+	return (count);
 }
-*/
+
+void FloatBitCounter(float num)
+{
+	char bit_count = 0;
+	char *f_ptr = (char*)&num;
+	unsigned size = sizeof(float) / sizeof (char);
+
+	printf("nuber chars in float %d\n", size);
+
+	while (size)
+	{
+		bit_count += CharBitCount(*f_ptr);
+
+		++f_ptr;
+		--size;
+	}
+
+	printf("nuber of set bits = %d\n", bit_count);
+}
+
+void SwapVariables(int *num1, int *num2)
+{
+	*num1 = *num1 ^ *num2;
+	*num2 = *num1 ^ *num2;
+	*num1 = *num1 ^ *num2;
+}
+
+int swapBits(unsigned int x) 
+{ 
+    /* Move all bits of first set to rightmost side */
+    unsigned int set1 =  (x >> 4); 
+  
+    /* Move all bits of second set to rightmost side */
+    unsigned int set2 =  (x >> 6) ; 
+  
+    /* XOR the two sets */
+    unsigned int xor = (set1 ^ set2); 
+
+	unsigned int result= 0;
+  
+    /* Put the xor bits back to their original positions */
+    xor = (xor << 4) | (xor << 6); 
+  
+    /* XOR the 'xor' with the original number so that the  
+       two sets are swapped */
+    result = x ^ xor; 
+  
+    return result; 
+}
+

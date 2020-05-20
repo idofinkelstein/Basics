@@ -96,11 +96,37 @@ static void NearestDivisibleBy16Test(void)
 	printf("\n");
 }
 
-void BitCounterTest()
+static void FloatBitCounterTest(void)
 {
-	int num = 9345634;
+	float num = 8.5;
+
+	FloatBitCounter(num);
+}
+
+static void BitCounterTest()
+{
+	int num = 222;
 
 	BitCounter(num);
+}
+
+static void swapBitsTest(void)
+{
+	int num = 44;
+	
+	printf("%d\n", swapBits(num));
+}
+
+void SwapVariablesTest(void)
+{
+	int a = 12;
+	int b = 25;
+
+	printf("a = %d, b = %d\n", a, b);
+
+	SwapVariables(&a, &b);
+
+	printf("a = %d, b = %d\n", a, b);
 }
 	
 int main()
@@ -116,6 +142,10 @@ int main()
 	ByteMirrorTest();
 	NearestDivisibleBy16Test();
 	BitCounterTest();
+	FloatBitCounterTest();
+	swapBitsTest();
+	SwapVariablesTest();
+
 	
 
 	return 0;
