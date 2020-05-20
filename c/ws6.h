@@ -20,4 +20,6 @@ int Are2And6On(char c);
 
 int Are2Or6On(unsigned char c);
 
+unsigned char ByteMirror(unsigned char ch);
+
 #endif /* __WS6_H__ */

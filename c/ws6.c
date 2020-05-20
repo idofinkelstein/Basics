@@ -161,6 +161,7 @@ int Are2And6On(unsigned char c)
 	return (answer == two_and_six_are_on);	
 }
 
+/* checks if 2 or 6 bit are set */
 int Are2Or6On(unsigned char c)
 {
 	unsigned char two_and_six_are_on = 34;
@@ -185,3 +186,26 @@ int SwapBit3And5(unsigned char c)
 	swap3 = bit5 & 
 }
 */
+
+unsigned char ByteMirror(unsigned char ch)
+{
+	unsigned char msb = 128;
+	unsigned char mirror_char = 0;
+	unsigned tmp_bit = 0;
+	int len_of_byte = 8;
+	int i = 0;
+
+	for (i = 1; i < len_of_byte; ++i)
+	{
+		tmp_bit = ch & msb;
+
+		mirror_char =  mirror_char ^ tmp_bit;
+
+		ch <<= 1;
+
+		mirror_char >>= 1;
+	}
+	
+	return (mirror_char);
+
+}

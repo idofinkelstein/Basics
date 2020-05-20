@@ -58,6 +58,13 @@ static void Are2Or6OnTest(void)
 	printf("%d: %d\n", ch, Are2Or6On(ch));
 }
 
+void ByteMirrorTest(void)
+{
+	unsigned char ch = 116;
+
+	printf("%d is now %d\n", ch, ByteMirror(ch));
+}
+
 int main()
 {
 	Pow2Test();
@@ -66,6 +73,7 @@ int main()
 	HasOnly3BitsTest();
 	Are2And6OnTest();
 	Are2Or6OnTest();
+	ByteMirrorTest();
 	
 
 	return 0;
