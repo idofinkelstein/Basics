@@ -69,7 +69,7 @@ long Pow2(unsigned int x, unsigned int y)
 /* computes the value of x * (2 ^ y) and returns the result (the easy way) */
 long PowTwo(unsigned int x, unsigned int y)
 {
-	return (x << y);
+	return ((long)x << y);
 }
 
 int IsPowerOf2(unsigned int num)
@@ -90,13 +90,8 @@ int IsPowerOf2(unsigned int num)
 }
 
 int IsPowerOf2NoLoop(unsigned int num)
-{
-	if(0 == num)
-	{
-		return 0;
-	}
-	
-	return (num == (num & (~num + 1))); /* equivalent to ~(n - 1) */
+{	
+	return (num && num == (num & (~num + 1))); /* equivalent to ~(n - 1) */
 }
 
 /* adds 1 */
@@ -154,103 +149,72 @@ void HasOnly3Bits(unsigned int* arr, int size)
 /* checks if 2 and 6 bit are set */
 int Are2And6On(unsigned char c)
 {
-	unsigned char two_and_six_are_on = 34; /* 00100010 */
-	unsigned char answer = 0;
-
-	answer = c & two_and_six_are_on;
-
-	return (answer == two_and_six_are_on);	
+	unsigned char mask2_6 = 0x22; /* 00100010 */
+	
+	return (mask2_6 == (c & mask2_6));	
 }
 
 /* checks if 2 or 6 bit are set */
 int Are2Or6On(unsigned char c)
 {
-	unsigned char two_and_six_are_on = 34;
-	unsigned char six_is_on = 32;
-	unsigned char two_is_on = 2;	
-	unsigned char answer = 0;
+	unsigned char mask6 = 0x20;
+	unsigned char mask2 = 0x2;	
 
-	answer = c & two_and_six_are_on;
-
-	answer = answer & six_is_on || answer & two_is_on;
-
-	return (answer);	
+	return (c & mask6 || c & mask2);	
 }
 
 unsigned char ByteMirror(unsigned char ch)
 {
-	unsigned char msb = 128;
+	unsigned char msb = 0x80;
 	unsigned char mirror_char = 0;
-	unsigned tmp_bit = 0;
 	int len_of_byte = 8;
 	int i = 0;
 
-	for (i = 1; i < len_of_byte; ++i)
+	for (i = 0; i < len_of_byte; ++i)
 	{
-		tmp_bit = ch & msb;
+		mirror_char >>= 1;
 
-		mirror_char =  mirror_char ^ tmp_bit;
+		mirror_char ^= (ch & msb);
 
 		ch <<= 1;
-
-		mirror_char >>= 1;
 	}
 	
 	return (mirror_char);
-
 }
 
 unsigned int NearestDivisibleBy16(unsigned int num)
-{
-	unsigned int msb = 0x80000000;	
-
-	if(16 > num)
-	{
-		return (FALSE);
-	}
-
-	while (!(msb & num))
-	{
-		msb >>= 1;
-	}
-		
-	return (msb);
-
+{	
+	return (num & ~0xF);
 }
 
 void BitCounter(unsigned int num)
 {
 	int bit_count = 0;
-	unsigned int lsb = 1;
-
-	while (num)
+	
+	while (num &= num - 1)
 	{
-		bit_count += lsb & num;
-
-		num >>= 1;
+		++bit_count;
 	}
 
 	printf("nuber of set bits = %d\n", bit_count);
 }
 
-
 void FloatBitCounter(float num)
 {
 	unsigned bit_count = 0;
 	unsigned *f_ptr = (unsigned*)&num; /* look at the at the address as it is an 										  int address */
-	unsigned mask = 1<<31;
-	unsigned dup = *f_ptr;
-	/**/	
+	unsigned mask = 0x80000000;
+	unsigned dup = *f_ptr;	
 	
 	while(mask)
 	{
-		bit_count += (dup & mask) / mask;
-		printf("%d, ", (dup & mask) / mask);
+		bit_count += !!(dup & mask);
+		printf("%d, ", !!(dup & mask));
 
-		mask >>=1;
+		mask >>= 1;
 	}
 
-	printf("nuber of set bits = %u\n", bit_count);
+	printf("\nnuber of set bits = %u\n", bit_count);
 }
 
 void SwapVariables(int *num1, int *num2)
@@ -262,30 +226,35 @@ void SwapVariables(int *num1, int *num2)
 
 int swapBits(unsigned int x) 
 { 
-	int mid = 0;
-    unsigned int set1 =  1 << 2; 
-    unsigned int set2 =  1 << 4; 
-    unsigned int xor = 0; 
-	unsigned int result= 0;
+    unsigned int mask3 = 0x4 & x; 
+    unsigned int mask5 = 0x10 & x;  
 	
-	/* take the 3rd and fifth bit */
-	set1 = set1 & x;
-	set2 = set2 & x;
+    x = x ^ ((mask3 | mask5) ^ ((mask3 << 2) | (mask5 >> 2)));
+	 
+    return x; 
+}
 
-	/* put them together */
-	mid = set1 | set2;
+unsigned CountBitsNoLoop(unsigned char num)
+{
+	return (!!(1 & num) + !!(2 & num) + !!(4 & num) + !!(8 & num)
+			+ !!(16 & num) + !!(32 & num) + !!(64 & num) + !!(128 & num));
+}
+
+unsigned char ByteMirrorV2(unsigned char ch)
+{
+	unsigned char mask_l = 0x80;
+	unsigned char mask_r = 0x1;
+	unsigned char move_mask = 7;
+
+	while (mask_r < mask_l)
+	{
+		ch ^= (((mask_l | mask_r) & ch) ^ ((((mask_l & ch) >> move_mask) |
+			 				               ((mask_r & ch) << move_mask))));
+		mask_r <<= 1;
+		mask_l >>= 1;
+		move_mask -= 2;
+	}
 	
-	/* swap the positions of them*/ 
-	set2 = set2 >> 2;
-	set1 = set1 << 2;
-    
-	/* put the swap bits together and xor them with the originals */
-    xor = set1 | set2;
-	xor = xor ^ mid; 
-
-	/* xor x with the xored bits */  
-    result = x ^ xor; 
-  
-    return result; 
+	return (ch);
 }
 

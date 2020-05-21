@@ -50,4 +50,8 @@ int swapBits(unsigned int x);
 /* swaps 2 variables without a third variable */
 void SwapVariables(int *num1, int *num2);
 
+unsigned CountBitsNoLoop(unsigned char num);
+
+unsigned char ByteMirrorV2(unsigned char ch);
+
 #endif /* __WS6_H__ */

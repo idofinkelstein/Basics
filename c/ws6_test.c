@@ -72,16 +72,18 @@ static void Are2And6OnTest(void)
 
 static void Are2Or6OnTest(void)
 {
-	unsigned char ch = 161;
+	unsigned char ch = 15;
 
 	printf("%d: %d\n", ch, Are2Or6On(ch));
 }
 
 static void ByteMirrorTest(void)
 {
-	unsigned char ch = 116;
+	unsigned char ch = 77;
 
 	printf("%d is now %d\n", ch, ByteMirror(ch));
+
+	printf("%d is now %d\n", ch, ByteMirrorV2(ch));
 }
 
 static void NearestDivisibleBy16Test(void)
@@ -107,12 +109,13 @@ static void BitCounterTest()
 {
 	int num = 222;
 
+	printf("%d has -> ", num);
 	BitCounter(num);
 }
 
 static void swapBitsTest(void)
 {
-	int num = 27;
+	int num = 171;
 	
 	printf("%d now become %d\n", num, swapBits(num));
 }
@@ -128,7 +131,14 @@ void SwapVariablesTest(void)
 
 	printf("a = %d, b = %d\n", a, b);
 }
-	
+
+void CountBitsNoLoopTest(void)
+{
+	unsigned char num = 222;
+
+	printf("%d has %d set bits\n", num, CountBitsNoLoop(num));
+}
+
 int main()
 {
 	Pow2Test();
@@ -145,6 +155,7 @@ int main()
 	FloatBitCounterTest();
 	swapBitsTest();
 	SwapVariablesTest();
+	CountBitsNoLoopTest();
 
 	return 0;
 }
