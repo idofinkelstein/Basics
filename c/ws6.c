@@ -284,22 +284,28 @@ void SwapVariables(int *num1, int *num2)
 
 int swapBits(unsigned int x) 
 { 
-    /* Move all bits of first set to rightmost side */
-    unsigned int set1 =  (x >> 4); 
-  
-    /* Move all bits of second set to rightmost side */
-    unsigned int set2 =  (x >> 6) ; 
-  
-    /* XOR the two sets */
-    unsigned int xor = (set1 ^ set2); 
-
+	int mid = 0;
+    
+    unsigned int set1 =  1 << 2; 
+    unsigned int set2 =  1 << 4; 
+    unsigned int xor = 0; 
 	unsigned int result= 0;
+	
+	/* take the 3rd and fifth bit */
+	set1 = set1 & x;
+	set2 = set2 & x;
+
+	/* put them together */
+	mid = set1 | set2;
+	
+	/* replace the positions*/ 
+	set2 = set2 >> 2;
+	set1 = set1 << 2;
+    
+	
+    xor = set1 | set2;
+	xor = xor ^ mid; 
   
-    /* Put the xor bits back to their original positions */
-    xor = (xor << 4) | (xor << 6); 
-  
-    /* XOR the 'xor' with the original number so that the  
-       two sets are swapped */
     result = x ^ xor; 
   
     return result; 

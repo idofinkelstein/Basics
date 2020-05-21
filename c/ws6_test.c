@@ -112,9 +112,9 @@ static void BitCounterTest()
 
 static void swapBitsTest(void)
 {
-	int num = 44;
+	int num = 20;
 	
-	printf("%d\n", swapBits(num));
+	printf("%d now become %d\n", num, swapBits(num));
 }
 
 void SwapVariablesTest(void)
