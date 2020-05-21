@@ -298,14 +298,15 @@ int swapBits(unsigned int x)
 	/* put them together */
 	mid = set1 | set2;
 	
-	/* replace the positions*/ 
+	/* swap the positions of them*/ 
 	set2 = set2 >> 2;
 	set1 = set1 << 2;
     
-	
+	/* put the swap bits together and xor them with original */
     xor = set1 | set2;
 	xor = xor ^ mid; 
-  
+
+	/* xor x with the xored bits */  
     result = x ^ xor; 
   
     return result; 
