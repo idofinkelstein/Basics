@@ -233,46 +233,24 @@ void BitCounter(unsigned int num)
 	printf("nuber of set bits = %d\n", bit_count);
 }
 
-/* utility function to count char's bits and to print them */
-unsigned CharBitCount(char ch)
-{
-	char dup = ch;
-	unsigned char mask = 1<<7;
-	unsigned count = 0;
 
-	while (ch)
-	{
-		ch &= (ch - 1);
-		
-		++count;	
-	}
+void FloatBitCounter(float num)
+{
+	unsigned bit_count = 0;
+	unsigned *f_ptr = (unsigned*)&num; /* look at the at the address as it is an 										  int address */
+	unsigned mask = 1<<31;
+	unsigned dup = *f_ptr;
+	/**/	
+	
 	while(mask)
 	{
+		bit_count += (dup & mask) / mask;
 		printf("%d, ", (dup & mask) / mask);
 
 		mask >>=1;
 	}
 
-	return (count);
-}
-
-void FloatBitCounter(float num)
-{
-	char bit_count = 0;
-	char *f_ptr = (char*)&num; /* look at the at the address as it is a char address */
-	unsigned size = sizeof(float) / sizeof (char);
-
-	printf("nuber chars in float %d\n", size);
-
-	while (size)
-	{
-		bit_count += CharBitCount(*f_ptr);
-
-		++f_ptr;
-		--size;
-	}
-
-	printf("nuber of set bits = %d\n", bit_count);
+	printf("nuber of set bits = %u\n", bit_count);
 }
 
 void SwapVariables(int *num1, int *num2)
