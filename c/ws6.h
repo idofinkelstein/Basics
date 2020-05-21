@@ -41,12 +41,16 @@ unsigned int NearestDivisibleBy16(unsigned int num);
 /* counts the bits in num */
 void BitCounter(int num);
 
+/* counts the bits in float */
 void FloatBitCounter(float num);
 
+/* counts the bits in char */
 unsigned CharBitCount(char ch);
 
+/* swaps the 3rd and fifth bits and returns the new number */
 int swapBits(unsigned int x); 
 
+/* swaps 2 variables without a third variable */
 void SwapVariables(int *num1, int *num2);
 
 #endif /* __WS6_H__ */

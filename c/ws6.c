@@ -95,8 +95,8 @@ int IsPowerOf2NoLoop(unsigned int num)
 	{
 		return 0;
 	}
-	/*  */
-	return (num == (num & (~num + 1)));
+	
+	return (num == (num & (~num + 1))); /* equivalent to ~(n - 1) */
 }
 
 /* adds 1 */
@@ -233,6 +233,7 @@ void BitCounter(unsigned int num)
 	printf("nuber of set bits = %d\n", bit_count);
 }
 
+/* utility function to count char's bits and to print them */
 unsigned CharBitCount(char ch)
 {
 	char dup = ch;
@@ -252,14 +253,13 @@ unsigned CharBitCount(char ch)
 		mask >>=1;
 	}
 
-
 	return (count);
 }
 
 void FloatBitCounter(float num)
 {
 	char bit_count = 0;
-	char *f_ptr = (char*)&num;
+	char *f_ptr = (char*)&num; /* look at the at the address as it is a char address */
 	unsigned size = sizeof(float) / sizeof (char);
 
 	printf("nuber chars in float %d\n", size);
@@ -285,7 +285,6 @@ void SwapVariables(int *num1, int *num2)
 int swapBits(unsigned int x) 
 { 
 	int mid = 0;
-    
     unsigned int set1 =  1 << 2; 
     unsigned int set2 =  1 << 4; 
     unsigned int xor = 0; 
@@ -302,7 +301,7 @@ int swapBits(unsigned int x)
 	set2 = set2 >> 2;
 	set1 = set1 << 2;
     
-	/* put the swap bits together and xor them with original */
+	/* put the swap bits together and xor them with the originals */
     xor = set1 | set2;
 	xor = xor ^ mid; 
 
