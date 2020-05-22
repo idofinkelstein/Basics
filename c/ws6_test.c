@@ -9,6 +9,42 @@ date:19/5/2020
 #include <limits.h> /* MIN_INT */
 #include "ws6.h"
 
+static void Pow2Test(void);
+static void PowTwoTest(void);
+static void IsPowerOf2Test(void);
+static void IsPowerOf2NoLoopTest(void);
+static void Add1Test(void);
+static void HasOnly3BitsTest(void);
+static void Are2And6OnTest(void);
+static void Are2Or6OnTest(void);
+static void ByteMirrorTest(void);
+static void NearestDivisibleBy16Test(void);
+static void FloatBitCounterTest(void);
+static void BitCounterTest(void);
+static void swapBitsTest(void);
+static void SwapVariablesTest(void);
+static void CountBitsNoLoopTest(void);
+
+int main()
+{
+	Pow2Test();
+	PowTwoTest();
+	IsPowerOf2Test();
+	IsPowerOf2NoLoopTest();
+	Add1Test();
+	HasOnly3BitsTest();
+	Are2And6OnTest();
+	Are2Or6OnTest();
+	ByteMirrorTest();
+	NearestDivisibleBy16Test();
+	BitCounterTest();
+	FloatBitCounterTest();
+	swapBitsTest();
+	SwapVariablesTest();
+	CountBitsNoLoopTest();
+
+	return 0;
+}
 
 static void Pow2Test(void)
 {
@@ -79,11 +115,13 @@ static void Are2Or6OnTest(void)
 
 static void ByteMirrorTest(void)
 {
-	unsigned char ch = 77;
+	unsigned char ch = 123;
 
 	printf("%d is now %d\n", ch, ByteMirror(ch));
 
 	printf("%d is now %d\n", ch, ByteMirrorV2(ch));
+
+	printf("%d is now %d\n", ch, ByteMirrorNoLoop(ch));
 }
 
 static void NearestDivisibleBy16Test(void)
@@ -105,12 +143,14 @@ static void FloatBitCounterTest(void)
 	FloatBitCounter(num);
 }
 
-static void BitCounterTest()
+static void BitCounterTest(void)
 {
-	int num = 222;
+	unsigned int num = 15475;
 
 	printf("%d has -> ", num);
 	BitCounter(num);
+	printf("%d has -> ", num);
+	BitCountNoLoop(num);
 }
 
 static void swapBitsTest(void)
@@ -120,7 +160,7 @@ static void swapBitsTest(void)
 	printf("%d now become %d\n", num, swapBits(num));
 }
 
-void SwapVariablesTest(void)
+static void SwapVariablesTest(void)
 {
 	int a = 12;
 	int b = 25;
@@ -132,32 +172,11 @@ void SwapVariablesTest(void)
 	printf("a = %d, b = %d\n", a, b);
 }
 
-void CountBitsNoLoopTest(void)
+static void CountBitsNoLoopTest(void)
 {
 	unsigned char num = 222;
 
 	printf("%d has %d set bits\n", num, CountBitsNoLoop(num));
-}
-
-int main()
-{
-	Pow2Test();
-	PowTwoTest();
-	IsPowerOf2Test();
-	IsPowerOf2NoLoopTest();
-	Add1Test();
-	HasOnly3BitsTest();
-	Are2And6OnTest();
-	Are2Or6OnTest();
-	ByteMirrorTest();
-	NearestDivisibleBy16Test();
-	BitCounterTest();
-	FloatBitCounterTest();
-	swapBitsTest();
-	SwapVariablesTest();
-	CountBitsNoLoopTest();
-
-	return 0;
 }
 
 

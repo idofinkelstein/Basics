@@ -191,9 +191,10 @@ void BitCounter(unsigned int num)
 {
 	int bit_count = 0;
 	
-	while (num &= num - 1)
+	for(; num; num &= (num - 1))
 	{
 		++bit_count;
+		
 	}
 
 	printf("nuber of set bits = %d\n", bit_count);
@@ -258,3 +259,26 @@ unsigned char ByteMirrorV2(unsigned char ch)
 	return (ch);
 }
 
+unsigned char ByteMirrorNoLoop(unsigned char ch)
+{
+	ch = (ch >> 4) | (ch << 4);
+
+	ch = (((ch & 0x33) << 2)) | (((ch & 0xcc) >> 2));
+
+	ch = (((ch & 0x55) << 1)) | (((ch & 0xaa) >> 1));
+	
+	return (ch);
+}
+
+void BitCountNoLoop(unsigned num) 
+{
+    num = num - ((num >> 1) & 0x55555555);
+    num = (num & 0x33333333) + ((num >> 2) & 0x33333333);
+    num = (num + (num >> 4)) & 0x0f0f0f0f;
+    num = num + (num >> 8);
+    num = num + (num >> 16);
+	num = num & 0x3f;
+
+	printf("nuber of set bits = %d\n", num);
+    
+}

@@ -54,4 +54,8 @@ unsigned CountBitsNoLoop(unsigned char num);
 
 unsigned char ByteMirrorV2(unsigned char ch);
 
+unsigned char ByteMirrorNoLoop(unsigned char ch);
+
+void BitCountNoLoop(unsigned num);
+
 #endif /* __WS6_H__ */
