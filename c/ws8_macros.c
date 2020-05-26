@@ -1,4 +1,11 @@
-#include <stdio.h>
+/**********************************
+file name: ws8_macros.c
+author: Ido Finkelstein
+reviewer: Shahrazad Tarboush Sirhan
+date: 26.5.2020
+***********************************/
+
+#include <stdio.h> /* printf */
 
 #define MAX(A, B) ((A) > (B) ? (A) : (B))
 
@@ -32,7 +39,6 @@ int main()
 	printf("%ld\n", SIZEOF_TYPE(char));	
 	printf("%ld\n",SIZEOF_TYPE(int));
 	printf("%ld\n",SIZEOF_TYPE(long));
-
 
 	return 0;
 }
