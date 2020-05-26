@@ -17,6 +17,14 @@ date: 26.5.2020
 
 int main()
 {	
+	struct strct
+	{
+		int num;
+		int *p_num;
+		long big_num;
+		char str[10];
+	};
+
 	int x = 34;
 	long int y = 12;
 	
@@ -39,6 +47,9 @@ int main()
 	printf("%ld\n", SIZEOF_TYPE(char));	
 	printf("%ld\n",SIZEOF_TYPE(int));
 	printf("%ld\n",SIZEOF_TYPE(long));
+	printf("%ld\n",SIZEOF_TYPE(struct strct));
+	printf("%ld\n",sizeof(struct strct));
+
 
 	return 0;
 }
