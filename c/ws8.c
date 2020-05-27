@@ -10,7 +10,7 @@ date: 26.5.2020
 #include <string.h>  /* strcpy, strcat */
 #include <assert.h>  /* assert */
 
-#define SIZE 5
+#define ARR_SIZE 5
 #define MAX_DIGITS_TO_INT 12
 #define STR2_SIZE 13
 #define STR4_SIZE 8
@@ -53,36 +53,36 @@ int main()
 
 	number = (int*)25;
 
-	hetrogeneneous_array = malloc(sizeof(element_t) * SIZE);
+	hetrogeneneous_array = malloc(sizeof(element_t) * ARR_SIZE);
 
 	InitArray(hetrogeneneous_array);
 	
 	/* prints the array */
-	for (i = 0; i < SIZE; ++i)
+	for (i = 0; i < ARR_SIZE; ++i)
 	{
 		hetrogeneneous_array[i].print(hetrogeneneous_array[i].data);
 	}
 
 	/* adds values to array */
-	for (i = 0; i < SIZE; ++i)
+	for (i = 0; i < ARR_SIZE; ++i)
 	{
 		hetrogeneneous_array[i].add(&hetrogeneneous_array[i].data, number);
 	}
 
 	/* adds again */
-	for (i = 0; i < SIZE; ++i)
+	for (i = 0; i < ARR_SIZE; ++i)
 	{
 		hetrogeneneous_array[i].add(&hetrogeneneous_array[i].data, number);
 	}
 
 	/* prints again */
-	for (i = 0; i < SIZE; ++i)
+	for (i = 0; i < ARR_SIZE; ++i)
 	{
 		hetrogeneneous_array[i].print(hetrogeneneous_array[i].data);
 	}
 
 	/* frees memory */
-	for (i = 0; i < SIZE; ++i)
+	for (i = 0; i < ARR_SIZE; ++i)
 	{
 		hetrogeneneous_array[i].free_s(hetrogeneneous_array[i].data);
 	}
@@ -109,6 +109,7 @@ static void PrintString(void *data)
 
 static int AddToInt(void **data, void *num)
 {
+	assert(data);
 	assert(num);
 
 	*(int*)data += *(int*)&num;
@@ -118,6 +119,7 @@ static int AddToInt(void **data, void *num)
 
 static int AddToFloat(void **data, void *num)
 {
+	assert(data);
 	assert(num);
 
 	*(float*)data += *(int*)&num;
@@ -132,6 +134,7 @@ static int AddToString(void **data, void *num)
 	char *tmp_str = NULL;
 	char *append_str = (char*)malloc(MAX_DIGITS_TO_INT * sizeof(char)); 
 
+	assert(data);
 	assert(num);
 
 	if (NULL == append_str)
@@ -144,6 +147,7 @@ static int AddToString(void **data, void *num)
 
 	append_str_len = strlen(append_str);
 
+	/* setting temp pointer just in case realloc fails */
 	tmp_str = realloc((char*)*data, append_str_len + str_len + 1);
 
 	if (NULL == tmp_str)
