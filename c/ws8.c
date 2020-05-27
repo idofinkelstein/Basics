@@ -14,111 +14,122 @@ date: 26.5.2020
 #define MAX_DIGITS_TO_INT 12
 #define STR2_SIZE 13
 #define STR4_SIZE 8
-
-/* declaration of struct element*/
-typedef struct element element; 
+#define SUCCESS 0
+#define FAILURE -1
 
 /* typedef of function pointers */
-typedef void (*add_t)(void*, int i);
-typedef void (*print_t) (int);
-typedef void (*free_t) (int i);
+typedef int (*add_t)(void**, void*);
+typedef void (*print_t) (void*);
+typedef void (*free_t) (void**);
 	
-static struct element
+typedef struct element
 {
 	void *data;
 	print_t print;
 	add_t add;
 	free_t free_s;
 
-}hetrogeneneous_array[SIZE] = {0};
+}element_t;
+
 
 /* function declarations */
-static void PrintInt(int i);
-static void PrintFloat(int i);
-static void PrintString(int i);
-static void AddToInt(void *num, int i);
-static void AddToFloat(void *num, int i);
-static void AddToString(void *string, int i);
-static void FreeString();
-static void FreeNonString();
+static void PrintInt(void *data);
+static void PrintFloat(void *data);
+static void PrintString(void *data);
+static int AddToInt(void **data, void *num);
+static int AddToFloat(void **data, void *num);
+static int AddToString(void **data, void *num);
+static void FreeString(void **data);
+static void FreeNonString(void **data);
 
-static void InitArray(void);
+static int InitArray(element_t *hetrogeneneous_array);
 
 int main()
 {
+	element_t *hetrogeneneous_array; 
+	
 	int i = 0;
 	void *number = NULL;
 
-	number = (int*)-44561;
+	number = (int*)25;
 
-	InitArray();
+	hetrogeneneous_array = malloc(sizeof(element_t) * SIZE);
+
+	InitArray(hetrogeneneous_array);
 	
 	/* prints the array */
 	for (i = 0; i < SIZE; ++i)
 	{
-		hetrogeneneous_array[i].print(i);
+		hetrogeneneous_array[i].print(hetrogeneneous_array[i].data);
 	}
 
 	/* adds values to array */
 	for (i = 0; i < SIZE; ++i)
 	{
-		hetrogeneneous_array[i].add(number, i);
+		hetrogeneneous_array[i].add(&hetrogeneneous_array[i].data, number);
 	}
 
 	/* adds again */
 	for (i = 0; i < SIZE; ++i)
 	{
-		hetrogeneneous_array[i].add(number, i);
+		hetrogeneneous_array[i].add(&hetrogeneneous_array[i].data, number);
 	}
 
 	/* prints again */
 	for (i = 0; i < SIZE; ++i)
 	{
-		hetrogeneneous_array[i].print(i);
+		hetrogeneneous_array[i].print(hetrogeneneous_array[i].data);
 	}
 
 	/* frees memory */
 	for (i = 0; i < SIZE; ++i)
 	{
-		hetrogeneneous_array[i].free_s(i);
+		hetrogeneneous_array[i].free_s(hetrogeneneous_array[i].data);
 	}
+
+	free(hetrogeneneous_array);
 
 	return 0;
 }
 
-static void PrintInt(int i)
+static void PrintInt(void *data)
 {
-	printf("%d\n",*(int*)&hetrogeneneous_array[i].data);
+	printf("%d\n",*(int*)&data);
 }
 
-static void PrintFloat(int i)
+static void PrintFloat(void *data)
 {
-	printf("%f\n",*(float*)&hetrogeneneous_array[i].data);
+	printf("%f\n",*(float*)&data);
 }
 
-static void PrintString(int i)
+static void PrintString(void *data)
 {
-	printf("%s\n",(char*)hetrogeneneous_array[i].data);
+	printf("%s\n",(char*)data);
 }
 
-static void AddToInt(void *num, int i)
-{
-	assert(num);
-
-	*(int*)&hetrogeneneous_array[i].data += *(int*)&num;
-}
-
-static void AddToFloat(void *num, int i)
+static int AddToInt(void **data, void *num)
 {
 	assert(num);
 
-	*(float*)&hetrogeneneous_array[i].data += *(int*)&num;
+	*(int*)data += *(int*)&num;
+
+	return(SUCCESS);
 }
 
-static void AddToString(void *num, int i)
+static int AddToFloat(void **data, void *num)
+{
+	assert(num);
+
+	*(float*)data += *(int*)&num;
+
+	return(SUCCESS);
+}
+
+static int AddToString(void **data, void *num)
 {	
 	size_t append_str_len = 0;
-	size_t str_len = strlen(hetrogeneneous_array[i].data);
+	size_t str_len = strlen(*data);
+	char *tmp_str = NULL;
 	char *append_str = (char*)malloc(MAX_DIGITS_TO_INT * sizeof(char)); 
 
 	assert(num);
@@ -126,17 +137,16 @@ static void AddToString(void *num, int i)
 	if (NULL == append_str)
 	{
 		printf("malloc failed!");
-		return;
+		return (FAILURE);
 	}
 
 	sprintf(append_str, "%d", *(int*)&num);
 
 	append_str_len = strlen(append_str);
 
-	hetrogeneneous_array[i].data = 
-	realloc((char*)hetrogeneneous_array[i].data, append_str_len + str_len + 1);
+	tmp_str = realloc((char*)*data, append_str_len + str_len + 1);
 
-	if (NULL == hetrogeneneous_array[i].data)
+	if (NULL == tmp_str)
 	{
 		printf("realloc failed!");
 
@@ -144,29 +154,33 @@ static void AddToString(void *num, int i)
 
 		append_str = NULL;
 
-		return;
+		return (FAILURE);
 	}
 
-	strcat((char*)hetrogeneneous_array[i].data, append_str);
+	*data = tmp_str;
+
+	strcat(*data, append_str);
 	
 	free(append_str);
 
 	append_str = NULL;
+
+	return(SUCCESS);
 }
 
-static void FreeString(int i)
+static void FreeString(void **data)
 {
-	free((char*)hetrogeneneous_array[i].data);
+	free((char*)data);
 
-	hetrogeneneous_array[i].data = NULL;
+	data = NULL;
 }
 
-static void FreeNonString(int i)
+static void FreeNonString(void **data)
 {
-	(void)i;
+	(void)data;
 }
 
-static void InitArray(void)
+static int InitArray(element_t *hetrogeneneous_array)
 {	
 	*(int*)&hetrogeneneous_array[0].data = 123;
 	hetrogeneneous_array[0].print = PrintInt;
@@ -180,6 +194,11 @@ static void InitArray(void)
 
 	hetrogeneneous_array[2].data = (char*)malloc(STR2_SIZE * sizeof(char));
 
+	if(NULL == hetrogeneneous_array[2].data)
+	{
+		return (FAILURE);
+	}
+
 	strcpy((char*)hetrogeneneous_array[2].data,"hello world!");
 	hetrogeneneous_array[2].print = PrintString;
 	hetrogeneneous_array[2].add = AddToString;
@@ -192,8 +211,15 @@ static void InitArray(void)
 
 	hetrogeneneous_array[4].data = (char*)malloc(STR4_SIZE * sizeof(char));
 
+	if(NULL == hetrogeneneous_array[4].data)
+	{
+		return (FAILURE);
+	}
+
 	strcpy((char*)hetrogeneneous_array[4].data,"EPISODE");
 	hetrogeneneous_array[4].print = PrintString;
 	hetrogeneneous_array[4].add = AddToString;
 	hetrogeneneous_array[4].free_s = FreeString;
+
+	return (SUCCESS);
 }
