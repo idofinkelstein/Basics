@@ -20,7 +20,7 @@ date: 26.5.2020
 /* typedef of function pointers */
 typedef int (*add_t)(void**, void*);
 typedef void (*print_t) (void*);
-typedef void (*free_t) (void**);
+typedef void (*free_t) (void*);
 	
 typedef struct element
 {
@@ -39,8 +39,8 @@ static void PrintString(void *data);
 static int AddToInt(void **data, void *num);
 static int AddToFloat(void **data, void *num);
 static int AddToString(void **data, void *num);
-static void FreeString(void **data);
-static void FreeNonString(void **data);
+static void FreeString(void *data);
+static void FreeNonString(void *data);
 
 static int InitArray(element_t *hetrogeneneous_array);
 
@@ -172,14 +172,14 @@ static int AddToString(void **data, void *num)
 	return(SUCCESS);
 }
 
-static void FreeString(void **data)
+static void FreeString(void *data)
 {
 	free((char*)data);
 
 	data = NULL;
 }
 
-static void FreeNonString(void **data)
+static void FreeNonString(void *data)
 {
 	(void)data;
 }
