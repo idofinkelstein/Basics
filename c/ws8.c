@@ -11,6 +11,9 @@ date: 26.5.2020
 #include <assert.h>  /* assert */
 
 #define SIZE 5
+#define MAX_DIGITS_TO_INT 12
+#define STR2_SIZE 13
+#define STR4_SIZE 8
 
 /* declaration of struct element*/
 typedef struct element element; 
@@ -27,7 +30,7 @@ static struct element
 	add_t add;
 	free_t free_s;
 
-}hetrogeneneous_array[SIZE];
+}hetrogeneneous_array[SIZE] = {0};
 
 /* function declarations */
 static void PrintInt(int i);
@@ -46,8 +49,8 @@ int main()
 	int i = 0;
 	void *number = NULL;
 
-	number  = (int*)-44561;
-	
+	number = (int*)-44561;
+
 	InitArray();
 	
 	/* prints the array */
@@ -116,8 +119,7 @@ static void AddToString(void *num, int i)
 {	
 	size_t append_str_len = 0;
 	size_t str_len = strlen(hetrogeneneous_array[i].data);
-	/* append_str = max size of int in digits + sign + end of string */
-	char *append_str = (char*)malloc(12 * sizeof(char)); 
+	char *append_str = (char*)malloc(MAX_DIGITS_TO_INT * sizeof(char)); 
 
 	assert(num);
 
@@ -176,7 +178,7 @@ static void InitArray(void)
 	hetrogeneneous_array[1].add = AddToFloat;
 	hetrogeneneous_array[1].free_s = FreeNonString;
 
-	hetrogeneneous_array[2].data = (char*)malloc(13 * sizeof(char));
+	hetrogeneneous_array[2].data = (char*)malloc(STR2_SIZE * sizeof(char));
 
 	strcpy((char*)hetrogeneneous_array[2].data,"hello world!");
 	hetrogeneneous_array[2].print = PrintString;
@@ -188,7 +190,7 @@ static void InitArray(void)
 	hetrogeneneous_array[3].add = AddToFloat;
 	hetrogeneneous_array[3].free_s = FreeNonString;
 
-	hetrogeneneous_array[4].data = (char*)malloc(8 * sizeof(char));
+	hetrogeneneous_array[4].data = (char*)malloc(STR4_SIZE * sizeof(char));
 
 	strcpy((char*)hetrogeneneous_array[4].data,"EPISODE");
 	hetrogeneneous_array[4].print = PrintString;
