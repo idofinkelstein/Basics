@@ -22,6 +22,7 @@ static int memmoveTest(void);
 static int AtoiTest(void);
 static int ItoaTest(void);
 static void ThreeArraysTest(void);
+static void EndianTest(void);
 
 int main()
 {
@@ -34,6 +35,7 @@ int main()
 	AtoiTest();
 	ItoaTest();
 	ThreeArraysTest();
+	EndianTest();
 	
 	return 0;
 }
@@ -302,7 +304,7 @@ static int AtoiTest(void)
 	int num5 = 0;
 	int num6 = 0;
 
-	strcpy(str5, "KKK");
+	strcpy(str5, "AD7L04A");
 	strcpy(str6, "111001011");
 
 	num1 = atoi(str1);
@@ -327,7 +329,7 @@ static int ItoaTest(void)
 	int num2 = -77724309;
 	char str1[32];
 	char str2[32];
-	int num3 = 12020;
+	int num3 = 2017156714;
 	char *str3 = malloc(33);
 
 	ItoaBin(num1, str2);
@@ -350,11 +352,27 @@ static void ThreeArraysTest(void)
 {
 	char arr1[] = {'a', 'g', 'G', 'T', '7', 'b', 'a', 'A', 'l'};
 	char arr2[] = {'b', 'g', '0', 'a', '7', 'l', 'l', '0', 'Q', 'A', 's'};
-	char arr3[] = {'c', 's', 'g', 'G', 'T', 's', 'Q', 'l', '1', 'a', 'b', 'a', 'A'};
+	char arr3[] = {'c', 's', 'g', 'G', 'T', 's', 'Q', '1', 'a', 'b', 'a', 'A'};
 	size_t size1 = sizeof(arr1);
 	size_t size2 = sizeof(arr2);
 	size_t size3 = sizeof(arr3);
 
 	ThreeArrays(arr1, arr2, arr3, size1, size2, size3);
+}
+
+static void EndianTest(void)
+{
+	int x = 0xAABBCCDD;
+	char *px = (char*)&x;
+
+	printf("The system is: ");
+	if(*px)
+	{
+		puts("little endian");
+	}
+	else
+	{
+		puts("big endian");
+	}
 }
 

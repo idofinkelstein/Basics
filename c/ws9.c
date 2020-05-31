@@ -271,9 +271,8 @@ char *ItoaBin(int num, char *str_num)
 char *ItoaAny(int num, char *str_num, int base)
 {
 	char *curr = str_num;
-	double f_num = num; /* to handle fractions (float is not enough) */
 	char sign = 0;
-	double correction = 0.01; /* to round fractions */
+
 
 	/* in case n is negative */
 	if (0 > num)
@@ -285,14 +284,8 @@ char *ItoaAny(int num, char *str_num, int base)
 	
 	do /* generates digits for any base */
 	{
-		f_num = num;
-
-		f_num = ((f_num / base) - (int)(f_num / base)) + correction;
-
-		f_num *= base;
-
-		*(curr++) = Convert((int)f_num); /* saving the chars
-										    in reversed order */
+		*(curr++) = Convert(num % base); /* saving the chars
+									     in reversed order */
 			
 	}while (num /= base);
 
@@ -369,15 +362,18 @@ int ThreeArrays(char *arr_a, char *arr_b, char *arr_c, size_t size_a,
 		ascii_arr[2][(unsigned char)arr_c[i]] = 1;	
 	}
 	
-	/* if the sum of the rows is 2, it prints the char */
+	/* if the sum of the first 2 rows is 2, it prints the char */
 	for (i = 0; i < ASCII_ELEMENTS; ++i)
 	{
-		if (ELEMENT_AMOUNT == 
-			ascii_arr[0][i] + ascii_arr[1][i] + ascii_arr[2][i])
+		if (ELEMENT_AMOUNT == /* 2 */
+			ascii_arr[0][i] + ascii_arr[1][i] && 
+			0 == ascii_arr[2][i]) 
 		{
 			printf("%c ", (char)i);
 		}
 	}
+
+	puts("");
 
 	free(ascii_arr[0]);
 	free(ascii_arr[1]);
