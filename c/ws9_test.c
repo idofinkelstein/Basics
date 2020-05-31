@@ -362,7 +362,7 @@ static void ThreeArraysTest(void)
 
 static void EndianTest(void)
 {
-	int x = 0xAABBCCDD;
+	int x = 1;
 	char *px = (char*)&x;
 
 	printf("The system is: ");
