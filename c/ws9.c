@@ -23,7 +23,7 @@ void *MemSet(void *str, int c, size_t n)
 	void *curr_str = str;
 	size_t dup_c = c;
 	size_t c_word = c;
-	size_t shift = sizeof(size_t);
+	size_t shift_byte = 8;
 
 	assert(str);
 
@@ -40,7 +40,7 @@ void *MemSet(void *str, int c, size_t n)
 	/* this loop duplicates input char word-size times */
 	while(c_word)
 	{
-		dup_c = dup_c | (c_word <<= shift);
+		dup_c = dup_c | (c_word <<= shift_byte);
 	}
 
 	/* this loop copys wordsize chunks to *curr_str */
@@ -50,7 +50,7 @@ void *MemSet(void *str, int c, size_t n)
 
 		curr_str = (size_t*)curr_str + 1;
 
-		n -= shift;
+		n -= shift_byte;
 	}
 
 	/* this loop copys the leftover bytes to *curr_str */
@@ -70,7 +70,7 @@ void *MemSet(void *str, int c, size_t n)
 {
 	void *curr_dest = dest;
 	void *curr_src= (void*)src;
-	size_t shift = sizeof(size_t);
+	size_t word_size = sizeof(size_t);
 
 	assert(dest);
 	assert(src);
@@ -96,7 +96,7 @@ void *MemSet(void *str, int c, size_t n)
 
 		curr_src = (size_t*)curr_src + 1;
 
-		n -= shift;
+		n -= word_size;
 	}
 
 	/* this loop copys the leftover bytes to *curr_dest */
@@ -118,51 +118,44 @@ void *MemMove(void *dest, const void *src, size_t n)
 {
 	void *curr_dest = dest;
 	void *curr_src= (void*)src;
-	size_t shift = sizeof(size_t);
+	size_t word_size = sizeof(size_t);
 
 	assert(dest);
 	assert(src);
 
-	/* in case  dest is smaller then src this loop
-	   copys   wordsize   chunks   to   *curr_dest */
-	while (dest < src && n > ADDRESS_MASK)
+	/* in case  dest is smaller then src MemCpy is called */
+	if (dest < src)
 	{
-		*(size_t*)curr_dest = *(size_t*)curr_src;
-
-		curr_dest = (size_t*)curr_dest + 1;		
-
-		curr_src = (size_t*)curr_src + 1;
-
-		n -= shift;
-	}
-
-	/* this loop copys the rest of the bytes to *curr_dest */
-	while (dest < src && n)
-	{
-		*(char*)curr_dest = *(char*)curr_src;
-
-		curr_dest = (char*)curr_dest + 1;		
-
-		curr_src = (char*)curr_src + 1;
-
-		--n;
+		MemCpy(dest, src, n);
 	}
 
 	/* in case dest is bigger then src, copying starts from
 	   the end */
 	if (src < dest)
 	{
-		curr_dest = (char*)curr_dest + n - 1;		
+		curr_dest = (char*)curr_dest + n;		
 
-		curr_src = (char*)curr_src + n - 1;
+		curr_src = (char*)curr_src + n;
+
+		
+		while (n > ADDRESS_MASK)
+		{
+			curr_dest = (size_t*)curr_dest - 1;		
+
+			curr_src = (size_t*)curr_src - 1;
+
+			*(size_t*)curr_dest = *(size_t*)curr_src;
+
+			n -= word_size;
+		}
 
 		while (n)
 		{
-			*(char*)curr_dest = *(char*)curr_src;
-
 			curr_dest = (char*)curr_dest - 1;		
 
 			curr_src = (char*)curr_src - 1;
+
+			*(char*)curr_dest = *(char*)curr_src;
 
 			--n;
 		}
