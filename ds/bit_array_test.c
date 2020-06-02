@@ -32,6 +32,7 @@ void PrintBit(size_t num);
 
 int main()
 {
+	InitLUT();
 	BitArrSetAllTest();
 	BitArrResetAllTest();
 	BitArrSetOnTest();
@@ -192,13 +193,14 @@ void BitArrRotLTest(void)
 
 void BitArrCountOnTest(void)
 {
-	bit_array_t arr = 4365;
+	bit_array_t arr = ~0;
 
 	puts("*** testing  BitArrCountOn ***");
 
 	PrintBit(arr);
 
 	printf("%ld\n", BitArrCountOn(arr));
+	printf("%ld\n", BitArrCountOnLUT(arr));
 	puts("");
 }
 
