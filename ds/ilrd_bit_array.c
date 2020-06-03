@@ -5,7 +5,6 @@ Reviewer: Uriel Naiman
 Date: 2/6/2020
 **********************/
 
-#include <stdio.h>
 #include <stddef.h> /* size_t */
 
 #define NUM_OF_BIT (sizeof(size_t) * 8)
@@ -179,11 +178,12 @@ bit_array_t BitArrMirrorLUT(bit_array_t arr)
 	unsigned char *curr_mirror = (unsigned char*)&mirror_arr + WORD_SIZE - 1;
 	size_t i = 0;
 
-	for (i = 0; i < (WORD_SIZE / 2); ++i)
+	for (i = 0; i < WORD_SIZE; ++i)
 	{
 		*curr_mirror = mirror_lut_g[*curr_arr];
 
 		++curr_arr;
+
 		--curr_mirror;
 	}
 

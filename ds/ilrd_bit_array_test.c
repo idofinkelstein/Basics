@@ -286,14 +286,14 @@ void BitArrCountOffTest(void)
 
 void BitArrMirrorTest(void)
 {
-	bit_array_t arr = 4365095;
-	bit_array_t arr2 = 4365095;
+	bit_array_t arr = 91243685657113095;
+	bit_array_t arr2 = 91243685657113095;
 	char str[65] = {0};
 
 	puts("*** testing  BitArrMirror ***");
 
 	BitArrToString(arr, str);
-	BitArrToString(arr2, str);
+	printf("%s\n", str);
 
 	arr = BitArrMirror(arr);
 	arr2 = BitArrMirrorLUT(arr2);
