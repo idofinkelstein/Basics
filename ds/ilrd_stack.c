@@ -11,7 +11,7 @@ Reviewer: Shiran Hodeda
 #define SECCESS 0
 #define FAILURE 1
 
-#define EXIT_IF_FAILES(CON, MSG, RET) if(CON){ printf(MSG); return (RET);}
+#define EXIT_IF_FAILES(CON, RET) if(CON){ return (RET);}
 
 typedef struct stack
 {
@@ -25,10 +25,15 @@ typedef struct stack
 stack_t *StackCreate(size_t capacity)
 {
 	stack_t *stack = (stack_t*)malloc(sizeof(stack_t));
-	EXIT_IF_FAILES(NULL == stack, "malloc failed\n", NULL);
+	EXIT_IF_FAILES(NULL == stack, NULL);
 
 	stack->head = (void**)malloc(sizeof(void*) * capacity);
-	EXIT_IF_FAILES(NULL == stack->head, "malloc failed\n", NULL);
+	
+	if (NULL == stack->head)
+	{
+		free(stack);
+		return (NULL);
+	}
 
 	stack->capacity = capacity;
 	stack->size = 0;
@@ -39,11 +44,11 @@ stack_t *StackCreate(size_t capacity)
 
 void StackDestroy(stack_t *stack)
 {
-	if (NULL != stack)
-	{
 		free(stack->head);
-		free(stack);	
-	}	
+		stack->head = NULL;
+
+		free(stack);
+		stack = NULL;	
 }
 
 int StackPush(stack_t *stack, void *element)
@@ -67,9 +72,7 @@ int StackPush(stack_t *stack, void *element)
 void StackPop(stack_t *stack)
 {
 	if (stack->size > 0) 	
-	{
-		*stack->head = 0;
-		
+	{		
 		--stack->top;
 
 		--stack->size;

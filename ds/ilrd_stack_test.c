@@ -46,10 +46,6 @@ int main()
 	StackDestroy(stk);
 	stk = NULL;
 
-	/* destroying more than once to check for errors */
-	StackDestroy(stk);
-	StackDestroy(stk);
-
 	stk = StackCreate(2);
 
 	printf("IsStackEmpty = %d\n", StackIsEmpty(stk));
