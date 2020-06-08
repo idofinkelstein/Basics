@@ -6,6 +6,7 @@ Date: 2/6/2020
 **********************/
 
 #include <stddef.h> /* size_t */
+#include <assert.h> /* assert */
 
 #define NUM_OF_BIT (sizeof(size_t) * 8)
 #define WORD_SIZE sizeof(size_t)
@@ -29,16 +30,22 @@ bit_array_t BitArrResetAll(bit_array_t arr)
 
 bit_array_t BitArrSetOn(bit_array_t arr, size_t index)
 {
+	assert(index >= 1 && index <= 64);
+
 	return (arr | ((size_t)1 << (index - 1)));
 }
 
 bit_array_t BitArrSetOff(bit_array_t arr, size_t index)
 {
+	assert(index >= 1 && index <= 64);
+	
 	return (arr & (~((size_t)1 << (index - 1))));
 }
 
 bit_array_t BitArrSetBit(bit_array_t arr, size_t index, int boolean_value)
 {
+	assert(index >= 1 && index <= 64);
+
 	return(boolean_value ? BitArrSetOn(arr, index) : BitArrSetOff(arr, index));
 }
 
@@ -49,11 +56,15 @@ bit_array_t BitArrFlip(bit_array_t arr, size_t index)
 
 int BitArrIsOn(bit_array_t arr, size_t index)
 {
+	assert(index >= 1 && index <= 64);
+
 	return (!!(arr & ((size_t)1 << (index - 1))));
 }
 
 int BitArrIsOff(bit_array_t arr, size_t index)
 {
+	assert(index >= 1 && index <= 64);
+
 	return (!(arr & ((size_t)1 << (index - 1))));
 }
 
@@ -79,26 +90,26 @@ bit_array_t BitArrRotL(bit_array_t arr, size_t num_to_shift)
 
 size_t BitArrCountOn(bit_array_t arr)
 {
-	size_t on_bits = 0;
-	
-	for(; arr; arr &= (arr - 1))
-	{
-		++on_bits;
-	}
-	
-	return (on_bits);
+	size_t m1  = 0x5555555555555555; /* binary: 0101... */
+	size_t m2  = 0x3333333333333333; /* binary: 00110011.. */
+	size_t m4  = 0x0F0F0F0F0F0F0F0F; /* binary:  4 zeros,  4 ones ... */
+	size_t m8  = 0x00FF00FF00FF00FF; /* binary:  8 zeros,  8 ones ... */
+	size_t m16 = 0x0000FFFF0000FFFF; /* binary: 16 zeros, 16 ones ... */
+	size_t m32 = 0x00000000FFFFFFFF; /* binary: 32 zeros, 32 ones */
+
+	arr = (arr & m1 ) + ((arr >>  1) & m1 ); 
+    arr = (arr & m2 ) + ((arr >>  2) & m2 );  
+    arr = (arr & m4 ) + ((arr >>  4) & m4 );  
+    arr = (arr & m8 ) + ((arr >>  8) & m8 );  
+    arr = (arr & m16) + ((arr >> 16) & m16);  
+    arr = (arr & m32) + ((arr >> 32) & m32);
+
+    return (arr);
 }
 
 size_t BitArrCountOff(bit_array_t arr)
 {
-	size_t on_bits = 0;
-	
-	for(; arr; arr &= (arr - 1))
-	{
-		++on_bits;
-	}
-	
-	return (NUM_OF_BIT - on_bits);
+	return (NUM_OF_BIT - BitArrCountOn(arr));
 }
 
 bit_array_t BitArrMirror(bit_array_t arr)
@@ -170,6 +181,7 @@ size_t BitArrCountOnLUT(bit_array_t arr)
 
 	return (bits_on);
 }
+
 
 bit_array_t BitArrMirrorLUT(bit_array_t arr)
 {

@@ -253,7 +253,7 @@ void BitArrRotLTest(void)
 
 void BitArrCountOnTest(void)
 {
-	bit_array_t arr = ~0;
+	bit_array_t arr = 1111111111111;
 	char str[65] = {0};
 
 	puts("*** testing  BitArrCountOn ***");
