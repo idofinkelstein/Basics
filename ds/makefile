@@ -1,31 +1,51 @@
 CC=gcc -ansi -pedantic-errors -Wall -Wextra -g
-all: stack vector
+
+all: stack vector slist
+
 # compiles stack
-stack: ilrd_stack_test.o ilrd_stack.o
-	$(CC) ilrd_stack_test.o ilrd_stack.o -o stack.out
+stack: stack_test.o stack.o
+	$(CC) stack_test.o stack.o -o stack.out
 	
 
-ilrd_stack_test.o: ilrd_stack_test.c 
-	$(CC) -c ilrd_stack_test.c 
+stack_test.o: stack_test.c 
+	$(CC) -c stack_test.c 
 
-ilrd_stack.o: ilrd_stack.c 
-	$(CC) -c ilrd_stack.c 
+stack.o: stack.c 
+	$(CC) -c stack.c 
 
 
 #compiles vector
-vector: ilrd_vector_test.o ilrd_vector.o
-	$(CC) ilrd_vector_test.o ilrd_vector.o -o vector.out
+vector: vector_test.o vector.o
+	$(CC) vector_test.o vector.o -o vector.out
 	
 
-ilrd_vector_test.o: ilrd_vector_test.c 
-	$(CC) -c ilrd_vector_test.c 
+vector_test.o: vector_test.c 
+	$(CC) -c vector_test.c 
 
-ilrd_vector.o: ilrd_vector.c 
-	$(CC) -c ilrd_vector.c 
+vector.o: vector.c 
+	$(CC) -c vector.c 
+
+#compiles slist
+slist: slist_test.o slist.o
+	$(CC) slist_test.o slist.o -o slist.out
+	
+
+slist_test.o: slist_test.c 
+	$(CC) -c slist_test.c 
+
+slist.o: slist.c 
+	$(CC) -c slist.c 
 
 
 clean_stack:
-	rm ilrd_stack_test.o ilrd_stack.o stack.out
+	rm stack_test.o stack.o stack.out
 
 clean_vector:
-	rm ilrd_vector_test.o ilrd_vector.o vector.out
+	rm vector_test.o vector.o vector.out
+
+clean_slist:
+	rm slist_test.o slist.o slist.out
+
+
+
+
