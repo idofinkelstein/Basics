@@ -5,9 +5,9 @@ Reviewer: Uriel Naiman
 Date: 2/6/2020
 **********************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "bit_array.h"
+#include <stdio.h>  /* printf */
+#include <stdlib.h> /* size_t */
+#include "ilrd_bit_array.h"
 
 #define MAX_SHIFT (sizeof(size_t) * 8 - 1)
 
@@ -29,10 +29,13 @@ void BitArrMirrorTest(void);
 void BitArrMirrorLUTTest(void);
 void BitArrToStringTest(void);
 void PrintBit(size_t num);
+void InitBitLUT(void);
+void InitMirrorLUT(void);
 
 int main()
 {
-	InitLUT();
+	InitBitLUT();
+	InitMirrorLUT();
 	BitArrSetAllTest();
 	BitArrResetAllTest();
 	BitArrSetOnTest();
@@ -54,108 +57,153 @@ int main()
 void BitArrSetAllTest(void)
 {
 	bit_array_t arr = 4365;
+	char str[65] = {0};
 
 	puts("*** testing  BitArrSetAll ***");
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
+
+	printf("%s\n", str);
 
 	arr = BitArrSetAll(arr);
+	
+	BitArrToString(arr, str);
 
-	PrintBit(arr);
+	printf("%s\n", str);
+
+	
 	puts("");
 }
 
 void BitArrResetAllTest(void)
 {
 	bit_array_t arr = 4365;
+	char str[65] = {0};
 
 	puts("*** testing  BitArrResetAll ***");
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
+
+	printf("%s\n", str);
 
 	arr = BitArrResetAll(arr);
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
+
+	printf("%s\n", str);
 	puts("");
 }
 
 void BitArrSetOnTest(void)
 {
 	bit_array_t arr = 4365;
+	char str[65] = {0};
 
 	puts("*** testing  BitArrSetOn ***");
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
+
+	printf("%s\n", str);
 
 	arr = BitArrSetOn(arr, 50);
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
+
+	printf("%s\n", str);
+
 	puts("");
 }
 
 void BitArrSetOffTest(void)
 {
 	bit_array_t arr = 4365;
+	char str[65] = {0};
 
 	puts("*** testing  BitArrSetOff ***");
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
+
+	printf("%s\n", str);
 
 	arr = BitArrSetOff(arr, 4);
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
+
+	printf("%s\n", str);
+
 	puts("");
 }
 
 void BitArrSetBitTest(void)
 {
 	bit_array_t arr = 4365;
+	char str[65] = {0};
 
 	puts("*** testing  BitArrSetBit ***");
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
 
-	arr = BitArrSetBit(arr, 4, 1);
+	printf("%s\n", str);
 
-	PrintBit(arr);
+	arr = BitArrSetBit(arr, 17, 1);
+
+	BitArrToString(arr, str);
+
+	printf("%s\n", str);
+
 	puts("");
 }
 
 void BitArrFlipTest(void)
 {
 	bit_array_t arr = 4365;
+	char str[65] = {0};
 
 	puts("*** testing  BitArrFlip ***");
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
+
+	printf("%s\n", str);
 
 	arr = BitArrFlip(arr, 2);
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
+
+	printf("%s\n", str);
+
 	puts("");
 }
 
 void BitArrIsOnTest(void)
 {
 	bit_array_t arr = 4365;
+	char str[65] = {0};
 
 	puts("*** testing  BitArrIsOn ***");
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
+
+	printf("%s\n", str);
 
 	arr = BitArrIsOn(arr, 1);
 
+	BitArrToString(arr, str);
+
 	printf("%ld\n", arr);
+
 	puts("");
 }
 
 void BitArrIsOffTest(void)
 {
 	bit_array_t arr = 4365;
+	char str[65] = {0};
 
 	puts("*** testing  BitArrSetOff ***");
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
+
+	printf("%s\n", str);
 
 	arr = BitArrIsOff(arr, 1);
 
@@ -166,73 +214,102 @@ void BitArrIsOffTest(void)
 void BitArrRotRTest(void)
 {
 	bit_array_t arr = 4365;
+	char str[65] = {0};
 
 	puts("*** testing  BitArrRotR ***");
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
+
+	printf("%s\n", str);
 
 	arr = BitArrRotR(arr, 3);
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
+
+	printf("%s\n", str);
+
 	puts("");
 }
 
 void BitArrRotLTest(void)
 {
 	bit_array_t arr = 4365;
+	char str[65] = {0};
 
 	puts("*** testing  BitArrRotL ***");
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
+
+	printf("%s\n", str);
 
 	arr = BitArrRotL(arr, 129);
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
+
+	printf("%s\n", str);
+
 	puts("");
 }
 
 void BitArrCountOnTest(void)
 {
-	bit_array_t arr = ~0;
+	bit_array_t arr = 1111111111111;
+	char str[65] = {0};
 
 	puts("*** testing  BitArrCountOn ***");
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
+
+	printf("%s\n", str);
 
 	printf("%ld\n", BitArrCountOn(arr));
 	printf("%ld\n", BitArrCountOnLUT(arr));
+
 	puts("");
 }
 
 void BitArrCountOffTest(void)
 {
 	bit_array_t arr = 4365;
+	char str[65] = {0};
 
 	puts("*** testing  BitArrCountOff ***");
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
+
+	printf("%s\n", str);
 
 	printf("%ld\n", BitArrCountOff(arr));
+
 	puts("");
 }
 
 void BitArrMirrorTest(void)
 {
-	bit_array_t arr = 4365;
+	bit_array_t arr = 91243685657113095;
+	bit_array_t arr2 = 91243685657113095;
+	char str[65] = {0};
 
 	puts("*** testing  BitArrMirror ***");
 
-	PrintBit(arr);
+	BitArrToString(arr, str);
+	printf("%s\n", str);
 
 	arr = BitArrMirror(arr);
+	arr2 = BitArrMirrorLUT(arr2);
+	
+	BitArrToString(arr, str);
+	printf("%s\n", str);
 
-	PrintBit(arr);
+	BitArrToString(arr2, str);
+	printf("%s\n", str);
+	
 	puts("");
 }
 
 void BitArrToStringTest(void)
 {
-	char str[9] = {0};
+	char str[65] = {0};
 	
 	bit_array_t arr = 0x796B6E69466F6449;
 
