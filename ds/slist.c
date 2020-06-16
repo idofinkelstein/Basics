@@ -133,17 +133,6 @@ slist_iter_t SListInsert(slist_t *slist, slist_iter_t where, void *data)
 		return (slist->tail);
 	}
 
-	/* in case node to be placed before head node */
-	if(SListIterIsEqual(where, slist->head))
-	{
-		new->next = where;
-		slist->head = new;
-
-		new->data = data;
-
-		return(new);
-	}
-
 	*new = *where; /* duplicates where */
 	where->next = new; 
 
@@ -281,5 +270,21 @@ int SListForEach(const slist_iter_t from,
 	}
 
 	return 1;
+}
+
+void SListAppend(slist_t *dest, slist_t *src)
+{
+	assert(dest);
+	assert(src);
+
+	*dest->tail = *src->head;
+
+	dest->tail = src->tail;
+
+	src->tail = src->head;
+
+	src->head->data = NULL;
+	src->head->next = NULL;
+	 
 }
 
