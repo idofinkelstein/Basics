@@ -277,7 +277,9 @@ void SListAppend(slist_t *dest, slist_t *src)
 	assert(dest);
 	assert(src);
 
-	*dest->tail = *src->head;
+	/* copies the content of node pointed to by src->head to the 
+	   node pointed to by dest->tail */
+	*dest->tail = *src->head; 
 
 	dest->tail = src->tail;
 
