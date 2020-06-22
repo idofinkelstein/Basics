@@ -160,7 +160,16 @@ void Scenario2Test(void)
 
 	for (i = 0; i < 90; ++i)
 	{
-		printf("%d, ", dest_arr[i]);
+		printf("%d", dest_arr[i]);
+
+		if (89 == i)
+		{
+			printf(".");
+		}
+		else
+		{
+			printf(", ");
+		}
 	}
 
 	printf("\n");

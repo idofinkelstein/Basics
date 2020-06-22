@@ -95,7 +95,7 @@ ssize_t CBufferWrite(c_buffer_t *c_buffer, const void *src, size_t count)
 	if (!CBufferFreeSpace(c_buffer))
 	{
 		errno = ENOBUFS;
-		return ERROR;
+		return (ERROR);
 	}
 
 	errno = 0;
@@ -136,7 +136,7 @@ size_t CBufferFreeSpace(const c_buffer_t *c_buffer)
 	/* if read is behind write, size = read + capacity - write */
 	return((c_buffer->read > c_buffer->write) ? 
 		   (c_buffer->read - c_buffer->write - 1) :
-		   (c_buffer->read + c_buffer->capacity) - c_buffer->write);
+		   (c_buffer->read + c_buffer->capacity) - c_buffer->write);	
 }
 
 size_t CBufferCapacity(const c_buffer_t *c_buffer)
