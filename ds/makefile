@@ -1,6 +1,6 @@
 CC=gcc -ansi -pedantic-errors -Wall -Wextra -g
 
-all: stack vector slist slist_additional queue
+all: stack vector slist slist_additional queue dlist c_buffer
 
 # compiles stack
 stack: stack_test.o stack.o
@@ -47,7 +47,7 @@ slist_additional_test.o: slist_additional_test.c
 slist_additional.o: slist_additional.c 
 	$(CC) -c slist_additional.c 
 
-#compiles slist
+#compiles queue
 queue: queue_test.o queue.o
 	$(CC) queue_test.o queue.o -o queue.out
 	
@@ -57,6 +57,29 @@ queue_test.o: queue_test.c
 
 queue.o: queue.c 
 	$(CC) -c queue.c 
+
+#compiles dlist
+dlist: dlist_test.o dlist.o
+	$(CC) dlist_test.o dlist.o -o dlist.out
+	
+
+dlist_test.o: dlist_test.c 
+	$(CC) -c dlist_test.c 
+
+dlist.o: dlist.c 
+	$(CC) -c dlist.c 
+
+#compiles c_buffer
+c_buffer: c_buffer_test.o c_buffer.o
+	$(CC) c_buffer_test.o c_buffer.o -o c_buffer.out
+	
+
+c_buffer_test.o: c_buffer_test.c 
+	$(CC) -c c_buffer_test.c 
+
+c_buffer.o: c_buffer.c 
+	$(CC) -c c_buffer.c 
+
 
 #clean up
 clean_stack:
@@ -73,6 +96,13 @@ clean_slist_additional:
 
 clean_queue:
 	rm queue_test.o queue.o queue.out
+
+clean_dlist:
+	rm dlist_test.o dlist.o dlist.out
+
+clean_c_buffer:
+	rm c_buffer_test.o c_buffer.o c_buffer.out
+
 
 
 
