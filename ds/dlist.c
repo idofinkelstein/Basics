@@ -10,9 +10,6 @@ Date: 19/6/2020
 
 #include "dlist.h"
 
-#define SUCCESS 0
-#define FAILURE 1
-
 /* management structure */
 struct dlist
 {
@@ -64,6 +61,9 @@ dlist_t *DListCreate(void)
 
 	start_dummy->prev = NULL;
 	end_dummy->next = NULL;
+
+	start_dummy->data = (void *)0xFEE1DEAD;
+	end_dummy->data = (void *)0xFEE1DEAD;
 
 	start_dummy->next = end_dummy;
 	end_dummy->prev = start_dummy;
@@ -130,7 +130,7 @@ void DListSetData(dlist_iter_t iter, void *data)
 {
 	assert(iter);
 
-	iter->data = (void*)data;
+	iter->data = data;
 }
 
 int DListIterIsEqual(const dlist_iter_t iter1, const dlist_iter_t iter2)
@@ -173,12 +173,13 @@ dlist_iter_t DListInsert(dlist_t *dlist, dlist_iter_t where, void *data)
 
 dlist_iter_t DListRemove(dlist_iter_t iter)
 {
-	dlist_iter_t temp = iter->next;
+	dlist_iter_t temp = DListNext(iter);
 
 	assert(iter);
 
 	iter->next->prev = DListPrev(iter);
 	iter->prev->next = DListNext(iter);
+
 	free(iter);
 	iter = NULL;
 
@@ -223,7 +224,6 @@ void *DListPopBack(dlist_t *dlist)
 
 size_t DListSize(const dlist_t *dlist)
 {
-	
 	dlist_iter_t curr = DListBegin(dlist);
 	size_t count = 0;
 
@@ -267,23 +267,19 @@ int DListForEach(dlist_iter_t from,
                  void *param)
 {
 	dlist_iter_t curr = from;
+	int do_action_status = 0;
 
 	assert(from);
 	assert(to);
 
-	while (!DListIterIsEqual(curr, to))
+	while (!DListIterIsEqual(curr, to) && !do_action_status)
 	{
-		if (NULL == curr)	
-		{
-			return (FAILURE);
-		}
+		do_action_status = do_action(curr->data, param);
 
-		do_action(curr->data, param);
-	
 		curr = DListNext(curr);	
-	}
+	}	
 
-	return (SUCCESS);
+	return (do_action_status);
 }
 
 dlist_iter_t DListSplice(dlist_iter_t from, dlist_iter_t to, dlist_iter_t where)
@@ -292,6 +288,7 @@ dlist_iter_t DListSplice(dlist_iter_t from, dlist_iter_t to, dlist_iter_t where)
 
 	assert(from);
 	assert(to);
+	assert(from != to);
 	assert(where);
 
 	/* reconnects wires */

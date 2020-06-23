@@ -9,6 +9,11 @@ Date: 19/6/2020
 
 #include "dlist.h"
 
+#define SUCCESS 0
+#define FAILURE 1
+#define TRUE 1
+#define FALSE 0
+
 /* utility functions declaration */
 int ChangeValue(void *data, void *param);
 int IsMatch(const void *data, void *param);
@@ -105,12 +110,12 @@ int ChangeValue(void *data, void *param)
 {
 	if (NULL == data)
 	{
-		return 0;
+		return FAILURE;
 	}
 
 	*(float*)data = *(float*)data + *(int*)param;
 
-	return 1;
+	return SUCCESS;
 }
 
 /* function to pass to Find */
@@ -119,11 +124,11 @@ int IsMatch(const void *data, void *param)
 	if (*(char*)data == *(char*)param)
 	{
 		puts("there is a match");
-		return 1;
+		return TRUE;
 	}
 
 	puts("there isn't match");
-	return 0; 
+	return FALSE; 
 }
 
 /* tests iterator manipulations, pop & push in a row and Splice */
