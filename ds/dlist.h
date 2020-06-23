@@ -47,23 +47,6 @@ Dlist API
 #ifndef ILRD_DLIST_H
 #define ILRD_DLIST_H
 
-/* move to C file 
-struct dlist
-{
-	dlist_node *head;
-    dlist_node *tail;
-};
-*/
-
-/* move to C file
-struct dlist_node
-{
-    void *data;
-    dlist_node *next;
-    dlist_node *prev;	
-};
-*/
-
 #include <stddef.h>	/* size_t */
 
 /* typedefs for the dlist and the iterator  */
