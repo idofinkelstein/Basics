@@ -62,8 +62,8 @@ dlist_t *DListCreate(void)
 	start_dummy->prev = NULL;
 	end_dummy->next = NULL;
 
-	start_dummy->data = (void *)0xFEE1DEAD;
-	end_dummy->data = (void *)0xFEE1DEAD;
+	start_dummy->data = (void*)0xFEE1DEAD;
+	end_dummy->data = (void*)0xFEE1DEAD;
 
 	start_dummy->next = end_dummy;
 	end_dummy->prev = start_dummy;
