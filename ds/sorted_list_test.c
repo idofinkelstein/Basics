@@ -13,10 +13,10 @@ Date: 24/6/2020
 #define FAILURE 1
 
 /* utility function declarations */
-int IsBefore(const void *data1, const void *data2);
+int IsBefore(const void *data1, const void *data2, void *param);
 int ChangeValue(void *data, void *param);
 int IsMatch(const void *data, void *param);
-int IsBeforeFloat(const void *data1, const void *data2);
+int IsBeforeFloat(const void *data1, const void *data2, void *param);
 
 /* test case function declarations */
 void Scenario1Test(void);
@@ -32,9 +32,11 @@ void Scenario9Test(void);
 int main()
 {
 	sorted_list_iter_t iter;
+	void *param = NULL;
 	sorted_list_is_before_func_t is_before = IsBefore;
-	sorted_list_t *list = SortedListCreate(is_before);
+	sorted_list_t *list = SortedListCreate(is_before, param);
 	int arr[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+	
 
 	printf("emptiness = %d\n", SortedListIsEmpty(list));
 
@@ -71,8 +73,9 @@ int main()
 void Scenario1Test(void)
 {
 	sorted_list_iter_t iter;
+	void *param = NULL;
 	sorted_list_is_before_func_t is_before = IsBefore;
-	sorted_list_t *list = SortedListCreate(is_before);
+	sorted_list_t *list = SortedListCreate(is_before, param);
 	int arr[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
 	printf("test scenario1: case: pops front & back and remove in the middle\n");
@@ -133,8 +136,9 @@ void Scenario1Test(void)
 void Scenario2Test(void)
 {
 	sorted_list_iter_t iter;
+	void *param = NULL;
 	sorted_list_is_before_func_t is_before = IsBeforeFloat;
-	sorted_list_t *list = SortedListCreate(is_before);
+	sorted_list_t *list = SortedListCreate(is_before, param);
 	float arr[] = {0, 1, 2, 3, 4.9, 5, 5.5, 5.1, 5.01, 9, 10};
 	float to_find = 5.1;
 
@@ -199,9 +203,10 @@ void Scenario2Test(void)
 void Scenario3Test(void)
 {
 	sorted_list_iter_t iter;
+	void *param = NULL;
 	sorted_list_is_before_func_t is_before = IsBefore;
 	sorted_list_do_action_func_t do_action = ChangeValue;
-	sorted_list_t *list = SortedListCreate(is_before);
+	sorted_list_t *list = SortedListCreate(is_before, param);
 	int arr[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 	int x = 5;
 	
@@ -238,9 +243,10 @@ void Scenario3Test(void)
 void Scenario4Test(void)
 {
 	sorted_list_iter_t iter;
+	void *param = NULL;
 	sorted_list_is_before_func_t is_before = IsBefore;
 	sorted_list_is_match_func_t is_match = IsMatch;
-	sorted_list_t *list = SortedListCreate(is_before);
+	sorted_list_t *list = SortedListCreate(is_before, param);
 	int arr[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
 	printf("test scenario4: case: FindIf (1, 5, 10)\n");
@@ -283,9 +289,10 @@ void Scenario4Test(void)
 /* test scenario5: case: Merge - 2 identical length lists */
 void Scenario5Test(void)
 {
+	void *param = NULL;
 	sorted_list_is_before_func_t is_before = IsBefore;
-	sorted_list_t *dest_list = SortedListCreate(is_before);
-	sorted_list_t *src_list = SortedListCreate(is_before);
+	sorted_list_t *dest_list = SortedListCreate(is_before, param);
+	sorted_list_t *src_list = SortedListCreate(is_before, param);
 	sorted_list_iter_t iter;
 	int dest[] = {-6, 2, 4, 5, 7, 12, 14, 15, 20, 22, 50};
 	int src[] = {-5, 1, 3, 6, 8, 9, 10, 20, 24, 52, 53};
@@ -336,9 +343,10 @@ void Scenario5Test(void)
 /* test scenario6: case: Merge - dest is an empty list */
 void Scenario6Test(void)
 {
+	void *param = NULL;
 	sorted_list_is_before_func_t is_before = IsBefore;
-	sorted_list_t *dest_list = SortedListCreate(is_before);
-	sorted_list_t *src_list = SortedListCreate(is_before);
+	sorted_list_t *dest_list = SortedListCreate(is_before, param);
+	sorted_list_t *src_list = SortedListCreate(is_before, param);
 	sorted_list_iter_t iter;
 	int src[] = {-5, 1, 3, 6, 8, 9, 10, 20, 24, 52, 53};
 
@@ -376,9 +384,10 @@ void Scenario6Test(void)
 /* test scenario7: case: Merge - src is an empty list */
 void Scenario7Test(void)
 {
+	void *param = NULL;
 	sorted_list_is_before_func_t is_before = IsBefore;
-	sorted_list_t *dest_list = SortedListCreate(is_before);
-	sorted_list_t *src_list = SortedListCreate(is_before);
+	sorted_list_t *dest_list = SortedListCreate(is_before, param);
+	sorted_list_t *src_list = SortedListCreate(is_before, param);
 	sorted_list_iter_t iter;
 	int dest[] = {-6, 2, 4, 5, 7, 12, 14, 15, 20, 22, 50};
 
@@ -416,9 +425,10 @@ void Scenario7Test(void)
 /* test scenario8: case: Merge - both lists are empty */
 void Scenario8Test(void)
 {
+	void *param = NULL;
 	sorted_list_is_before_func_t is_before = IsBefore;
-	sorted_list_t *dest_list = SortedListCreate(is_before);
-	sorted_list_t *src_list = SortedListCreate(is_before);
+	sorted_list_t *dest_list = SortedListCreate(is_before, param);
+	sorted_list_t *src_list = SortedListCreate(is_before, param);
 	
 	printf("test scenario8: case: Merge - both lists are empty\n");
 
@@ -433,9 +443,10 @@ void Scenario8Test(void)
 /* test scenario5: case: Merge - 2 floating point lists with different size */
 void Scenario9Test(void)
 {
+	void *param = NULL;
 	sorted_list_is_before_func_t is_before = IsBeforeFloat;
-	sorted_list_t *dest_list = SortedListCreate(is_before);
-	sorted_list_t *src_list = SortedListCreate(is_before);
+	sorted_list_t *dest_list = SortedListCreate(is_before, param);
+	sorted_list_t *src_list = SortedListCreate(is_before, param);
 	sorted_list_iter_t iter;
 	float dest[] = {-6, 2, 4, 5, 1, 12, 12.543, 345.15, 20.11, 22.11, 50.1};
 	float src[] = {0.4, 1.45, 65.63, 2, 1.6, 0.58, -34.9, -111.10, -111.20, 24,
@@ -505,7 +516,7 @@ int ChangeValue(void *data, void *param)
 }
 
 /* function to pass to Create */
-int IsBefore(const void *data1, const void *data2)
+int IsBefore(const void *data1, const void *data2, void *param)
 {
 	/* data2 is the new data */
 
@@ -526,7 +537,7 @@ int IsMatch(const void *data, void *param)
 }
 
 /* function to pass to Create */
-int IsBeforeFloat(const void *data1, const void *data2)
+int IsBeforeFloat(const void *data1, const void *data2, void *param)
 {
 	/* data2 is the new data */
 	

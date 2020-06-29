@@ -13,10 +13,11 @@ Date: 24/6/2020
 struct sorted_list
 {
 	dlist_t *dlist;
+	void *param;
 	sorted_list_is_before_func_t is_before; 
 };
 
-sorted_list_t *SortedListCreate(sorted_list_is_before_func_t is_before)
+sorted_list_t *SortedListCreate(sorted_list_is_before_func_t is_before, void *param)
 {
 	sorted_list_t *list = (sorted_list_t*)malloc(sizeof(sorted_list_t));
 
@@ -35,7 +36,8 @@ sorted_list_t *SortedListCreate(sorted_list_is_before_func_t is_before)
 		return (NULL);
 	}
 
-	list->is_before = is_before;
+	list->is_before = is_before;	
+	list->param = param;
 
 	return (list);
 }
@@ -120,7 +122,9 @@ sorted_list_iter_t SortedListInsert(sorted_list_t *sorted_list, void *data)
 
 	/* increments new node to the right place to keep it orderly */
 	while (!SortedListIterIsEqual(new, SortedListEnd(sorted_list)) && 
-		   !sorted_list->is_before(data, SortedListGetData(new)))
+		   !sorted_list->is_before(data,
+								   SortedListGetData(new),
+								   sorted_list->param))
 	{
 		new = SortedListNext(new);
 	}
@@ -173,13 +177,17 @@ sorted_list_iter_t SortedListFind(sorted_list_t *sorted_list,
 	assert(to.internal_iter);
 
 	while (!SortedListIterIsEqual(curr, to) &&
-			sorted_list->is_before(SortedListGetData(curr), to_find))
+			sorted_list->is_before(SortedListGetData(curr),
+								   to_find,
+								   sorted_list->param))
 	{
 		curr = SortedListNext(curr);
 	}
 	
 	if (!SortedListIterIsEqual(curr, to) &&
-		!sorted_list->is_before(to_find, SortedListGetData(curr)))
+		!sorted_list->is_before(to_find,
+								SortedListGetData(curr),
+								sorted_list->param))
 	{
 		return (curr);
 	}
@@ -236,7 +244,9 @@ void SortedListMerge(sorted_list_t *dest, sorted_list_t *src)
 		
 		/* as long as to->data is lesser than where->data this loop increments to */		
 		while (!SortedListIterIsEqual(to, SortedListEnd(src))  &&
-			   dest->is_before(SortedListGetData(to), SortedListGetData(where)))
+			   dest->is_before(SortedListGetData(to),
+							   SortedListGetData(where),
+							   dest->param))
 		{
 			to = SortedListNext(to);
 		}
