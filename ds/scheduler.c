@@ -138,12 +138,11 @@ int SchRun(sch_t *sch)
 		/* runs repeated tasks until recieves a stop signal */
 		if (CONTINUE == task_result && !sch->stop_signal)
 		{
-			SchTimerStart(sch,
-						  timer->interval,
-						  timer->task_func,
-						  timer->param);
+			timer->abs_time = timer->interval + time(NULL);
 
-			free(PQDequeue(sch->pqueue));			
+			PQEnqueue(sch->pqueue, timer);
+
+			PQDequeue(sch->pqueue);			
 		}
 		else if (STOP == task_result)
 		{
