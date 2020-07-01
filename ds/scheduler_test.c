@@ -1,8 +1,16 @@
+/***********************
+File name: scheduler_test.c
+Author: Ido Finkelstein
+Reviewer: Rita Lampert 
+Date: 1/7/2020
+************************/
 
-#include <stdio.h>
+#include <stdio.h>   /* printf       */
+#include <stdbool.h> /* true, false  */
 
 #include "scheduler.h"
 
+/* task function declarations */
 int task1(sch_t *sch, unique_id_t uid, void *param);
 int task2(sch_t *sch, unique_id_t uid, void *param);
 int task3(sch_t *sch, unique_id_t uid, void *param);
@@ -14,8 +22,9 @@ int main()
 	unique_id_t uid1 = SchTimerStart(sched, 1, task_func , NULL);
 	unique_id_t bad_uid = {0, -1, -1};
 	unique_id_t uid2;
+	int stop = false;
 
-	SchTimerStart(sched, 2, task3, NULL);
+	SchTimerStart(sched, 1, task3, &stop);
 	printf("%ld-%d-%ld\n", uid1.time, uid1.pid, uid1.counter);
 	uid2 = SchTimerStart(sched, 2, task2, NULL);
 	
@@ -24,8 +33,13 @@ int main()
 	
 	printf("%ld-%d-%ld\n", uid1.time, uid1.pid, uid1.counter);
 
+	stop = true;
+	SchTimerStart(sched, 6, task3, &stop);
+
 	SchTimerCancel(sched, uid2);
 	SchTimerCancel(sched, bad_uid);
+
+	uid2 = SchTimerStart(sched, 4, task2, NULL);
 
 	SchRun(sched);
 
@@ -37,7 +51,7 @@ int main()
 int task1(sch_t *sch, unique_id_t uid, void *param)
 {
 	static size_t count = 0;
-	printf("DDDD\n");
+	printf("hello!\n");
 
 	(void)uid;
 	(void)param;
@@ -65,13 +79,19 @@ int task2(sch_t *sch, unique_id_t uid, void *param)
 	return 0;
 }
 
-
 int task3(sch_t *sch, unique_id_t uid, void *param)
 {
+	int signal = *(int*)param;
 	(void)uid;
-	(void)param;
 
-	SchStop(sch);
+	if (true == signal)
+	{
+		SchStop(sch);
+	}
+	else
+	{
+		puts("continue!");
+	}
 
 	return 0;
 }

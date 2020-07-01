@@ -1,4 +1,11 @@
-#include <stdio.h>
+/***********************
+File name: uid_test.c
+Author: Ido Finkelstein
+Reviewer: Hilla Pilo
+Date: 26/6/2020
+************************/
+
+#include <stdio.h> /* printf */
 
 #include "uid.h"
 
