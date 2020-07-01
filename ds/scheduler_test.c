@@ -22,9 +22,10 @@ int main()
 	unique_id_t uid1 = SchTimerStart(sched, 1, task_func , NULL);
 	unique_id_t bad_uid = {0, -1, -1};
 	unique_id_t uid2;
-	int stop = false;
+	int stop = true;
+	int run = false;
 
-	SchTimerStart(sched, 1, task3, &stop);
+	SchTimerStart(sched, 3, task3, &run);
 	printf("%ld-%d-%ld\n", uid1.time, uid1.pid, uid1.counter);
 	uid2 = SchTimerStart(sched, 2, task2, NULL);
 	
@@ -34,7 +35,7 @@ int main()
 	printf("%ld-%d-%ld\n", uid1.time, uid1.pid, uid1.counter);
 
 	stop = true;
-	SchTimerStart(sched, 6, task3, &stop);
+	SchTimerStart(sched, 2, task3, &stop);
 
 	SchTimerCancel(sched, uid2);
 	SchTimerCancel(sched, bad_uid);
@@ -92,6 +93,8 @@ int task3(sch_t *sch, unique_id_t uid, void *param)
 	{
 		puts("continue!");
 	}
+
+	printf("%d\n", signal);
 
 	return 0;
 }
