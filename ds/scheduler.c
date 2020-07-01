@@ -83,7 +83,7 @@ unique_id_t SchTimerStart(sch_t *sch,
 	
 	timer->uid = UIDCreate();
 
-	if(UIDIsSame(timer->uid), UIDGetBadUID())
+	if(UIDIsSame(timer->uid, UIDGetBadUID()))
 	{
 		free(timer);
 
