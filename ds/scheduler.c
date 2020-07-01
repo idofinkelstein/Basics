@@ -5,10 +5,10 @@
 #include "pqueue.h"
 #include "scheduler.h"
 
-#define SUCCESS 0
 #define FAILURE 1
 #define CONTINUE 1
 #define STOP 0
+#define ERROR -1
 
 int Compare(const void *data1, const void *data2, void *param);
 int IsMatch(const void *data, void *param);
@@ -82,9 +82,20 @@ unique_id_t SchTimerStart(sch_t *sch,
 	}
 	
 	timer->uid = UIDCreate();
+
+	if(UIDIsSame(timer->uid), UIDGetBadUID())
+	{
+		free(timer);
+
+		return(UIDGetBadUID());
+	}
+
 	timer->interval = interval_in_sec;
+
 	timer->task_func = task;
+
 	timer->param = param;
+
 	timer->abs_time = interval_in_sec + time(NULL);
 
 	PQEnqueue(sch->pqueue, timer);
@@ -97,7 +108,7 @@ int SchRun(sch_t *sch)
 	t_t *timer = NULL;
 	int task_result = 0;
 
-	while (!PQIsEmpty(sch->pqueue))
+	while (!PQIsEmpty(sch->pqueue) && ERROR != task_result)
 	{
 		timer = PQPeek(sch->pqueue);
 		
@@ -121,13 +132,9 @@ int SchRun(sch_t *sch)
 		{
 			free(PQDequeue(sch->pqueue));
 		}
-		else 
-		{
-			return (FAILURE);
-		}
 	}
-
-	return (SUCCESS);
+			
+	return (ERROR == task_result);
 }
 
 void SchTimerCancel(sch_t *sch, unique_id_t uid)

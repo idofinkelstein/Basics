@@ -52,6 +52,7 @@ int main()
 	unique_id_t uid1 = SchTimerStart(sched, 1, task_func , NULL);
 	unique_id_t bad_uid = {0, -1, -1};
 	unique_id_t uid2;
+
 	SchTimerStart(sched, 2, task3, NULL);
 	printf("%ld-%d-%ld\n", uid1.time, uid1.pid, uid1.counter);
 	uid2 = SchTimerStart(sched, 2, task2, NULL);
@@ -61,7 +62,7 @@ int main()
 	
 	printf("%ld-%d-%ld\n", uid1.time, uid1.pid, uid1.counter);
 
-	/*SchTimerCancel(sched, uid2);*/
+	SchTimerCancel(sched, uid2);
 	SchTimerCancel(sched, bad_uid);
 
 	SchRun(sched);
