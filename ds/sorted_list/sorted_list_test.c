@@ -520,6 +520,8 @@ int IsBefore(const void *data1, const void *data2, void *param)
 {
 	/* data2 is the new data */
 
+	(void)param;
+
 	return (*(int*)data1 < *(int*)data2);
 }
 
@@ -540,6 +542,8 @@ int IsMatch(const void *data, void *param)
 int IsBeforeFloat(const void *data1, const void *data2, void *param)
 {
 	/* data2 is the new data */
+
+	(void)param;
 	
 	return (*(float*)data1 < *(float*)data2);
 }

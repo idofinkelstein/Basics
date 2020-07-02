@@ -5,7 +5,7 @@ Reviewer: Shiran Hodeda
 ***********************/
 
 #include <stdio.h>
-#include "ilrd_stack.h"
+#include "stack.h"
 
 #define STACK_SIZE 100
 

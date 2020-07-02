@@ -7,7 +7,7 @@ Date: 8/6/2020
 
 #include <stdio.h>
 
-#include "ilrd_vector.h"
+#include "vector.h"
 /* API testing functions declaration */
 vector_t *VectorCreateTest(size_t capacity);
 void VectorDestroyTest(vector_t *vector);

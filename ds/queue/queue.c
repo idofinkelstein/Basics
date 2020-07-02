@@ -78,7 +78,7 @@ int QEnqueue(queue_t *queue, void *data)
 		return (FAILURE);
 	}
 
-	return SUCCESS;
+	return (SUCCESS);
 }
 
 void QDequeue(queue_t *queue)

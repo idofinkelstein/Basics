@@ -21,17 +21,14 @@ Main operations on SLL:
 -   Find - finds data stored in list. O(n)
 -   ForEach - performs an operation given by the user on all elements in the
 	list. O(n)
--	Flip - reverses the order of a given slist.
--	HasLoop - tells wether a given slist has loop
--	FindIntersection - returns a pointer to a first node mutual to both slists,
-	if any.
+-	Append - appends the src list to the end of dest list.
 
 Generally, in case of errors will return the end of the list. User should
 compare the results with the end of the list to determine errors. 
 Please note the documentation of each function for further details.
 It is recommended to use asserts when compiling.
 
-Vector API
+slist API
 -   Ver:  1.0  API team discussion
 -   Ver:  1.1  API team approval
 -   Ver:  1.2  API mentor approval
@@ -39,8 +36,9 @@ Vector API
                                  - renamed "InsertBefore"->"Insert"
                                  - added comments to "Insert" & "InsertAfter"
 								   regarding empty list case
--	Ver:  1.4 Fixes - added slist argument to Remove function
-				    - added a comment to Insert function
+-	Ver:  1.4  Fixes - added slist argument to Remove function
+				     - added a comment to Insert function
+-   Ver:  1.5  Fixes - support append function
 */
 
 #ifndef ILRD_SLIST_H
@@ -50,7 +48,7 @@ Vector API
 struct slist
 {
 	slist_node *head;
-	slist_node *tail;
+    slist_node *tail;
 };
 */
 
@@ -72,7 +70,7 @@ typedef struct slist slist_t;
 
 /* return value is boolean - 1 for match, 0 if not matched */
 typedef int (*slist_is_match_func_t)(void *data, void *param);
-/* return value is boolean - 0 for success, 1 for fail */
+/* return value is status - 0 for success, 1 for fail */
 typedef int (*slist_do_action_func_t)(void *data, void *param);
 
 /*---------------------------------------------------------------------------*/
@@ -290,7 +288,7 @@ slist_iter_t SListFind(const slist_iter_t from,
 * Args:
 *   - from - iterator to the beginning of range
 *   - to - iterator to the end of range
-*   - do_action - function pointer to the action function
+*   - do_action - function pointer to the action pointer
 *	- param - parameter to pass to action function (optional)
 *   
 * Return value:
@@ -302,11 +300,24 @@ slist_iter_t SListFind(const slist_iter_t from,
 *	- do_action is a function to be implemeneted by the user. See signature 
 *	  in typedef.
 */
-
 int SListForEach(const slist_iter_t from, 
                  const slist_iter_t to, 
 				 slist_do_action_func_t do_action, 
                  void *param);
+                 
+/*---------------------------------------------------------------------------*/
+/* SListAppend:
+*   - appends the src list to the end of dest list.
+*
+* Args:
+*   - dest - pointer to slist given by user.
+*   - src - pointer to slist given by user.
+*
+* Comments: 
+*   - in case of invalid slists - undefined behavior.
+*   
+*/
+void SListAppend(slist_t *dest, slist_t *src);
 
 /*---------------------------------------------------------------------------*/
 

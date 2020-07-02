@@ -33,6 +33,7 @@ void scenario8Test(void);
 void scenario9Test(void);
 void scenario10Test(void);
 void scenario11Test(void);
+void Scenario12Test(void);
 
 int main()
 {
@@ -81,6 +82,7 @@ int main()
 	scenario9Test();
 	scenario10Test();
 	scenario11Test();
+	Scenario12Test();
 
 	return 0;
 }
@@ -514,6 +516,105 @@ int IsMatch(void *data, void *param)
 
 	puts("there isn't match");
 	return 0; 
+}
+
+/* tests append */
+void Scenario12Test(void)
+{
+	slist_t *dest = SListCreate();
+	slist_t *src = SListCreate();
+	slist_iter_t dest_curr = SListBegin(dest);
+	slist_iter_t src_curr = SListBegin(src);
+	
+	SListInsert(dest, SListEnd(dest), "1");
+	SListInsert(dest, SListEnd(dest), "2");
+	SListInsert(dest, SListEnd(dest), "3");
+	SListInsert(src, SListEnd(src), "4");
+	SListInsert(src, SListEnd(src), "5");
+	SListInsert(src, SListEnd(src), "6");
+
+	printf("dest before: ");
+	
+	while (dest_curr)
+	{
+		if (SListGetData(dest_curr))
+		{
+			printf("%s ", (char*)SListGetData(dest_curr));
+		}
+
+		dest_curr = SlistNext(dest_curr);
+	}
+
+	puts("");
+
+	printf("src before: ");
+
+	while (src_curr)
+	{
+		if (SListGetData(src_curr))
+		{
+			printf("%s ", (char*)SListGetData(src_curr));
+		}
+
+		src_curr = SlistNext(src_curr);
+	}
+	
+	puts("");
+
+	SListAppend(dest, src);
+
+	dest_curr = SListBegin(dest);
+	src_curr = SListBegin(src);
+
+	printf("dest after: ");
+
+	while (dest_curr)
+	{
+		if (SListGetData(dest_curr))
+		{
+			printf("%s ", (char*)SListGetData(dest_curr));
+		}
+
+		dest_curr = SlistNext(dest_curr);
+	}
+
+	puts("");
+
+	printf("src after: ");
+
+	while (src_curr)
+	{
+		if (SListGetData(src_curr))
+		{
+			printf("%s ", (char*)SListGetData(src_curr));
+		}
+
+		src_curr = SlistNext(src_curr);
+	}
+	
+	puts("");
+
+	printf("src->head == src->tail ?  %d\n",
+		   SListIterIsEqual(SListBegin(src), SListEnd(src)));
+
+	dest_curr = SListBegin(dest);
+	
+	while (dest_curr)
+	{
+		printf("%d ", SListIterIsEqual(dest_curr, SListEnd(dest)));
+
+		if (SListIterIsEqual(dest_curr, SListEnd(dest)))
+		{
+			printf("<- this is the new tail");
+		}
+		
+		dest_curr = SlistNext(dest_curr);
+	}
+
+	puts("");
+
+	SListDestroy(src);
+	SListDestroy(dest);
 }
 
 /* function to pass to ForEach */

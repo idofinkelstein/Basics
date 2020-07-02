@@ -9,7 +9,7 @@ Date:  8/6/2020
 #include <stdlib.h>    /* malloc, free   */
 #include <sys/types.h> /* ssize_t 		 */
 #include <assert.h>
-#include "ilrd_vector.h"
+#include "vector.h"
 
 #define INC_FACTOR 2 /* increase factor */
 #define DEC_FACTOR 2 /* decrease factor */

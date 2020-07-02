@@ -14,15 +14,15 @@ Date: 19/6/2020
 struct dlist
 {
 	struct dlist_node *head;
-    struct dlist_node *tail;
+	struct dlist_node *tail;
 };
 
 /* node structure */
 struct dlist_node
 {
-    void *data;
-    struct dlist_node *next;
-    struct dlist_node *prev;
+	void *data;
+	struct dlist_node *next;
+	struct dlist_node *prev;
 };
 
 dlist_t *DListCreate(void)

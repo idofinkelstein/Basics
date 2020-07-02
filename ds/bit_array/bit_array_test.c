@@ -7,7 +7,7 @@ Date: 2/6/2020
 
 #include <stdio.h>  /* printf */
 #include <stdlib.h> /* size_t */
-#include "ilrd_bit_array.h"
+#include "bit_array.h"
 
 #define MAX_SHIFT (sizeof(size_t) * 8 - 1)
 

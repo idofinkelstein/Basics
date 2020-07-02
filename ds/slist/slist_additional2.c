@@ -7,12 +7,13 @@ Date: 15/6/2020
 
 #include <stdlib.h>
 
-#include "slist_addition.h" /* size_t */
+#include "slist_additional.h" /* size_t */
 
 size_t ListSize(node_t *head);
 
 node_t *Flip(node_t *head)
 {
+	
 	node_t *curr = head->next;
 	node_t *next = head->next;
 
@@ -30,7 +31,6 @@ node_t *Flip(node_t *head)
 		head = curr;
 		curr = next;
 	}
-
 	return (head);
 }
 
@@ -41,28 +41,13 @@ int HasLoop(const node_t *head)
 
 	/* this loop increment both node pointers, if the list contains loop - 
 	   they will meet at some point */
-	while(fast)
+	while(fast && fast->next && fast != slow)
 	{
-		/*  make sure i'm not incrementing a NULL pointer,
-		    perhaps the list has end  */
-		if(fast->next)
-		{
-			fast = fast->next->next;
-		}
-		else
-		{
-			return 0;
-		}
-
-		slow = slow->next;
-
-		if (fast == slow)
-		{
-			return 1;
-		}
+		fast = fast->next->next;
+		slow = slow->next;	
 	}
 
-	return 0;
+	return (fast == slow);
 }
 
 node_t *FindIntersection(node_t *head1, node_t *head2)
@@ -104,18 +89,13 @@ node_t *FindIntersection(node_t *head1, node_t *head2)
 	}
 	
 	/* if the two nodes are identical - returns one of them */
-	while (large)
+	while (large != little && large)
 	{
-		if (large == little)
-		{
-			return (large);
-		}
-
 		large = large->next;
 		little = little->next;
 	}
 	
-	return (NULL);
+	return (large);
 }
 
 size_t ListSize(node_t *head)

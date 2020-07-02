@@ -34,7 +34,6 @@ int main()
 	
 	printf("%ld-%d-%ld\n", uid1.time, uid1.pid, uid1.counter);
 
-	stop = true;
 	SchTimerStart(sched, 2, task3, &stop);
 
 	SchTimerCancel(sched, uid2);
@@ -73,7 +72,6 @@ int task2(sch_t *sch, unique_id_t uid, void *param)
 	(void)uid;
 	(void)param;
 	(void)sch;
-
 
 	printf("hi!\n");
 

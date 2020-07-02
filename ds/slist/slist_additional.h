@@ -1,3 +1,10 @@
+/**************************
+File name: slist_additional.h
+Author: Ido Finkelstein
+Reviewer: Rita Lempert
+Date: 15/6/2020
+***************************/
+
 #ifndef __SLIST_ADDITION_H__
 #define __SLIST_ADDITION_H__
 

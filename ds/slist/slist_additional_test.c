@@ -8,7 +8,7 @@ Date: 15/6/2020
 #include <stdio.h>  /* printf */
 #include <stdlib.h> /* malloc, free */
 
-#include "slist_addition.h"
+#include "slist_additional.h"
 
 /* unit-test functions declaration */
 void FlipTest(void);
@@ -130,7 +130,7 @@ void HasLoopTest(void)
 	node5->next = node6;
 	node6->next = node7;
 	node7->next = node8;
-	node8->next = node3; /* start of loop */
+	node8->next = NULL; /* start of loop */
 	node1->data = &x1;
 	node2->data = &x2;
 	node3->data = &x3;
