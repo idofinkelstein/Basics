@@ -95,7 +95,6 @@ void *FSAAlloc(fsa_t *fsa)
 void FSAFree(void *block)
 {
 	fsa_t *fsa = NULL;
-
 	block_t *temp = NULL;
 
 	assert(block);
@@ -103,13 +102,11 @@ void FSAFree(void *block)
 	block = ((char*)block - sizeof(block_t)); /* moves the pointer to the
 												 actual data */
 	temp = block;
-
 	fsa = temp->next;
 
 	++fsa->free_blocks;
 	
 	temp->next = fsa->head;
-
 	fsa->head = temp;
 }
 
