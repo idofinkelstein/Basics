@@ -140,11 +140,9 @@ void VSAFree(void *block)
 {
 	block_t *curr = (block_t*)((char*)block - sizeof(block_t));
 	
-
 	assert(block);
 
-	curr->available_bytes = curr->capacity;
-	
+	curr->available_bytes = curr->capacity;	
 }
 
 size_t VSABiggestFreeBlock(vsa_t *vsa)
