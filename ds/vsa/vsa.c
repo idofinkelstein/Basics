@@ -56,9 +56,13 @@ vsa_t *VSAInit(void *mem_pool, size_t pool_size)
 	}
 
 	block = vsa->head;
-	block->available_bytes = pool_size - 2 * sizeof(block_t) - sizeof(vsa_t) - padding;
+	block->available_bytes = pool_size - 2 * sizeof(block_t) -
+							 sizeof(vsa_t) - padding;
+
 	block->capacity = block->available_bytes;
-	block->next = (block_t*)((char*)vsa  + pool_shift - word_size - sizeof(block_t));
+
+	block->next = (block_t*)((char*)vsa  + pool_shift -
+				   word_size - sizeof(block_t));
 
 	block = block->next;
 	block->next = NULL;
