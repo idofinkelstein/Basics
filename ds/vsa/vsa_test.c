@@ -134,24 +134,20 @@ void TestCase2(void)
 	block4 = VSAAlloc(vsa, 140);
 	block5 = VSAAlloc(vsa, 140);
 
-<<<<<<< HEAD
+
 	printf("block1 address = %p\n", (void*)block1);
 	printf("block2 address = %p\n", (void*)block2);
 	printf("block3 address = %p\n", (void*)block3);
 	printf("block4 address = %p\n", (void*)block4);
 	printf("block5 address = %p\n", (void*)block5);
 
-=======
->>>>>>> 5b7706654d7363843f7596f6d9bdc90496d8db97
 	printf("max block available = %ld\n", VSABiggestFreeBlock(vsa));
 
 	block6 = VSAAlloc(vsa, 140);
 
-<<<<<<< HEAD
+
 	printf("block6 address = %p\n", (void*)block6);
 	
-=======
->>>>>>> 5b7706654d7363843f7596f6d9bdc90496d8db97
 	printf("max block available = %ld\n", VSABiggestFreeBlock(vsa));
 
 	VSAFree(block3);
@@ -166,11 +162,8 @@ void TestCase2(void)
 
 	block1 = VSAAlloc(vsa, 900);
 
-<<<<<<< HEAD
 	printf("block1 address = %p\n", (void*)block1);
 
-=======
->>>>>>> 5b7706654d7363843f7596f6d9bdc90496d8db97
 	printf("max block available after huge allocation = %ld\n",
 		   VSABiggestFreeBlock(vsa));
 	
