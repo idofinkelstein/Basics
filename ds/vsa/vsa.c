@@ -56,6 +56,7 @@ vsa_t *VSAInit(void *mem_pool, size_t pool_size)
 	}
 
 	block = vsa->head;
+<<<<<<< HEAD
 	block->available_bytes = pool_size - 2 * sizeof(block_t) -
 							 sizeof(vsa_t) - padding;
 
@@ -63,6 +64,11 @@ vsa_t *VSAInit(void *mem_pool, size_t pool_size)
 
 	block->next = (block_t*)((char*)vsa  + pool_shift -
 				   word_size - sizeof(block_t));
+=======
+	block->available_bytes = pool_size - 2 * sizeof(block_t) - sizeof(vsa_t) - padding;
+	block->capacity = block->available_bytes;
+	block->next = (block_t*)((char*)vsa  + pool_shift - word_size - sizeof(block_t));
+>>>>>>> 5b7706654d7363843f7596f6d9bdc90496d8db97
 
 	block = block->next;
 	block->next = NULL;
@@ -144,9 +150,17 @@ void VSAFree(void *block)
 {
 	block_t *curr = (block_t*)((char*)block - sizeof(block_t));
 	
+<<<<<<< HEAD
 	assert(block);
 
 	curr->available_bytes = curr->capacity;	
+=======
+
+	assert(block);
+
+	curr->available_bytes = curr->capacity;
+	
+>>>>>>> 5b7706654d7363843f7596f6d9bdc90496d8db97
 }
 
 size_t VSABiggestFreeBlock(vsa_t *vsa)
