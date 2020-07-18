@@ -19,6 +19,7 @@ static const size_t mask = 0x1;
 size_t ActualBlockSize(size_t block_size);
 int BlockIsFree(block_t *block);
 size_t BlockActoualCapacity(block_t *block);
+int BlockIsLast(block_t *block);
 
 struct variable_sized_alloc
 {
@@ -91,7 +92,7 @@ void *VSAAlloc(vsa_t *vsa, size_t block_size)
 	
 	/* this loop increments curr & defragments adjacent free blocks until
 	   it meets suitable block for allocation */
-	while (BlockActoualCapacity(prev) < actual_block_size && curr->next != NULL)
+	while (BlockActoualCapacity(prev) < actual_block_size && !BlockIsLast(curr))
 	{
 		prev = curr; /* saves the last block for evaluation in while
 						loop condition */
@@ -99,7 +100,7 @@ void *VSAAlloc(vsa_t *vsa, size_t block_size)
 		next = curr->next;
 
 		/* this loop does the task of defragmenting adjacent free blocks */
-		while (BlockIsFree(curr) && BlockIsFree(next) && next->next != NULL)
+		while (BlockIsFree(curr) && BlockIsFree(next) && !BlockIsLast(next))
 		{
 			curr->capacity += BlockActoualCapacity(next) + sizeof(block_t);
 			
@@ -113,7 +114,7 @@ void *VSAAlloc(vsa_t *vsa, size_t block_size)
 	curr = prev;
 
 	/* no suitable block found */
-	if (NULL == curr->next || 
+	if (BlockIsLast(curr) || 
 		BlockActoualCapacity(curr) < actual_block_size || 
 		!BlockIsFree(curr))
 	{
@@ -197,4 +198,9 @@ int BlockIsFree(block_t *block)
 size_t BlockActoualCapacity(block_t *block)
 {
 	return (block->capacity & ~1);
+}
+
+int BlockIsLast(block_t *block)
+{
+	return (block->next == NULL);
 }
