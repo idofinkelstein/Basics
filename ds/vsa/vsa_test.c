@@ -12,11 +12,13 @@ Date: 11.7.2020
 
 void TestCase1(void);
 void TestCase2(void);
+void TestCase3(void);
 
 int main()
 {
 	TestCase1();
 	TestCase2();
+	TestCase3();
 
 	return 0;
 }
@@ -25,7 +27,7 @@ void TestCase1(void)
 {
 	void *pool = NULL;
 	vsa_t *vsa = NULL;
-	size_t pool_size = 600;
+	size_t pool_size = 601;
 	void *block1 = NULL;
 	void *block2 = NULL;
 	void *block3 = NULL;
@@ -168,6 +170,44 @@ void TestCase2(void)
 		   VSABiggestFreeBlock(vsa));
 	
 	pool = (char*)pool - 3;	
+
+	free(pool); 
+}
+
+void TestCase3(void)
+{
+	void *pool = NULL;
+	vsa_t *vsa = NULL;
+	size_t pool_size = 360;
+	void *block1 = NULL;
+	void *block2 = NULL;
+	void *block3 = NULL;
+	
+	puts("\n*** TestCase 3 ***");
+
+	pool = malloc(pool_size);
+
+	vsa = VSAInit(pool, pool_size);
+
+	printf("max block available = %ld\n", VSABiggestFreeBlock(vsa));
+
+	block1 = VSAAlloc(vsa, 104);
+	printf("max block available after block1 allocated = %ld\n", VSABiggestFreeBlock(vsa));
+	
+	block2 = VSAAlloc(vsa, 96);
+	printf("max block available after block2 allocated = %ld\n", VSABiggestFreeBlock(vsa));
+	block3 = VSAAlloc(vsa, 128);
+	printf("block2 address = %p\n", (void*)block2);
+	printf("block3 address = %p\n", (void*)block3);
+
+	printf("max block available = %ld\n", VSABiggestFreeBlock(vsa));
+
+	if (NULL != block1)
+	{
+		VSAFree(block1);
+	}
+
+	printf("max block available after block1 was freed = %ld\n", VSABiggestFreeBlock(vsa));
 
 	free(pool); 
 }

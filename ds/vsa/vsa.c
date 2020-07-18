@@ -9,13 +9,16 @@ Date: 11.7.2020
 
 #include "vsa.h"
 
+typedef struct block block_t;
+
 static const size_t unalligned_address_mask = sizeof(size_t) - 1;
 static const size_t word_size = sizeof(size_t);
+static const size_t mask = 0x1;
 
 /* Utility function declaration */
 size_t ActualBlockSize(size_t block_size);
-
-typedef struct block block_t;
+int BlockIsFree(block_t *block);
+size_t BlockActoualCapacity(block_t *block);
 
 struct variable_sized_alloc
 {
@@ -25,9 +28,12 @@ struct variable_sized_alloc
 
 struct block
 {
-	block_t *next;
-	size_t available_bytes; /* how many bytes available */
+	block_t *next;	
 	size_t capacity; 		/* volume of block */
+
+	/* capacity last bit: 1 - occupied
+						  0 - free
+	*/
 };
 
 vsa_t *VSAInit(void *mem_pool, size_t pool_size)
@@ -57,21 +63,15 @@ vsa_t *VSAInit(void *mem_pool, size_t pool_size)
 
 	block = vsa->head;
 
-	block->available_bytes = pool_size - 2 * sizeof(block_t) -
-							 sizeof(vsa_t) - padding;
-
-	block->capacity = block->available_bytes;
+	block->capacity = pool_shift - 2 * sizeof(block_t) -
+							 sizeof(vsa_t) - word_size;
 
 	block->next = (block_t*)((char*)vsa  + pool_shift -
 				   word_size - sizeof(block_t));
 
-	block->available_bytes = pool_size - 2 * sizeof(block_t) - sizeof(vsa_t) - padding;
-	block->capacity = block->available_bytes;
-	block->next = (block_t*)((char*)vsa  + pool_shift - word_size - sizeof(block_t));
-
 	block = block->next;
 	block->next = NULL;
-	block->available_bytes = 0;
+	
 	block->capacity = 0;
 
 	return (vsa);	
@@ -91,7 +91,7 @@ void *VSAAlloc(vsa_t *vsa, size_t block_size)
 	
 	/* this loop increments curr & defragments adjacent free blocks until
 	   it meets suitable block for allocation */
-	while (prev->available_bytes < actual_block_size && curr->next != NULL )
+	while (BlockActoualCapacity(prev) < actual_block_size && curr->next != NULL)
 	{
 		prev = curr; /* saves the last block for evaluation in while
 						loop condition */
@@ -99,10 +99,10 @@ void *VSAAlloc(vsa_t *vsa, size_t block_size)
 		next = curr->next;
 
 		/* this loop does the task of defragmenting adjacent free blocks */
-		while (curr->available_bytes == curr->capacity && next->next != NULL)
+		while (BlockIsFree(curr) && BlockIsFree(next) && next->next != NULL)
 		{
-			curr->available_bytes += next->capacity + sizeof(block_t);
-			curr->capacity = curr->available_bytes;
+			curr->capacity += BlockActoualCapacity(next) + sizeof(block_t);
+			
 			curr->next = next->next;
 			next = next->next;
 		}
@@ -113,59 +113,53 @@ void *VSAAlloc(vsa_t *vsa, size_t block_size)
 	curr = prev;
 
 	/* no suitable block found */
-	if (NULL == curr->next || curr->available_bytes < actual_block_size)
+	if (NULL == curr->next || 
+		BlockActoualCapacity(curr) < actual_block_size || 
+		!BlockIsFree(curr))
 	{
 		return (NULL);
 	}
 
-	capacity_remained = curr->capacity - actual_block_size;
+	capacity_remained = BlockActoualCapacity(curr) - actual_block_size;
 
-	curr->available_bytes = 0;
-	
 	/* if remain_capacity is smaller then this size there is no need for new
 	   block */
 	if (capacity_remained < sizeof(block_t) * 2)
 	{
 		ret_block = (block_t*)((char*)curr + sizeof(block_t));
+		curr->capacity += 0x1;
 
 		return (ret_block);
 	}
 
 	new_block = (block_t*)((char*)curr + actual_block_size);
+
 	new_block->next = curr->next;
 	curr->next = new_block;
 
 	new_block->capacity = capacity_remained;
-	new_block->available_bytes = new_block->capacity;
 
 	ret_block = (block_t*)((char*)curr + sizeof(block_t));
 
-	curr->capacity = actual_block_size - sizeof(block_t);
-	
+	curr->capacity = actual_block_size - sizeof(block_t) + 0x1;
+		
 	return (ret_block);	
 }
 
 void VSAFree(void *block)
 {
-	block_t *curr = (block_t*)((char*)block - sizeof(block_t));
-	
+	block_t *curr = (block_t*)((char*)block - sizeof(block_t));	
 
 	assert(block);
 
-	curr->available_bytes = curr->capacity;	
-
-
-	assert(block);
-
-	curr->available_bytes = curr->capacity;
-	
+	curr->capacity -= 0x1;	
 }
 
 size_t VSABiggestFreeBlock(vsa_t *vsa)
 {
 	block_t *curr = vsa->head;
-	size_t max_block_available = curr->available_bytes;
-	
+	size_t max_block_available = curr->capacity * BlockIsFree(curr);
+
 	/* this block size can't be achieved so basicly this
 	   function call defragments all available blocks in the pool */
 	VSAAlloc(vsa, vsa->pool_size);
@@ -174,16 +168,15 @@ size_t VSABiggestFreeBlock(vsa_t *vsa)
 
 	while (curr != NULL)
 	{
-		if (curr->available_bytes > max_block_available)
+		if (curr->capacity > max_block_available && BlockIsFree(curr))
 		{
-			max_block_available = curr->available_bytes;
+			max_block_available = curr->capacity;
 		}
 		
 		curr = curr->next;
 	}
 
-	/* taking into account the block header overhead */
-	return(max_block_available - sizeof(block_t));
+	return(max_block_available);
 }
 
 size_t ActualBlockSize(size_t block_size)
@@ -196,3 +189,12 @@ size_t ActualBlockSize(size_t block_size)
 	return (block_size + sizeof(block_t));
 }
 
+int BlockIsFree(block_t *block)
+{
+	return !(block->capacity & mask);
+}
+
+size_t BlockActoualCapacity(block_t *block)
+{
+	return (block->capacity & ~1);
+}
