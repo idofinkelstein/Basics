@@ -9,7 +9,7 @@ Data: 17/7/2020
 
 #include "sort.h"
 
-static void SwapBytes(char *byte1, char *byte2, size_t n_bytes);
+void SwapBytes(char *byte1, char *byte2, size_t n_bytes);
 
 void BubbleSort(void *base, size_t nmemb , size_t size ,
                   sort_cmp_func_t cmp,
@@ -44,14 +44,3 @@ void BubbleSort(void *base, size_t nmemb , size_t size ,
 	}
 }
 
-static void SwapBytes(char *byte1, char *byte2, size_t n_bytes)
-{
-	while (n_bytes)
-	{
-		*byte1 ^= *byte2;
-   	 	*byte2 ^= *byte1;
-    	*byte1++ ^= *byte2++;
-
-		--n_bytes;
-	}
-}

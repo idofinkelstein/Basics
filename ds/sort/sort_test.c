@@ -8,6 +8,7 @@ Data: 17/7/2020
 #include <stdio.h>   /* printf, puts */
 #include <stdlib.h>  /* malloc, free */
 #include <strings.h> /* strcasecmp   */
+#include <time.h>    /* time		 */
 
 #include "sort.h"
 
@@ -41,6 +42,9 @@ int main()
 
 void BubbleSortTest(void)
 {
+	clock_t begin;
+	clock_t end; 
+    double time_spent;
 	int arr[] = {4 , 23, 1, 65, 4, 2, -6, 0, 41, 34, -345, 35, -76};
 	size_t size = sizeof(arr) / sizeof(int);
 	double arr2[10000] = {0};
@@ -65,7 +69,13 @@ void BubbleSortTest(void)
 
 	puts("");
 
+	begin = clock();
 	BubbleSort(arr2, size2 , sizeof(double) , DoubleCompare, NULL);
+	end = clock();
+
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Time taken to sort array of size 10k with bubble sort is: %f\n",
+			time_spent);
 
 	for (i = 0; i < size2 / 100; ++i)
 	{
@@ -78,6 +88,9 @@ void BubbleSortTest(void)
 
 void InsertionSortTest(void)
 {
+	clock_t begin;
+	clock_t end; 
+    double time_spent;
 	int arr[] = {4 , 23, 1, 65, 4, 2, -6, 0, 41, 34, -345, 35, -76};
 	size_t size = sizeof(arr) / sizeof(int);
 	int arr2[10000] = {0};
@@ -102,7 +115,13 @@ void InsertionSortTest(void)
 
 	puts("");
 
+	begin = clock();
 	InsertionSort(arr2, size2 , sizeof(int) , Compare, NULL);
+	end = clock();
+
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Time taken to sort array of size 10k with insertion sort is: %f\n",
+			time_spent);
 
 	for (i = 0; i < size2 / 100; ++i)
 	{
@@ -115,6 +134,9 @@ void InsertionSortTest(void)
 
 void SelectionSortTest(void)
 {
+	clock_t begin;
+	clock_t end; 
+    double time_spent;
 	int arr[] = {4 , 23, 1, 65, 4, 2, -6, 0, 41, 34, -345, 35, -76};
 	size_t size = sizeof(arr) / sizeof(int);
 	int arr2[10000] = {0};
@@ -139,7 +161,13 @@ void SelectionSortTest(void)
 
 	puts("");
 
+	begin = clock();
 	SelectionSort(arr2, size2 , sizeof(int) , Compare, NULL);
+	end = clock();
+
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Time taken to sort array of size 10k with selection sort is: %f\n",
+			time_spent);
 
 	for (i = 0; i < size2 / 100; ++i)
 	{

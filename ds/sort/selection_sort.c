@@ -7,7 +7,7 @@ Data: 17/7/2020
 
 #include "sort.h"
 
-static void SwapBytes(char *byte1, char *byte2, size_t n_bytes);
+void SwapBytes(char *byte1, char *byte2, size_t n_bytes);
 
 void SelectionSort(void *base, size_t nmemb, size_t size,
                   sort_cmp_func_t cmp,
@@ -39,17 +39,3 @@ void SelectionSort(void *base, size_t nmemb, size_t size,
 	}
 }
 
-
-static void SwapBytes(char *byte1, char *byte2, size_t n_bytes)
-{
-	char temp = 0;
-
-	while (n_bytes)
-	{
-		temp = *byte1; 
-   	 	*byte1++ = *byte2;
-    	*byte2++ = temp;
-
-		--n_bytes;
-	}
-}
