@@ -16,10 +16,10 @@ static const size_t word_size = sizeof(size_t);
 static const size_t mask = 0x1;
 
 /* Utility function declaration */
-size_t ActualBlockSize(size_t block_size);
-int BlockIsFree(block_t *block);
-size_t BlockActoualCapacity(block_t *block);
-int BlockIsLast(block_t *block);
+static size_t ActualBlockSize(size_t block_size);
+static int BlockIsFree(block_t *block);
+static size_t BlockActoualCapacity(block_t *block);
+static int BlockIsLast(block_t *block);
 
 struct variable_sized_alloc
 {
@@ -180,7 +180,7 @@ size_t VSABiggestFreeBlock(vsa_t *vsa)
 	return(max_block_available);
 }
 
-size_t ActualBlockSize(size_t block_size)
+static size_t ActualBlockSize(size_t block_size)
 {
 	while (block_size & unalligned_address_mask)
 	{
@@ -190,17 +190,17 @@ size_t ActualBlockSize(size_t block_size)
 	return (block_size + sizeof(block_t));
 }
 
-int BlockIsFree(block_t *block)
+static int BlockIsFree(block_t *block)
 {
 	return !(block->capacity & mask);
 }
 
-size_t BlockActoualCapacity(block_t *block)
+static size_t BlockActoualCapacity(block_t *block)
 {
 	return (block->capacity & ~1);
 }
 
-int BlockIsLast(block_t *block)
+static int BlockIsLast(block_t *block)
 {
 	return (block->next == NULL);
 }
