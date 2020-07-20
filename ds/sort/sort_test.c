@@ -26,16 +26,18 @@ void StringSelectionSortingTest(void);
 void StringBubbleSortingTest(void);
 void StringInsertionSortingTest(void);
 void Test(void);
+void CountingeSortTest(void);
 
 int main()
 {
-	BubbleSortTest();
+	/*BubbleSortTest();
 	InsertionSortTest();
 	SelectionSortTest();
 	StringSelectionSortingTest();
 	StringInsertionSortingTest();
 	StringBubbleSortingTest();
-	Test();
+	Test();*/
+	CountingeSortTest();
 	
 	return 0;
 }
@@ -289,6 +291,34 @@ void Test(void)
 	for (i = 0; i < 5; ++i)
 	{
 		printf("%s, ", sports[i]);
+	}
+
+	puts("");
+}
+
+void CountingeSortTest(void)
+{
+	int arr[] = {1, 5, 4, 2, 3, 0, -3, -4, -3, 12, 7};
+	int res[11];
+	size_t size = sizeof(arr) / sizeof(int);
+	int arr1[] = {-5, -6, -1, -33, -22, -12, -8 };
+	int res1[7];
+	size_t size1 = sizeof(arr1) / sizeof(int);
+	size_t i = 0;
+
+	CountingSort(arr, size, -4, 12, res);
+	CountingSort(arr1, size1, -33, -1, res1);
+
+	for (i = 0; i < size1; ++i)
+	{
+		printf("%d, ", res1[i]);
+	}
+
+	puts("");
+
+	for (i = 0; i < size; ++i)
+	{
+		printf("%d, ", res[i]);
 	}
 
 	puts("");
