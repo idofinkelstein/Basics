@@ -17,7 +17,7 @@ int main()
 
 
 	/*CountingSort(arr, size, 3, 12);*/
-	RadixBitsSort(arr, size, 3);
+	RadixBitsSort(arr, size, 2);
 	
 	for (i = 0; i < size; ++i)
 	{

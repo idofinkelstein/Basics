@@ -151,4 +151,10 @@ void CountingSortHelper(uint *arr,
 			--count_arr[((to_place & to_mask) >> chank)- shift];
 	}
 
+	for (i = 0; i < range; ++i)
+	{
+		count_arr[i] = 0;
+	}
+
+
 }
