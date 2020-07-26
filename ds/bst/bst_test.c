@@ -286,7 +286,7 @@ void TestCase4(void)
 	util = BSTBegin(tree);
 	end = BSTEnd(tree);
 
-	/*while (!BSTIterIsEqual(curr, end))
+	/*while (!BSTIterIsEqual(curr, end))*/
 	{
 		curr = BSTNext(util);
 		printf("%d\n", *(int*)BSTGetData(util));
@@ -300,7 +300,7 @@ void TestCase4(void)
 		printf("%d\n", *(int*)BSTGetData(util));
 		BSTRemove(util);
 		util = curr;
-		curr = BSTNext(util);
+		curr = BSTBegin(tree);
 		printf("%d\n", *(int*)BSTGetData(util));
 		BSTRemove(util);
 		util = curr;
@@ -310,15 +310,17 @@ void TestCase4(void)
 		util = curr;
 		
 	
-	}*/
+	}/*
 	util = BSTNext(util);
 	util = BSTNext(util);
 	util = BSTNext(util);
 	curr = BSTNext(util);
+	printf("%d\n", *(int*)BSTGetData(util));
+	printf("%d\n", *(int*)BSTGetData(curr));
 	BSTRemove(util);
-	BSTRemove(util);
+	BSTRemove(curr);
 
-/*
+
 	BSTRemove(BSTBegin(tree));
 	BSTRemove(BSTBegin(tree));
 	BSTRemove(BSTBegin(tree));
@@ -327,8 +329,8 @@ void TestCase4(void)
 	BSTRemove(BSTBegin(tree));
 	BSTRemove(BSTBegin(tree));
 	BSTRemove(BSTBegin(tree));
-	BSTRemove(BSTBegin(tree));
-	*/
+	BSTRemove(BSTBegin(tree));*/
+	
 
 	begin = BSTBegin(tree);
 	end = BSTEnd(tree);
