@@ -1,20 +1,21 @@
-#include <stdlib.h>
-#include <stdio.h>
+/********************************
+File name: bst.c
+Author: Ido Finkelstein
+Reviewer: Ori Komemie
+Date: 24/7/2020
+*********************************/
+
+
+#include <stdlib.h> /* malloc, free */
+#include <assert.h>
+
 #include "bst.h"
-/*
-typedef struct bst_node bst_node_t;
-typedef struct bst bst_t;
-typedef struct iterator
-{
-    struct bst_node *node;
 
-}bst_iter_t;
-*/
-
+/* utility function declarations */
 static void SetNode(bst_iter_t curr, bst_iter_t new);
 static void DeleteChildrenlessNode(bst_iter_t curr);
 static void Delete1ChildNode(bst_iter_t curr);
-bst_iter_t GetEnd(bst_iter_t iter);
+static bst_iter_t GetEnd(bst_iter_t iter);
 
 struct bst
 {
@@ -48,7 +49,6 @@ bst_t *BSTtCreate(bst_cmp_func_t cmp, void *param)
 	bst->param = param;
 	bst->cmp = cmp;
 	
-	printf("bst add = %p\n", (void*)bst);
 	dummy.node = (bst_node_t*)malloc(sizeof(bst_node_t));
 
 	if (NULL == dummy.node)
@@ -73,6 +73,8 @@ void BSTDestroy(bst_t *bst)
 {
 	bst_iter_t curr = {NULL};
 	bst_iter_t temp = {NULL};
+
+	assert(bst);
 
 	curr.node = bst->root;
 
@@ -111,22 +113,31 @@ void BSTDestroy(bst_t *bst)
 
 void *BSTGetData(bst_iter_t iter)
 {
+	assert(iter.node);
+
 	return (iter.node->data);
 }
 
 int BSTIterIsEqual(bst_iter_t iter1, bst_iter_t iter2)
 {
+	assert(iter1.node);
+	assert(iter2.node);
+
 	return (iter1.node == iter2.node);
 }
 
 int BSTIsEmpty(const bst_t *bst)
 {
+	assert(bst);
+
 	return (bst->root == bst->end);
 }
 
 bst_iter_t BSTEnd(const bst_t *bst)
 {
 	bst_iter_t end = {NULL};
+
+	assert(bst);
 
 	end.node = bst->end;
 
@@ -137,6 +148,8 @@ bst_iter_t BSTBegin(const bst_t *bst)
 {
 	bst_iter_t curr = {NULL};
 	curr.node = bst->root;
+
+	assert(bst);
 
 	while (curr.node->left != NULL)
 	{
@@ -149,6 +162,8 @@ bst_iter_t BSTBegin(const bst_t *bst)
 bst_iter_t BSTPrev(bst_iter_t iter)
 {
 	bst_iter_t curr = iter;
+
+	assert(iter.node);
 
 	if (curr.node->left != NULL)
 	{
@@ -180,6 +195,8 @@ bst_iter_t BSTPrev(bst_iter_t iter)
 bst_iter_t BSTNext(bst_iter_t iter)
 {
 	bst_iter_t curr = iter;
+
+	assert(iter.node);
 
 	if (curr.node->right != NULL)
 	{
@@ -215,6 +232,8 @@ size_t BSTSize(const bst_t *bst)
 	bst_iter_t curr = {NULL};
 	size_t count = 0;
 
+	assert(bst);
+
 	curr.node = bst->end->parent;
 
 	while (!BSTIsEmpty(bst) && ++count && BSTPrev(curr).node != curr.node) 
@@ -229,6 +248,8 @@ bst_iter_t BSTInsert(bst_t *bst, void *data)
 {
 	bst_iter_t new_node = {NULL};
 	bst_iter_t curr = {NULL};
+
+	assert(bst);
 
 	curr.node = bst->root;
 	new_node.node = malloc(sizeof(bst_node_t));
@@ -305,11 +326,12 @@ void BSTRemove(bst_iter_t iter)
 	bst_iter_t curr = iter;
 	bst_t *bst = NULL;
 
+	assert(iter.node);
+
 	curr = GetEnd(curr);
 	bst = curr.node->data;
 
-	printf("bst add = %p\n", (void*)curr.node->data);
-
+	/* case only 1 element in the tree */
 	if (BSTSize(bst) == 1)
 	{
 		free(curr.node->parent);
@@ -321,6 +343,7 @@ void BSTRemove(bst_iter_t iter)
 
 	curr = iter;
 
+	/* case node to remove is root node */
 	if (bst->root == curr.node)
 	{
 		if (BSTPrev(curr).node != curr.node)
@@ -334,8 +357,6 @@ void BSTRemove(bst_iter_t iter)
 			iter.node->data = curr.node->data;
 		}
 	}
-	
-/*************************************************************************/
 
 
 	/* has no children */
@@ -368,6 +389,8 @@ void BSTRemove(bst_iter_t iter)
 bst_iter_t BSTFind(const bst_t *bst, const void *data)
 {
 	bst_iter_t curr = {NULL};
+
+	assert(bst);
 
 	curr.node = bst->root;
 
@@ -405,6 +428,9 @@ int BSTForEach(bst_iter_t from, bst_iter_t to,
 			   void *param)
 {
 	bst_iter_t curr = from;
+
+	assert(from.node);
+	assert(to.node);
 
 	while (!BSTIterIsEqual(curr, to))
 	{
@@ -474,7 +500,7 @@ static void Delete1ChildNode(bst_iter_t curr)
 		free(curr.node);
 }
 
-bst_iter_t GetEnd(bst_iter_t iter)
+static bst_iter_t GetEnd(bst_iter_t iter)
 {
 	while (iter.node->parent)
 	{

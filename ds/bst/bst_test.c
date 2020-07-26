@@ -1,22 +1,32 @@
-#include <stdio.h>
+/********************************
+File name: bst_test.c
+Author: Ido Finkelstein
+Reviewer: Ori Komemie
+Date: 24/7/2020
+*********************************/
+
+#include <stdio.h> /* printf */
 
 #include "bst.h"
 
+/* utility function declarations */
 int CompareInt(const void *data1, const void *data2, void *param);
 int ChangeValue(void *data, void *param);
 
+/* test function declarations */
 void TestCase1(void);
 void TestCase2(void);
 void TestCase3(void);
 void TestCase4(void);
 void TestCase5(void);
+
 int main()
 {
-	/*TestCase1();
+	TestCase1();
 	TestCase2();
-	TestCase3();*/
+	TestCase3();
 	TestCase4();
-	/*TestCase5();*/
+	TestCase5();
 
 	return 0;
 }
@@ -188,37 +198,20 @@ void TestCase3(void)
 	bst_t *tree = NULL;
 	void *param = NULL;
 	bst_iter_t iter1 = {NULL};
-	bst_iter_t iter2 = {NULL};
-	bst_iter_t iter3 = {NULL};
-	bst_iter_t iter4 = {NULL};
 	bst_iter_t iter5 = {NULL};
-	bst_iter_t iter6 = {NULL};
 	bst_iter_t util = {NULL};
 	int arr[] = {1, 2, 4, 3, 5, 6, 8, 7, 9, 11, 10, 13, -1};
-	int x = 5;
 	bst_iter_t begin = {NULL};
 	bst_iter_t end = {NULL};
 
 	tree = BSTtCreate(CompareInt, param);
 
-	iter1 = BSTInsert(tree, &arr[3]); /* 3 */
-	iter2 = BSTInsert(tree, &arr[0]); /* 1 */
-	iter3 = BSTInsert(tree, &arr[5]); /* 6 */
-	iter4 = BSTInsert(tree, &arr[4]); /* 5 */
-	iter5 = BSTInsert(tree, &arr[9]); /* 11 */
-	iter6 = BSTInsert(tree, &arr[1]); /* 2 */
-
-	begin = BSTBegin(tree);
-	end = BSTEnd(tree);
-
-	for (util = begin; !BSTIterIsEqual(util, end); util = BSTNext(util))
-	{
-		printf("%d\n", *(int*)BSTGetData(util));
-	}
-
-	puts("");
-
-	BSTRemove(iter5);
+	BSTInsert(tree, &arr[3]); /* 3 */
+	BSTInsert(tree, &arr[0]); /* 1 */
+	BSTInsert(tree, &arr[5]); /* 6 */
+	BSTInsert(tree, &arr[4]); /* 5 */
+	iter1 = BSTInsert(tree, &arr[9]); /* 11 */
+	iter5 = BSTInsert(tree, &arr[1]); /* 2 */
 
 	begin = BSTBegin(tree);
 	end = BSTEnd(tree);
@@ -242,6 +235,18 @@ void TestCase3(void)
 
 	puts("");
 
+	BSTRemove(iter5);
+
+	begin = BSTBegin(tree);
+	end = BSTEnd(tree);
+
+	for (util = begin; !BSTIterIsEqual(util, end); util = BSTNext(util))
+	{
+		printf("%d\n", *(int*)BSTGetData(util));
+	}
+
+	puts("");
+
 	BSTDestroy(tree);
 }
 
@@ -250,7 +255,6 @@ void TestCase4(void)
 	bst_t *tree = NULL;
 	void *param = NULL;
 	bst_iter_t util = {NULL};
-	bst_iter_t curr = {NULL};
 	int arr[] = {1, 2, 4, 3, 5, 6, 8, 7, 9, 11, 10, 13, -1};
 	bst_iter_t begin = {NULL};
 	bst_iter_t end = {NULL};
@@ -283,55 +287,27 @@ void TestCase4(void)
 
 	puts("");
 
-	util = BSTBegin(tree);
-	end = BSTEnd(tree);
+	while (!BSTIsEmpty(tree))
+	{	
+		BSTRemove(BSTBegin(tree));
+	}
 
-	/*while (!BSTIterIsEqual(curr, end))*/
-	{
-		curr = BSTNext(util);
-		printf("%d\n", *(int*)BSTGetData(util));
-		BSTRemove(util);
-		util = curr;
-		curr = BSTNext(util);
-		printf("%d\n", *(int*)BSTGetData(util));
-		BSTRemove(util);
-		util = curr;
-		curr = BSTNext(util);
-		printf("%d\n", *(int*)BSTGetData(util));
-		BSTRemove(util);
-		util = curr;
-		curr = BSTBegin(tree);
-		printf("%d\n", *(int*)BSTGetData(util));
-		BSTRemove(util);
-		util = curr;
-		curr = BSTNext(util);
-		printf("%d\n", *(int*)BSTGetData(util));
-		BSTRemove(util);
-		util = curr;
-		
+	printf("size = %ld\n", BSTSize(tree));	
+
+	BSTInsert(tree, &arr[3]); /* 3 */
+	BSTInsert(tree, &arr[1]); /* 2 */
+	BSTInsert(tree, &arr[0]); /* 1 */
+	BSTInsert(tree, &arr[7]); /* 7 */
+	BSTInsert(tree, &arr[12]); /* -1 */
+	BSTInsert(tree, &arr[4]); /* 5 */
+	BSTInsert(tree, &arr[11]); /* 13 */
+	BSTInsert(tree, &arr[8]); /* 9 */
+	BSTInsert(tree, &arr[9]); /* 11 */
+	BSTInsert(tree, &arr[10]); /* 10 */
+	BSTInsert(tree, &arr[6]); /* 8 */
+	BSTInsert(tree, &arr[5]); /* 6 */
+	BSTInsert(tree, &arr[2]); /* 4 */
 	
-	}/*
-	util = BSTNext(util);
-	util = BSTNext(util);
-	util = BSTNext(util);
-	curr = BSTNext(util);
-	printf("%d\n", *(int*)BSTGetData(util));
-	printf("%d\n", *(int*)BSTGetData(curr));
-	BSTRemove(util);
-	BSTRemove(curr);
-
-
-	BSTRemove(BSTBegin(tree));
-	BSTRemove(BSTBegin(tree));
-	BSTRemove(BSTBegin(tree));
-	BSTRemove(BSTBegin(tree));
-	BSTRemove(BSTBegin(tree));
-	BSTRemove(BSTBegin(tree));
-	BSTRemove(BSTBegin(tree));
-	BSTRemove(BSTBegin(tree));
-	BSTRemove(BSTBegin(tree));*/
-	
-
 	begin = BSTBegin(tree);
 	end = BSTEnd(tree);
 
@@ -343,7 +319,6 @@ void TestCase4(void)
 	}
 
 	puts("");
-	
 
 	BSTDestroy(tree);
 }
