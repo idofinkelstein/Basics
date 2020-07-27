@@ -9,9 +9,12 @@ and changed comments regarding insert, prev, next, end and begin and iter
 typedef */
 /* version 1.2: changes Remove input arg, edited typedef */
 /* version 1.3 changed comment regarding cmp function and typedef */
+/* version 1.4: removed all complexity mentions, updated notes for, remove,
+ prev, next, begin, end*/
 
 
 /* typedefs for the bst and the iterator  */
+
 typedef struct bst_node bst_node_t;
 typedef struct iterator
 {
@@ -39,7 +42,6 @@ typedef int (*bst_do_action_func_t)(void *data, void *param);
 * Return Value:
 *   - pointer to the tree.
 *
-* The function is in O(1) complexity
 */
 bst_t *BSTtCreate(bst_cmp_func_t cmp, void *param);
 
@@ -50,7 +52,6 @@ bst_t *BSTtCreate(bst_cmp_func_t cmp, void *param);
 * Args:
 *   - bst - pointer to the tree to be destroyed
 *
-* The function is in O(n) complexity
 */
 void BSTDestroy(bst_t *bst);
 
@@ -64,7 +65,6 @@ void BSTDestroy(bst_t *bst);
 * Return Value:
 *   - number of elements in the tree
 *
-* The function is in O(n) complexity
 */
 size_t BSTSize(const bst_t *bst);
 
@@ -79,7 +79,6 @@ size_t BSTSize(const bst_t *bst);
 *   1 - empty (TRUE)
 *   0 - not empty. (FALSE)
 *
-* The function is in O(1) complexity   
 */
 int BSTIsEmpty(const bst_t *bst);
 
@@ -101,7 +100,6 @@ int BSTIsEmpty(const bst_t *bst);
 *	- User should compare the return value to the end of the treee to determine
 *	  if function succeeded.
 *
-* The function is in O(n) complexity
 */
 bst_iter_t BSTInsert(bst_t *bst, void *data);
 
@@ -110,79 +108,80 @@ bst_iter_t BSTInsert(bst_t *bst, void *data);
 *   - removes an element from the tree.
 * 
 * Args:
-*   - bst - pointer to bst
-*   - data - data to remove
+*   - iter - iterator to element to be removed
 *
 * Comments: 
-*   - if the end of the tree is given - undefined behavior.
+*   - if the end of the tree is given as input - undefined behavior.
 *
-* The function is in O(n) complexity
 */
 void BSTRemove(bst_iter_t iter);
 
 /*---------------------------------------------------------------------------*/
 /* BSTBegin:
-*   - returns an iterator to the first element in the tree.
+*   - returns an iterator to the first (smallest) element in the tree,
+*     acordind to the order defined by the cmp function.
 *
 * Args:
 *   - bst - pointer to the tree
 *
 * Return Value:
-*   - an iterator to the smallest element in the tree acording to he bst's cmp
-*     function logic
+*   - an iterator to the first (smallest) element in the tree acording to the
+*     order defined by the cmp function.
 *
-* The function is in O(height) complexity
 */
 bst_iter_t BSTBegin(const bst_t *bst);
 
 /*---------------------------------------------------------------------------*/
 /* BSTEnd
-*   - returns an iterator to the end of the list
+*   - returns an iterator to the end of the list. The prev on the BSTEnd is
+*    defined as the largest item on the tree acordind to the order defined by
+*    the cmp function.
 *
 * Args:
 *	- bst - pointer to the tree
 *
 * Return value:
 *   - an iterator to the next of the largest element in the tree acording to
-*     the bst's cmp function logic
+*     the order defined by the cmp function.
 *
-* The function is in O(1) complexity
 */
 bst_iter_t BSTEnd(const bst_t *bst);
 
 /*---------------------------------------------------------------------------*/
 /* BSTPrev
-*   - returns an iterator to the next bigest element to the iterator given by
-*     the user
+*   - returns an iterator to the previous (smaller) element of the given input,
+*    acordind to the order defined by the cmp function.
 *
 * Args:
 *   - iter - iterator to get the element after
 *
 * Return value:
-*   - an iterator to the next bigest element to the iterator given.
+*   -an iterator to the previous (smaller) element of the given input,
+*    acordind to the order defined by the cmp function.
 *
 * Comments: 
 *   - in case of invalid iterator given - undefined behavior.
+*   - prev of BSTBegin is undefined.
 *
-* The function is in O(1) complexity
 */
 bst_iter_t BSTPrev(bst_iter_t iter);
 
 /*---------------------------------------------------------------------------*/
 /* BSTNext
-*   - returns an iterator to the next smallest element to the iterator given
-*     by the user
+*   - returns an iterator to the next (bigger) element of the given input,
+*    acordind to the order defined by the cmp function.
 *
 * Args:
 *   - iter - iterator to get the element after
 *
 * Return value:
-*   - an iterator to the next smallest element to the iterator given.
+*   - an iterator to the next (bigger) element of the given input,
+*    acordind to the order defined by the cmp function.
 *
 * Comments: 
 *   - in case of invalid iterator given - undefined behavior.
+*   - next of BSTEnd is undefined.
 *
-* The function is in O(1) complexity
 */
 bst_iter_t BSTNext(bst_iter_t iter);
 
@@ -198,7 +197,6 @@ bst_iter_t BSTNext(bst_iter_t iter);
 *   - 1 - equal (TRUE) 
 *   - 0 - not equal (FALSE)
 *
-* The function is in O(1) complexity
 */
 int BSTIterIsEqual(bst_iter_t iter1, bst_iter_t iter2);
 
@@ -215,7 +213,6 @@ int BSTIterIsEqual(bst_iter_t iter1, bst_iter_t iter2);
 * Comments: 
 *   - in case of invalid iterator - undefined behavior.
 *
-* The function is in O(1) complexity
 */
 void *BSTGetData(bst_iter_t iter);
 
@@ -235,7 +232,6 @@ void *BSTGetData(bst_iter_t iter);
 *	- User should compare the return value to the end iterator, to determine
 *	  whether function succeeded.
 *
-* The function is in O(n) complexity
 */
 bst_iter_t BSTFind(const bst_t *bst, const void *data);
 
@@ -259,7 +255,6 @@ bst_iter_t BSTFind(const bst_t *bst, const void *data);
 *	- do_action is a function to be implemeneted by the user. See signature 
 *	  in typedef.
 *
-* The function is in O(n) complexity
 */
 int BSTForEach(bst_iter_t from, bst_iter_t to, 
 				bst_do_action_func_t do_action ,void *param);
