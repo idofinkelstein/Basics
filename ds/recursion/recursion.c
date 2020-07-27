@@ -1,12 +1,15 @@
-#include <stdio.h>
-#include <stdlib.h>
+/**********************
+Author: Ido Finkelstein
+File name: recursion.c
+Reviewer: Hila Pilo
+Date: 26/7/2020
+***********************/
+
+
+#include <stdio.h>  /* malloc, free */
+#include <stdlib.h> /* printf */
 
 #include "recursion.h"
-
-
-
-
-
 
 int Fibonacci(int element_index)
 {
@@ -31,7 +34,6 @@ int Fibonacci2(int element_index)
 	
 	while (element_index)
 	{
-
 		res = prev + prevprev;
 		prevprev = prev;	
 		prev = res;
@@ -42,47 +44,23 @@ int Fibonacci2(int element_index)
 	return res;
 }
 
-node_t *Flip2(node_t *head)
+node_t *Flip(node_t *node)
 {
-	 node_t *curr = head;
-	
-	curr = head->next;
-	
-	if(head == NULL)
-	{
-		return head;
-	}
-	
+	node_t *next_node = NULL;
 
+    if (node == NULL || node->next == NULL)
+    {
+        return(node);
+    }
+    
+    next_node = Flip(node->next);
+    node->next->next = node;
 
-	return Flip2(head->next);
+    node->next = NULL;
 
-	head->next = curr;
-
+    return(next_node);
 }
 
-node_t *Flip(node_t *head)
-{
-	node_t *curr = head->next;
-	node_t *next = head->next;
-
-	head->next = NULL;
-	/* the idea is to keep 3 pointers - one for the current node, one for the
-	   previous node and one for the next node. (head is the previous) */
-	while(curr)
-	{
-		/* make sure i'm not incrementing a NULL pointer */
-		if (next)
-		{
-			next = curr->next;
-		}
-		curr->next = head;
-		head = curr;
-		curr = next;
-	}
-
-	return (head);
-}
 
 size_t StrLen(const char *str)
 {
@@ -96,7 +74,7 @@ size_t StrLen(const char *str)
 	return ++count + StrLen(str + 1);	
 }
 
-	
+
 int StrCmp(const char *str1, const char *str2)
 {
 	if (*str2 != *str1 || *str2 == '\0')
@@ -105,6 +83,20 @@ int StrCmp(const char *str1, const char *str2)
 	}
 
 	return StrCmp(str1 + 1, str2 + 1);
+}
+
+int StrnCmp(const char *str1, const char *str2, size_t n)
+{
+	if ((*str2 != *str1 || *str2 == '\0') && n)
+	{
+		return (*str1 - *str2);
+	}
+	else if (!n)
+	{
+		return (*(str1 - 1) - *(str2 - 1));
+	}
+
+	return StrnCmp(str1 + 1, str2 + 1, n - 1);
 }
 
 char *StrCpy(char *dest, const char *src)
@@ -131,13 +123,65 @@ char *StrCat(char *dest, const char *src)
 
 	else if (*src != '\0')
 	{
-
 		*dest = *src;
 		StrCat(dest + 1, (char*)src + 1);
-
 	}
 
 	return dest;	
+}
+
+char *StrStr(const char *haystack, const char *needle)
+{
+	size_t len = StrLen(needle);
+
+	if (StrnCmp(haystack, needle, len) == 0)
+	{
+		return ((char*)haystack);
+	}
+	else if (*haystack == '\0')
+	{
+		return (NULL);
+	}
+
+	return StrStr(haystack + 1, needle);
+	
+}
+
+/* inserts elements to stack in a sorted way */
+void SortedInsert(stack_t *stack, int *num) 
+{ 
+    int *temp = NULL;
+     
+    if (StackIsEmpty(stack) || *num > *(int *)StackPeek(stack)) 
+    { 
+        StackPush(stack, num);
+        return; 
+    } 
+
+    temp = (int *)StackPeek(stack);
+    StackPop(stack);
+
+    SortedInsert(stack, num); 
+    
+    StackPush(stack, temp);
+
+} 
+
+/* sort a stack */
+void SortStack(stack_t *stack)
+{
+    int *num = NULL;
+
+    if (!StackIsEmpty(stack))
+    {
+        num = (int *)StackPeek(stack);
+        StackPop(stack);
+
+        SortStack(stack);
+
+        SortedInsert(stack, num);
+    }
+   
 }
 
 node_t *CreateNode(node_t *node)

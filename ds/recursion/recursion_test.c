@@ -1,14 +1,28 @@
-#include <stdio.h>
-#include <string.h>
+/**********************
+Author: Ido Finkelstein
+File name: recursion_test.c
+Reviewer: Hila Pilo
+Date: 26/7/2020
+***********************/
+
+
+#include <stdio.h> /* printf, puts */
+#include <string.h> /* strcmp, strncmp, strlen, strcpy, strstr, strcat */
 
 
 #include "recursion.h"
 
+#define STACK_SIZE 20
+
+/* Test functions declaration */
 void TesTStrLen(void);
 void FlipTest(void);
 void TestStrCmp(void);
 void TestStrCpy(void);
 void TestStrCat(void);
+void TestStrStr(void);
+void TestStrnCmp(void);
+void TestSortStack(void);
 
 int main()
 {
@@ -16,11 +30,14 @@ int main()
 
 	printf("%d\n", Fibonacci(n));
 	printf("%d\n", Fibonacci2(n));
-	/*FlipTest();*/
+	FlipTest();
 	TesTStrLen();
 	TestStrCmp();
 	TestStrCpy();
 	TestStrCat();
+	TestStrnCmp();
+	TestStrStr();
+	TestSortStack();
 
 	return 0;
 }
@@ -44,6 +61,24 @@ void TestStrCmp(void)
 	printf("strcmp: %d\n", strcmp("hello", "hell"));
 	printf("StrCmp: %d\n", StrCmp("aello", "hello"));
 	printf("strcmp: %d\n", strcmp("aello", "hello"));
+}
+
+void TestStrnCmp(void)
+{
+	char str[] = "hellfa";
+
+	puts("*** test strncmp & StrnCmp ***");
+	
+	printf("StrnCmp: %d\n", StrnCmp("helloa", str, 6));
+	printf("strncmp: %d\n", strncmp("hellfa", "helloa", 6));
+	printf("StrnCmp: %d\n", StrnCmp("heklo", "hello", 3));
+	printf("strncmp: %d\n", strncmp("heklo", "hello", 3));
+	printf("StrnCmp: %d\n", StrnCmp("hello", "hell", 4));
+	printf("strncmp: %d\n", strncmp("hello", "hell", 4));
+	printf("StrnCmp: %d\n", StrnCmp("aello", "hello", 5));
+	printf("strncmp: %d\n", strncmp("aello", "hello", 5));
+
+	puts(str);
 }
 
 void TestStrCpy(void)
@@ -83,6 +118,33 @@ void TestStrCat(void)
 	printf("strcat: %s\n", strcat(str6, ""));
 	printf("StrCat: %s\n", StrCat(str7, "123456789"));
 	printf("strcat: %s\n", strcat(str8, "123456789"));
+}
+
+void TestStrStr(void)
+{
+	char str1[] = "dodododidodo";
+	char str2[] = "dododi";
+	char str3[] = "idoidoxidos";
+	char str4[] = "idox";
+	char str5[] = "hello world!";
+	char str6[] = "le";
+	
+	printf("*** testing StrStr and compare to strstr ***\n");
+	printf("haystack = [%s]\n", str1);
+	printf("needle = [%s]\n", str2);
+	printf("StrStr's output = [%s]\n", StrStr(str1, str2));
+	printf("strstr's output = [%s]\n", strstr(str1, str2));
+	puts("");
+	printf("haystack = [%s]\n", str3);
+	printf("needle = [%s]\n", str4);
+	printf("StrStr's output = [%s]\n", StrStr(str3, str4));
+	printf("strstr's output = [%s]\n", strstr(str3, str4));
+	puts("");
+	printf("haystack = [%s]\n", str5);
+	printf("needle = [%s]\n", str6);
+	printf("StrStr's output = [%s]\n", StrStr(str5, str6));
+	printf("strstr's output = [%s]\n", strstr(str5, str6));
+	puts("");
 }
 
 void FlipTest(void)
@@ -139,7 +201,7 @@ void FlipTest(void)
 	}
 	puts("");
 
-	node1 = Flip2(node1);
+	node1 = Flip(node1);
 
 	while (node1)
 	{
@@ -149,5 +211,31 @@ void FlipTest(void)
 	puts("");
 
 	SListDestroy(node8);
+}
+
+void TestSortStack(void)
+{
+	int arr[] = {76, 3, 1, 23, 12, 4, 66, 77, 74, 3, 100, -5, -4};
+	size_t size = sizeof(arr) / sizeof(int);
+	stack_t *stk = StackCreate(STACK_SIZE);
+	size_t i = 0;
+
+	for (i = 0; i < size; ++i)
+	{
+		StackPush(stk, &arr[i]);
+	}
+
+	SortStack(stk);
+
+	for (i = 0; i < size; ++i)
+	{
+		printf("%d\n", *(int*)StackPeek(stk));
+		StackPop(stk);
+	}
+
+
+	StackDestroy(stk);
+	stk = NULL;
+
 }
 
