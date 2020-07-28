@@ -23,13 +23,11 @@ void TestStrCat(void);
 void TestStrStr(void);
 void TestStrnCmp(void);
 void TestSortStack(void);
+void TestFibonacci(void);
 
 int main()
 {
-	int n = 3;
-
-	printf("%d\n", Fibonacci(n));
-	printf("%d\n", Fibonacci2(n));
+	TestFibonacci();
 	FlipTest();
 	TesTStrLen();
 	TestStrCmp();
@@ -40,6 +38,22 @@ int main()
 	TestSortStack();
 
 	return 0;
+}
+
+void TestFibonacci(void)
+{
+	printf("n = 0 f(n) = %d\n", Fibonacci(0));
+	printf("n = 0 f(n) = %d\n", Fibonacci2(0));
+	printf("n = 1 f(n) = %d\n", Fibonacci(1));
+	printf("n = 1 f(n) = %d\n", Fibonacci2(1));
+	printf("n = 2 f(n) = %d\n", Fibonacci(2));
+	printf("n = 2 f(n) = %d\n", Fibonacci2(2));
+	printf("n = 3 f(n) = %d\n", Fibonacci(3));
+	printf("n = 3 f(n) = %d\n", Fibonacci2(3));
+	printf("n = 4 f(n) = %d\n", Fibonacci(4));
+	printf("n = 4 f(n) = %d\n", Fibonacci2(4));
+	printf("n = 7 f(n) = %d\n", Fibonacci(7));
+	printf("n = 7 f(n) = %d\n", Fibonacci2(7));
 }
 
 void TesTStrLen(void)

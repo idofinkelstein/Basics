@@ -13,7 +13,12 @@ Date: 26/7/2020
 
 int Fibonacci(int element_index)
 {
-	if (element_index < 2)
+	if (element_index < 1)
+	{
+		return 0;
+	}
+
+	else if (element_index < 2)
 	{
 		return 1;
 	}
@@ -27,12 +32,16 @@ int Fibonacci2(int element_index)
 	int prevprev = 0;
 	int res = 0;
 
-	if (element_index < 2)
+	if (element_index < 1)
+	{
+		return 0;
+	}
+	else if (element_index <= 2)
 	{
 		return 1;
 	}
 	
-	while (element_index)
+	while (element_index - 1)
 	{
 		res = prev + prevprev;
 		prevprev = prev;	
@@ -41,7 +50,7 @@ int Fibonacci2(int element_index)
 		--element_index;
 	}
 
-	return res;
+	return (res);
 }
 
 node_t *Flip(node_t *node)
@@ -71,7 +80,7 @@ size_t StrLen(const char *str)
 		return (count);
 	}
 	
-	return ++count + StrLen(str + 1);	
+	return (++count + StrLen(str + 1));	
 }
 
 
@@ -82,7 +91,7 @@ int StrCmp(const char *str1, const char *str2)
 		return (*str1 - *str2);
 	}
 
-	return StrCmp(str1 + 1, str2 + 1);
+	return (StrCmp(str1 + 1, str2 + 1));
 }
 
 int StrnCmp(const char *str1, const char *str2, size_t n)
@@ -96,7 +105,7 @@ int StrnCmp(const char *str1, const char *str2, size_t n)
 		return (*(str1 - 1) - *(str2 - 1));
 	}
 
-	return StrnCmp(str1 + 1, str2 + 1, n - 1);
+	return (StrnCmp(str1 + 1, str2 + 1, n - 1));
 }
 
 char *StrCpy(char *dest, const char *src)
@@ -105,12 +114,12 @@ char *StrCpy(char *dest, const char *src)
 
 	if (*src == '\0')
 	{
-		 return(dest);		
+		 return (dest);		
 	}
 
 	StrCpy(dest + 1, (char*)src + 1);
 
-	return dest;	
+	return (dest);	
 }
 
 char *StrCat(char *dest, const char *src)
@@ -118,7 +127,7 @@ char *StrCat(char *dest, const char *src)
 	if (*dest != '\0')
 	{
 		StrCat(dest + 1, (char*)src);
-		return dest;
+		return (dest);
 	}
 
 	else if (*src != '\0')
@@ -127,7 +136,7 @@ char *StrCat(char *dest, const char *src)
 		StrCat(dest + 1, (char*)src + 1);
 	}
 
-	return dest;	
+	return (dest);	
 }
 
 char *StrStr(const char *haystack, const char *needle)
@@ -143,7 +152,7 @@ char *StrStr(const char *haystack, const char *needle)
 		return (NULL);
 	}
 
-	return StrStr(haystack + 1, needle);
+	return (StrStr(haystack + 1, needle));
 	
 }
 
