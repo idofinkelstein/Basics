@@ -26,14 +26,14 @@ typedef struct token
 /* utility functions declaration */
 static void DoNothing(f_stack_t *numbers, c_stack_t *operators);
 static char *PushOperator(f_stack_t *numbers, c_stack_t *operators, char *input);
-static char *open_bracket(f_stack_t *numbers, c_stack_t *operators, char *input);
-static char *close_bracket(f_stack_t *numbers, c_stack_t *operators, char *input);
+static char *CalculateAndPushOperator(f_stack_t *numbers, c_stack_t *operators, char *input);
+static char *OpenBracket(f_stack_t *numbers, c_stack_t *operators, char *input);
+static char *CloseBracket(f_stack_t *numbers, c_stack_t *operators, char *input);
 static char *ToDo(f_stack_t *numbers, c_stack_t *operators, char *input);
 static void Operate(f_stack_t *numbers, c_stack_t *operators);
 static char *Insert(f_stack_t *numbers, c_stack_t *operators, char *input);
 static void InitArray();
 static token_t g_lut[128];
-
 
 
 float Calculator(const char *input)
@@ -69,7 +69,7 @@ float Calculator(const char *input)
 	return (sum);
 }
 
-static char *open_bracket(f_stack_t *numbers, c_stack_t *operators, char *input)
+static char *OpenBracket(f_stack_t *numbers, c_stack_t *operators, char *input)
 {
 	assert(operators);
 
@@ -81,14 +81,14 @@ static char *open_bracket(f_stack_t *numbers, c_stack_t *operators, char *input)
 	return (input);
 }
 
-static char *close_bracket(f_stack_t *numbers, c_stack_t *operators, char *input)
+static char *CloseBracket(f_stack_t *numbers, c_stack_t *operators, char *input)
 {
 	assert(numbers);
 	assert(operators);
 
 	++input;
 
-	while (CStackPeek(operators) != '(')
+	while ('(' != CStackPeek(operators))
 	{
 		Operate(numbers, operators);
 	}
@@ -147,12 +147,16 @@ static char *ToDo(f_stack_t *numbers, c_stack_t *operators, char *input)
 	
 	/* chooses operation according to result of previous statement */
 	g_lut[operation].operation(numbers, operators);
-	
-	CStackPush(operators, *input);
 
+	/*checks again to decide next step: pushing or calculating + pushing */
+	operation = (g_lut[(size_t)*input].precedene > 
+			 	 g_lut[(size_t)CStackPeek(operators)].precedene);
+	
+	input = g_lut[operation].char_check(numbers, operators, (char*)input);
+	
 	++input;
 
-	return (input);
+	return (input);	
 }
 
 static char *PushOperator(f_stack_t *numbers, c_stack_t *operators, char *input)
@@ -163,7 +167,20 @@ static char *PushOperator(f_stack_t *numbers, c_stack_t *operators, char *input)
 
 	CStackPush(operators, *input);
 
-	return input;
+	return (input);
+}
+
+static char *CalculateAndPushOperator(f_stack_t *numbers, c_stack_t *operators, char *input)
+{
+	(void)numbers;
+
+	assert(operators);
+
+	Operate(numbers,operators);
+
+	CStackPush(operators, *input);
+
+	return (input);
 }
 
 static void DoNothing(f_stack_t *numbers, c_stack_t *operators)
@@ -174,7 +191,7 @@ static void DoNothing(f_stack_t *numbers, c_stack_t *operators)
 
 static void InitArray()
 {
-	g_lut[0].char_check = PushOperator;
+	g_lut[0].char_check = CalculateAndPushOperator;
 	g_lut[0].operation = Operate;
 	g_lut[1].char_check = PushOperator;
 	g_lut[1].operation = DoNothing;
@@ -183,8 +200,8 @@ static void InitArray()
 	g_lut['/'].char_check = ToDo;
 	g_lut['+'].char_check = ToDo;
 	g_lut['-'].char_check = ToDo;
-	g_lut['('].char_check = open_bracket;
-	g_lut[')'].char_check = close_bracket;
+	g_lut['('].char_check = OpenBracket;
+	g_lut[')'].char_check = CloseBracket;
 	g_lut['0'].char_check = Insert;
 	g_lut['1'].char_check = Insert;
 	g_lut['2'].char_check = Insert;
@@ -233,30 +250,5 @@ static void InitArray()
 	g_lut['9'].precedene = 0;
 	g_lut['.'].precedene = 0;
 }
-
-	/*if (CStackIsEmpty(operators))  if 1
-	{
-
-		CStackPush(operators, *input);
-		++input;
-		return (input);
-
-	} */
-	/* if input operator > prev operator : -> push input  (1) */
-	/*else if (g_lut[(size_t)*input].precedene > 
-			 g_lut[(size_t)CStackPeek(operators)].precedene)
-	{
-
-		CStackPush(operators, *input);
-
-	}
-*/
-	/* if input operator < prev operator : -> perform operation on prev operator and push input  (0) */
-	/*else
-	{
-		g_lut[(size_t)CStackPeek(operators)].operation(numbers, operators);
-		CStackPush(operators, *input);
-	}
-*/
 
 
