@@ -283,6 +283,12 @@ avl_node_t *InsertNode(avl_t *avl, avl_node_t *node, void *data)
 avl_node_t *CreateNode(avl_node_t *new, void *data)
 {
 	new = (avl_node_t*)malloc(sizeof(avl_node_t));
+
+	if (NULL == new)
+	{
+		return (NULL);
+	}	
+
 	new->data = data;
 	new->left = new->right = NULL;
 
