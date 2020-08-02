@@ -3,6 +3,7 @@
 #include "avl.h"
 
 int Compare(const void *data1, const void *data2, void *param);
+int ChangeValue(void *data, void *param);
 
 void TestCase1(void);
 
@@ -20,7 +21,7 @@ void TestCase1(void)
 	int arr[] = {0, 1, 2, 3, 0, 66, 43, 36, 37, 3, 7, 38};
 	size_t size = sizeof(arr) / sizeof(int);
 	size_t i = 0;
-	int x = 23;
+	int x = 5;
 
 	for (i = 0; i < size; ++i)
 	{
@@ -50,6 +51,8 @@ void TestCase1(void)
 
 	AVLFind(avl, &arr[1]);
 
+	AVLForEach(avl, ChangeValue, &x);
+
 	AVLDestroy(avl);
 }
 
@@ -58,4 +61,17 @@ int Compare(const void *data1, const void *data2, void *param)
 	(void)param;
 
 	return (*(int*)data1 - *(int*)data2);
+}
+
+/* function to pass to ForEach */
+int ChangeValue(void *data, void *param)
+{
+	if (NULL == data)
+	{
+		return 1;
+	}
+
+	*(int*)data = *(int*)data + *(int*)param;
+
+	return 0;
 }

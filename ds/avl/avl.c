@@ -36,6 +36,9 @@ avl_node_t *RightRotation(avl_node_t *root);
 avl_node_t *RightLeftRotation(avl_node_t *root);
 avl_node_t *LeftRotation(avl_node_t *root);
 avl_node_t *LeftRightRotation(avl_node_t *root);
+int RecursiveForEach(avl_node_t *root, 
+							avl_do_action_func_t do_action,
+							void *param);
 
 avl_t *AVLCreate(avl_cmp_func_t cmp, void *param)
 {
@@ -101,7 +104,6 @@ int AVLInsert(avl_t *avl, void *data)
 
 void *AVLFind(const avl_t *avl, const void *data)
 {
-
 	avl_node_t *node = avl->root;
 
 	assert(avl);
@@ -112,6 +114,43 @@ void *AVLFind(const avl_t *avl, const void *data)
 	}
 
 	return (node);
+}
+
+int AVLForEach(avl_t *avl, avl_do_action_func_t do_action ,void *param)
+{
+	avl_node_t *root = avl->root;
+	
+	if (!AVLIsEmpty(avl) && !RecursiveForEach(root, do_action, param))
+	{
+		return (0);
+	}
+
+	return 1;
+}
+
+
+/*--------------------------Utility functions--------------------------------*/
+
+int RecursiveForEach(avl_node_t *root, 
+							avl_do_action_func_t do_action,
+							void *param)
+{
+	int ret = 0;
+
+	if (root->left != NULL)
+	{
+		ret = RecursiveForEach(root->left, do_action, param);
+	}
+	
+	ret = do_action(root->data, param);
+
+	if (root->right != NULL)
+	{
+		ret = RecursiveForEach(root->right, do_action, param);
+	}
+
+	return (ret);
+
 }
 
 void DeleteNode(avl_node_t *node)
