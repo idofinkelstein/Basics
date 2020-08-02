@@ -1,17 +1,22 @@
-#include <stdlib.h>
-#include <stdio.h>
+/********************************
+File name: avl.c
+Author: Ido Finkelstein
+Reviewer: Guy Chen
+Date: 1/8/2020
+*********************************/
+
+#include <stdlib.h> /* malloc, free */
+#include <stdio.h>  /* printf */
 #include <assert.h>
 
 #include "avl.h"
-#include "stack.h"
-
 
 
 typedef struct avl_node avl_node_t;
 
 struct avl_node
 {
-	void *data;
+	void *data; /* represents the key, more fields could be added in the future */
 	avl_node_t *left;
 	avl_node_t *right;
 };
@@ -23,7 +28,7 @@ struct avl
 	void *param;
 };
 
-
+/* Utility function declarations */
 void DeleteNode(avl_node_t *node);
 size_t GetSize(avl_node_t *node, size_t count);
 void *RecursiveFind(const avl_t *avl, avl_node_t *node, const void *data);
@@ -36,6 +41,12 @@ avl_node_t *RightRotation(avl_node_t *root);
 avl_node_t *RightLeftRotation(avl_node_t *root);
 avl_node_t *LeftRotation(avl_node_t *root);
 avl_node_t *LeftRightRotation(avl_node_t *root);
+avl_node_t *RecursiveRemove(avl_t *avl, avl_node_t *node, void *data);
+avl_node_t *GetMinClosestNode(avl_node_t *node);
+int IsBalancedRecursive(avl_node_t *node, int balance);
+void InOrderTraversal(avl_node_t *node);
+void PreOrderTraversal(avl_node_t *node);
+void PostOrderTraversal(avl_node_t *node);
 int RecursiveForEach(avl_node_t *root, 
 							avl_do_action_func_t do_action,
 							void *param,
@@ -63,6 +74,8 @@ void AVLDestroy(avl_t *avl)
 {
 	avl_node_t *node = avl->root;
 
+	assert(avl);
+
 	if (!AVLIsEmpty(avl))
 	{
 		DeleteNode(node);	
@@ -83,6 +96,8 @@ size_t AVLSize(const avl_t *avl)
 	size_t count = 0;
 	avl_node_t *node = avl->root;
 
+	assert(avl);
+
 	if (!AVLIsEmpty(avl))
 	{
 		count = GetSize(node, count);	
@@ -95,10 +110,9 @@ int AVLInsert(avl_t *avl, void *data)
 {
 	avl_node_t *node = avl->root;
 
-	node = InsertNode(avl, node, data);
+	assert(avl);
 
-	printf("height = %ld\n", NodeHeight(node));
-	printf("balance = %d\n", Balance(node));
+	node = InsertNode(avl, node, data);
 
 	return (node == NULL);
 }
@@ -122,6 +136,8 @@ int AVLForEach(avl_t *avl, avl_do_action_func_t do_action ,void *param)
 	avl_node_t *root = avl->root;
 	int status = 0;
 
+	assert(avl);
+
 	if (!AVLIsEmpty(avl))
 	{
 		status = RecursiveForEach(root, do_action, param, status);
@@ -130,20 +146,121 @@ int AVLForEach(avl_t *avl, avl_do_action_func_t do_action ,void *param)
 	return status;
 }
 
+void AVLRemove(avl_t *avl, void *data)
+{
+	avl_node_t *root = avl->root;
+
+	assert(avl);
+
+	if (!AVLIsEmpty(avl))
+	{
+		RecursiveRemove(avl, root, data);
+	}
+}
 
 /*--------------------------Utility functions--------------------------------*/
+
+avl_node_t *RecursiveRemove(avl_t *avl, avl_node_t *node, void *data)
+{
+	avl_node_t *temp_node = NULL;
+	/* variable to check whether the root has been changed during rebalancing */
+	int root_swap = 0; 
+
+	/* deletion part */
+	if (avl->cmp(node->data, data, NULL) == 0)
+	{
+		/* node to remove has no children */
+		if (node->left == NULL && node->right == NULL)
+		{
+			free(node);
+			return (NULL);
+		}
+		/* node to remove has one child */
+		else if ((node->left == NULL && node->right) || 
+				 (node->left && node->right == NULL))
+		{		
+			if (node->left)
+			{
+				temp_node = node->left;
+				free(node);
+				return (temp_node);
+			}
+			else
+			{
+				temp_node = node->right;
+				free(node);
+				return(temp_node);
+			}
+		}
+		/* node to remove has two children */
+		else
+		{
+			temp_node = GetMinClosestNode(node);
+			node->data = temp_node->data;		
+			node->right = RecursiveRemove(avl, node->right, node->data);
+			return (node);			
+		}
+	}
+	
+	/* scanning part */
+	else if (avl->cmp(node->data, data, NULL) > 0 && node->left != NULL)		
+	{
+		node->left = RecursiveRemove(avl, node->left, data);
+	}
+	else if (avl->cmp(node->data, data, NULL) < 0 && node->right != NULL)
+	{
+		node->right = RecursiveRemove(avl, node->right, data);
+	}
+
+	if (node == avl->root)
+	{
+		root_swap = !root_swap;
+	}
+
+	/* rebalancing part */
+	if (Balance(node) > 1)
+	{			
+		if (NodeHeight(node->left->left) >= NodeHeight(node->left->right))
+		{
+			node = RightRotation(node);
+		}
+		else
+		{
+			node = LeftRightRotation(node);
+		}
+	}
+	else if (Balance(node) < -1)
+	{
+		if (NodeHeight(node->right->right) >= NodeHeight(node->right->left))
+		{
+			node = LeftRotation(node);
+		}
+		else
+		{
+			node = RightLeftRotation(node);
+		}
+	}	
+
+	if (root_swap)
+	{
+		root_swap = !root_swap;
+		avl->root = node;
+	}
+
+	return (node);	
+}
 
 int RecursiveForEach(avl_node_t *root, 
 							avl_do_action_func_t do_action,
 							void *param,
 							int status)
 {
-	
 	if (root->left != NULL)
 	{
 		status = RecursiveForEach(root->left, do_action, param, status);
 	}
 
+	/* condition to stop function from iterating the whole tree */
 	if (status)
 	{
 		return (status);
@@ -157,12 +274,10 @@ int RecursiveForEach(avl_node_t *root,
 	}
 
 	return (status);
-
 }
 
 void DeleteNode(avl_node_t *node)
 {
-
 	if (node->left != NULL)
 	{	
 		DeleteNode(node->left);
@@ -177,7 +292,6 @@ void DeleteNode(avl_node_t *node)
 
 	if (node != NULL)
 	{
-		printf("%d ",*(int*)node->data);
 		free(node);
 		node = NULL;
 	}
@@ -194,7 +308,7 @@ size_t GetSize(avl_node_t *node, size_t count)
 		count = GetSize(node->right, count);		
 	}
 
-		return ++count;	
+	return ++count;	
 }
 
 void *RecursiveFind(const avl_t *avl, avl_node_t *node, const void *data)
@@ -223,8 +337,10 @@ void *RecursiveFind(const avl_t *avl, avl_node_t *node, const void *data)
 avl_node_t *InsertNode(avl_t *avl, avl_node_t *node, void *data)
 {
 	avl_node_t *new = NULL;
+	/* variable to check whether the root has been changed during rebalancing */
 	int root_swap = 0;
 
+	/* insertion part */ 
 	if (node == NULL)
 	{
 		new = CreateNode(new, data);
@@ -236,7 +352,7 @@ avl_node_t *InsertNode(avl_t *avl, avl_node_t *node, void *data)
 
 		return (new);
 	}
-
+	/* scanning part */
 	if (avl->cmp(node->data, data, data) != 0)
 	{
 		if (avl->cmp(node->data, data, data) > 0)
@@ -253,7 +369,7 @@ avl_node_t *InsertNode(avl_t *avl, avl_node_t *node, void *data)
 			root_swap = !root_swap;
 		}
 
-
+		/* rebalancing part */
 		if (Balance(node) > 1)
 		{			
 			if (NodeHeight(node->left->left) >= NodeHeight(node->left->right))
@@ -311,6 +427,7 @@ size_t NodeHeight(avl_node_t *node)
 {
 	size_t height = 0;
 
+	/* this condition ignores leaves so it counts only the linkes  */
 	if (node == NULL || (node->left == NULL && node->right == NULL))
 	{
 		return 0;
@@ -377,3 +494,118 @@ avl_node_t *LeftRightRotation(avl_node_t *root)
 
 	return (pivot);
 }
+
+avl_node_t *GetMinClosestNode(avl_node_t *node)
+{
+	if (node->right != NULL)
+	{
+		node = node->right;
+	}
+	
+	while (node->left != NULL)
+	{
+		node = node->left;
+	}
+
+	return (node);	
+}
+
+/*------------------------Debug functions------------------------------*/
+
+/* boolian function, return 1 if the whole tree is balanced */
+int IsBalanced(avl_t *avl)
+{
+	avl_node_t *root = avl->root;
+	int balance = 0;
+
+	balance = IsBalancedRecursive(root, balance);
+
+	return (balance <= 1 && balance >= -1);
+}
+
+int IsBalancedRecursive(avl_node_t *node, int balance)
+{
+	if (node->left != NULL)
+	{
+		balance = IsBalancedRecursive(node->left, balance);
+	}
+
+	if (balance > 1 || balance < -1)
+	{
+		return (balance);
+	}
+	
+	balance = Balance(node);
+
+	if (node->right != NULL)
+	{
+		balance = IsBalancedRecursive(node->right, balance);
+	}
+
+	return (balance);
+}
+
+void ChooseTraversalOrder(avl_t *avl, int num)
+{
+	avl_node_t *root = avl->root;
+
+	if (num == 1)
+	{
+		InOrderTraversal(root);
+	}
+	else if (num == 2)
+	{
+		PreOrderTraversal(root);
+	}
+	else if (num == 3)
+	{
+		PostOrderTraversal(root);
+	}
+}
+
+void InOrderTraversal(avl_node_t *node)
+{
+	if (node->left != NULL)
+	{
+		InOrderTraversal(node->left);
+	}
+	
+	printf("%d\n", *(int*)node->data);
+
+	if (node->right != NULL)
+	{
+		InOrderTraversal(node->right);
+	}
+}
+
+void PreOrderTraversal(avl_node_t *node)
+{
+	printf("%d\n", *(int*)node->data);
+
+	if (node->left != NULL)
+	{
+		PreOrderTraversal(node->left);
+	}
+
+	if (node->right != NULL)
+	{
+		PreOrderTraversal(node->right);
+	}
+}
+
+void PostOrderTraversal(avl_node_t *node)
+{
+	if (node->left != NULL)
+	{
+		PostOrderTraversal(node->left);
+	}	
+
+	if (node->right != NULL)
+	{
+		PostOrderTraversal(node->right);
+	}
+
+	printf("%d\n", *(int*)node->data);
+}
+
+

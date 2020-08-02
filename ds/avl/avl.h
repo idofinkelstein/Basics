@@ -1,3 +1,10 @@
+/********************************
+File name: avl.h
+Author: Ido Finkelstein
+Reviewer: Guy Chen
+Date: 1/8/2020
+*********************************/
+
 /*
 An AVL tree is a binary search tree which has the following properties:
 1. The sub-trees of every node differ in height by at most one.
@@ -143,6 +150,10 @@ void *AVLFind(const avl_t *avl, const void *data);
 *
 */
 int AVLForEach(avl_t *avl, avl_do_action_func_t do_action ,void *param);
+
+/* debug functions - not included in the API */
+int IsBalanced(avl_t *avl);
+void ChooseTraversalOrder(avl_t *avl, int num);
 
 /*---------------------------------------------------------------------------*/
 
