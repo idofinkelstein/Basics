@@ -4,6 +4,7 @@
 
 int Compare(const void *data1, const void *data2, void *param);
 int ChangeValue(void *data, void *param);
+int PrintTree(void *data, void *param);
 
 void TestCase1(void);
 
@@ -52,6 +53,7 @@ void TestCase1(void)
 	AVLFind(avl, &arr[1]);
 
 	AVLForEach(avl, ChangeValue, &x);
+	AVLForEach(avl, PrintTree, NULL);
 
 	AVLDestroy(avl);
 }
@@ -73,5 +75,14 @@ int ChangeValue(void *data, void *param)
 
 	*(int*)data = *(int*)data + *(int*)param;
 
+	return 0;
+}
+
+int PrintTree(void *data, void *param)
+{
+	(void)param;
+	printf("%d\n", *(int*)data);
+
+	
 	return 0;
 }
