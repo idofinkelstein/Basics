@@ -37,6 +37,7 @@ avl_node_t *CreateNode(avl_node_t *new, void *data);
 size_t NodeHeight(avl_node_t *node);
 size_t Max(size_t a, size_t b);
 int Balance(avl_node_t *node);
+avl_node_t *Rebalance(avl_node_t *node);
 avl_node_t *RightRotation(avl_node_t *root);
 avl_node_t *RightLeftRotation(avl_node_t *root);
 avl_node_t *LeftRotation(avl_node_t *root);
@@ -218,28 +219,7 @@ avl_node_t *RecursiveRemove(avl_t *avl, avl_node_t *node, void *data)
 	}
 
 	/* rebalancing part */
-	if (Balance(node) > 1)
-	{			
-		if (NodeHeight(node->left->left) >= NodeHeight(node->left->right))
-		{
-			node = RightRotation(node);
-		}
-		else
-		{
-			node = LeftRightRotation(node);
-		}
-	}
-	else if (Balance(node) < -1)
-	{
-		if (NodeHeight(node->right->right) >= NodeHeight(node->right->left))
-		{
-			node = LeftRotation(node);
-		}
-		else
-		{
-			node = RightLeftRotation(node);
-		}
-	}	
+	node = Rebalance(node);
 
 	if (root_swap)
 	{
@@ -370,28 +350,7 @@ avl_node_t *InsertNode(avl_t *avl, avl_node_t *node, void *data)
 		}
 
 		/* rebalancing part */
-		if (Balance(node) > 1)
-		{			
-			if (NodeHeight(node->left->left) >= NodeHeight(node->left->right))
-			{
-				node = RightRotation(node);
-			}
-			else
-			{
-				node = LeftRightRotation(node);
-			}
-		}
-		else if (Balance(node) < -1)
-		{
-			if (NodeHeight(node->right->right) >= NodeHeight(node->right->left))
-			{
-				node = LeftRotation(node);
-			}
-			else
-			{
-				node = RightLeftRotation(node);
-			}
-		}	
+		node = Rebalance(node);
 	}
 
 	if (root_swap)
@@ -608,4 +567,31 @@ void PostOrderTraversal(avl_node_t *node)
 	printf("%d\n", *(int*)node->data);
 }
 
+avl_node_t *Rebalance(avl_node_t *node)
+{
+	if (Balance(node) > 1)
+	{			
+		if (NodeHeight(node->left->left) >= NodeHeight(node->left->right))
+		{
+			node = RightRotation(node);
+		}
+		else
+		{
+			node = LeftRightRotation(node);
+		}
+	}
+	else if (Balance(node) < -1)
+	{
+		if (NodeHeight(node->right->right) >= NodeHeight(node->right->left))
+		{
+			node = LeftRotation(node);
+		}
+		else
+		{
+			node = RightLeftRotation(node);
+		}
+	}	
+
+	return (node);
+}
 
