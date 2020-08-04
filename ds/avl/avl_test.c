@@ -9,16 +9,23 @@ Date: 1/8/2020
 
 #include "avl.h"
 
-int Compare(const void *data1, const void *data2, void *param);
-int ChangeValue(void *data, void *param);
-int PrintTree(void *data, void *param);
+static int Compare(const void *data1, const void *data2, void *param);
+static int ChangeValue(void *data, void *param);
+static int PrintTree(void *data, void *param);
 
-void TestCase1(void);
-void TestCase2(void);
-void TestCase3(void);
-void TestCase4(void);
+static void TestCase1(void);
+static void TestCase2(void);
+static void TestCase3(void);
+static void TestCase4(void);
 
-int main()
+enum traversal
+{
+	INORDER = 1,
+	PREORDER,
+	POSTORDER
+};
+
+int main(void)
 {
 	TestCase1();
 	TestCase2();
@@ -28,7 +35,7 @@ int main()
 	return 0;
 }
 
-void TestCase1(void)
+static void TestCase1(void)
 {
 	avl_t *avl = AVLCreate(Compare, NULL);
 			  /* 0   1  2  3  4  5   6   7   8   9  10 */
@@ -71,7 +78,7 @@ void TestCase1(void)
 	AVLDestroy(avl);
 }
 
-void TestCase2(void)
+static void TestCase2(void)
 {
 	avl_t *avl = AVLCreate(Compare, NULL);
 			  /* 0   1  2  3  4  5   6   7   8   9  10 */
@@ -102,7 +109,7 @@ void TestCase2(void)
 	AVLDestroy(avl);
 }
 
-void TestCase3(void)
+static void TestCase3(void)
 {
 	avl_t *avl = AVLCreate(Compare, NULL);
 			  /* 0  1  2  3  4   5   6   7   8   9  10  11  12 13  14  15  16  17  18 */
@@ -142,7 +149,7 @@ void TestCase3(void)
 	AVLDestroy(avl);
 }
 
-void TestCase4(void)
+static void TestCase4(void)
 {
 	avl_t *avl = AVLCreate(Compare, NULL);
 			  /* 0  1  2  3  4   5   6   7   8   9  10  11  12 13  14  15  16  17  18 */
@@ -157,13 +164,13 @@ void TestCase4(void)
 	
 	/* testing debug functions (not in the API) */
 	puts("in order traversl:");
-	ChooseTraversalOrder(avl, 1);
+	ChooseTraversalOrder(avl, INORDER);
 
 	puts("pre order traversl:");
-	ChooseTraversalOrder(avl, 2);
+	ChooseTraversalOrder(avl, PREORDER);
 
 	puts("post order traversl:");
-	ChooseTraversalOrder(avl, 3);	
+	ChooseTraversalOrder(avl, POSTORDER);	
 
 
 	AVLDestroy(avl);
@@ -177,7 +184,7 @@ int Compare(const void *data1, const void *data2, void *param)
 }
 
 /* function to pass to ForEach */
-int ChangeValue(void *data, void *param)
+static int ChangeValue(void *data, void *param)
 {
 	if (NULL == data)
 	{
@@ -189,7 +196,7 @@ int ChangeValue(void *data, void *param)
 	return 0;
 }
 
-int PrintTree(void *data, void *param)
+static int PrintTree(void *data, void *param)
 {
 	(void)param;
 	printf("%d\n", *(int*)data);
