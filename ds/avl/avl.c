@@ -37,7 +37,7 @@ struct avl
 
 /* Utility function declarations */
 static void DeleteNode(avl_node_t *node);
-static size_t GetSize(avl_node_t *node, size_t count);
+static size_t GetSize(avl_node_t *node);
 static void *RecursiveFind(const avl_t *avl, avl_node_t *node, const void *data);
 static avl_node_t *InsertNode(avl_t *avl, avl_node_t *node, void *data);
 static avl_node_t *CreateNode(avl_node_t *new, void *data);
@@ -55,7 +55,7 @@ static int IsBalancedRecursive(avl_node_t *node, int balance);
 static void InOrderTraversal(avl_node_t *node);
 static void PreOrderTraversal(avl_node_t *node);
 static void PostOrderTraversal(avl_node_t *node);
-static int RecursiveForEach(avl_node_t *root, 
+static int RecursiveForEach(avl_node_t *node, 
 							avl_do_action_func_t do_action,
 							void *param,
 							int status);
@@ -80,17 +80,10 @@ avl_t *AVLCreate(avl_cmp_func_t cmp, void *param)
 
 void AVLDestroy(avl_t *avl)
 {
-	avl_node_t *node = NULL;
-
 	assert(avl);
 
-	node = avl->root;
-
-	if (!AVLIsEmpty(avl))
-	{
-		DeleteNode(node);	
-	}
-
+	DeleteNode(avl->root);	
+	
 	free(avl);
 	avl = NULL;
 }
@@ -104,19 +97,9 @@ int AVLIsEmpty(const avl_t *avl)
 
 size_t AVLSize(const avl_t *avl)
 {
-	size_t count = 0;
-	avl_node_t *node = NULL;
-
 	assert(avl);
 
-	node = avl->root;
-
-	if (!AVLIsEmpty(avl))
-	{
-		count = GetSize(node, count);	
-	}
-
-	return (count);
+	return (GetSize(avl->root));
 }
 
 int AVLInsert(avl_t *avl, void *data)
@@ -134,33 +117,18 @@ int AVLInsert(avl_t *avl, void *data)
 
 void *AVLFind(const avl_t *avl, const void *data)
 {
-	avl_node_t *node = NULL;
-
 	assert(avl);
 
-	node = avl->root;
-
-	if (!AVLIsEmpty(avl))
-	{
-		node = RecursiveFind(avl, node, data);
-	}
-
-	return (node);
+	return (RecursiveFind(avl, avl->root, data));
 }
 
 int AVLForEach(avl_t *avl, avl_do_action_func_t do_action ,void *param)
 {
-	avl_node_t *root = NULL;
 	int status = 0;
 
 	assert(avl);
-
-	root = avl->root;
-
-	if (!AVLIsEmpty(avl))
-	{
-		status = RecursiveForEach(root, do_action, param, status);
-	}
+	
+	status = RecursiveForEach(avl->root, do_action, param, status);	
 
 	return status;
 }
@@ -250,85 +218,72 @@ static avl_node_t *RecursiveRemove(avl_t *avl, avl_node_t *node, void *data)
 	return (node);	
 }
 
-static int RecursiveForEach(avl_node_t *root, 
+static int RecursiveForEach(avl_node_t *node, 
 							avl_do_action_func_t do_action,
 							void *param,
 							int status)
 {
-	if (NULL != root->left)
+	if (NULL == node)
 	{
-		status = RecursiveForEach(root->left, do_action, param, status);
+		return (status);
 	}
 
-	/* condition to stop function from iterating the whole tree */
+	status = RecursiveForEach(node->left, do_action, param, status);
+	
+	/* condition to stop function from iterating the whole tree */	
 	if (status)
 	{
 		return (status);
 	}
+
+	status = do_action(node->data, param);
+
+	status = RecursiveForEach(node->right, do_action, param, status);
 	
-	status = do_action(root->data, param);
-
-	if (root->right != NULL)
-	{
-		status = RecursiveForEach(root->right, do_action, param, status);
-	}
-
 	return (status);
 }
 
 static void DeleteNode(avl_node_t *node)
 {
-	if (NULL != node->left)
-	{	
-		DeleteNode(node->left);
-		node->left = NULL;		
-	}
-
-	if (NULL != node->right)
+	if (NULL == node)
 	{
-		DeleteNode(node->right);
-		node->right = NULL;
+		return;
 	}
+		
+	DeleteNode(node->left);
+	DeleteNode(node->right);
 
-	if (NULL != node)
-	{
-		free(node);
-		node = NULL;
-	}
+	free(node);
+	node = NULL;	
 }
 
-static size_t GetSize(avl_node_t *node, size_t count)
+static size_t GetSize(avl_node_t *node)
 {
-	if (NULL != node->left)
-	{			
-		count = GetSize(node->left, count);			
-	}
-	if (NULL != node->right)
+	if (NULL == node)
 	{
-		count = GetSize(node->right, count);		
+		return 0;
 	}
-
-	return ++count;	
+						
+	return (1 + GetSize(node->left) + GetSize(node->right));
 }
 
 static void *RecursiveFind(const avl_t *avl, avl_node_t *node, const void *data)
 {
+	if (NULL == node)
+	{
+		return (NULL);
+	}
+
 	if (avl->cmp(node->data, data, avl->param) != 0) 
 	{
-		if (avl->cmp(node->data, data, avl->param) > 0 &&
-		    NULL != node->left)
+		if (avl->cmp(node->data, data, avl->param) > 0)
 		{
 			node = RecursiveFind(avl, node->left, data);
 		}
-		else if (avl->cmp(node->data, data, avl->param) < 0 && 
-				 NULL != node->right)
+		else if (avl->cmp(node->data, data, avl->param) < 0)
 		{
 			node = RecursiveFind(avl, node->right, data);
 		}
-		else
-		{
-			return (NULL);
-		}	
 	}
 	
 	return (node);
