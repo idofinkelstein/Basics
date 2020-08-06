@@ -4,9 +4,11 @@ Author: Ido Finkelstein
 Reviewer: Guy Chen
 Date: 1/8/2020
 *********************************/
+#ifndef NDEBUG
+#include <stdio.h> /* printf */
+#endif
 
 #include <stdlib.h> /* malloc, free */
-#include <stdio.h>  /* printf */
 #include <assert.h>
 
 enum traversal
@@ -16,6 +18,13 @@ enum traversal
 	POSTORDER
 };
 
+typedef enum 
+{
+	LEFT = 0, /* NEVER CHANGE THIS VALUE!!! */
+	RIGHT
+
+}child_t;
+
 #include "avl.h"
 
 
@@ -24,8 +33,7 @@ typedef struct avl_node avl_node_t;
 struct avl_node
 {
 	void *data; /* represents the key, more fields could be added in the future */
-	avl_node_t *left;
-	avl_node_t *right;
+	avl_node_t *child[2];
 };
 
 struct avl
@@ -104,15 +112,9 @@ size_t AVLSize(const avl_t *avl)
 
 int AVLInsert(avl_t *avl, void *data)
 {
-	avl_node_t *node = NULL;
-
 	assert(avl);
 
-	node = avl->root;
-
-	node = InsertNode(avl, node, data);
-
-	return (node == NULL);
+	return (InsertNode(avl, avl->root, data) == NULL);
 }
 
 void *AVLFind(const avl_t *avl, const void *data)
@@ -135,16 +137,9 @@ int AVLForEach(avl_t *avl, avl_do_action_func_t do_action ,void *param)
 
 void AVLRemove(avl_t *avl, void *data)
 {
-	avl_node_t *root = NULL;
-
 	assert(avl);
-
-	root = avl->root;
-
-	if (!AVLIsEmpty(avl))
-	{
-		RecursiveRemove(avl, root, data);
-	}
+	
+	RecursiveRemove(avl, avl->root, data);	
 }
 
 /*--------------------------Utility functions--------------------------------*/
@@ -152,55 +147,57 @@ void AVLRemove(avl_t *avl, void *data)
 static avl_node_t *RecursiveRemove(avl_t *avl, avl_node_t *node, void *data)
 {
 	avl_node_t *temp_node = NULL;
+	child_t child = 0;
 	/* variable to check whether the root has been changed during rebalancing */
 	int root_swap = 0; 
+
+	if (NULL == node)
+	{
+		return (NULL);
+	}
 
 	/* deletion part */
 	if (0 == avl->cmp(node->data, data, avl->param))
 	{
 		/* node to remove has no children */
-		if (NULL == node->left  && NULL == node->right)
+		if (NULL == node->child[LEFT]  && NULL == node->child[RIGHT])
 		{
 			free(node);
 			return (NULL);
 		}
 		/* node to remove has one child */
-		else if ((NULL == node->left && node->right) || 
-				 (node->left && NULL == node->right))
+		else if (node->child[LEFT] && NULL == node->child[RIGHT])
 		{		
-			if (node->left)
-			{
-				temp_node = node->left;
-				free(node);
-				return (temp_node);
-			}
-			else
-			{
-				temp_node = node->right;
-				free(node);
-				return(temp_node);
-			}
-		}
+			temp_node = node->child[LEFT];
+			free(node);
+			return (temp_node);
+		}	
+		else if (node->child[RIGHT] && NULL == node->child[LEFT])
+		{
+			temp_node = node->child[RIGHT];
+			free(node);
+			return(temp_node);
+		}	
 		/* node to remove has two children */
 		else
 		{
 			temp_node = GetMinClosestNode(node);
 			node->data = temp_node->data;		
-			node->right = RecursiveRemove(avl, node->right, node->data);
+			node->child[RIGHT] = RecursiveRemove(avl, 
+												 node->child[RIGHT], 
+												 node->data);
 			return (node);			
 		}
 	}
 	
 	/* scanning part */
-	else if (avl->cmp(node->data, data, avl->param) > 0 && NULL != node->left)		
+	else
 	{
-		node->left = RecursiveRemove(avl, node->left, data);
+		/* if node->data > data go left, else go right */
+		child = avl->cmp(node->data, data, avl->param) < 0;
+		node->child[child] = RecursiveRemove(avl, node->child[child], data);
 	}
-	else if (avl->cmp(node->data, data, avl->param) < 0 && NULL != node->right)
-	{
-		node->right = RecursiveRemove(avl, node->right, data);
-	}
-
+	
 	if (node == avl->root)
 	{
 		root_swap = !root_swap;
@@ -228,7 +225,7 @@ static int RecursiveForEach(avl_node_t *node,
 		return (status);
 	}
 
-	status = RecursiveForEach(node->left, do_action, param, status);
+	status = RecursiveForEach(node->child[LEFT], do_action, param, status);
 	
 	/* condition to stop function from iterating the whole tree */	
 	if (status)
@@ -238,7 +235,7 @@ static int RecursiveForEach(avl_node_t *node,
 
 	status = do_action(node->data, param);
 
-	status = RecursiveForEach(node->right, do_action, param, status);
+	status = RecursiveForEach(node->child[RIGHT], do_action, param, status);
 	
 	return (status);
 }
@@ -250,8 +247,8 @@ static void DeleteNode(avl_node_t *node)
 		return;
 	}
 		
-	DeleteNode(node->left);
-	DeleteNode(node->right);
+	DeleteNode(node->child[LEFT]);
+	DeleteNode(node->child[RIGHT]);
 
 	free(node);
 	node = NULL;	
@@ -264,26 +261,23 @@ static size_t GetSize(avl_node_t *node)
 		return 0;
 	}
 						
-	return (1 + GetSize(node->left) + GetSize(node->right));
+	return (1 + GetSize(node->child[LEFT]) + GetSize(node->child[RIGHT]));
 }
 
 static void *RecursiveFind(const avl_t *avl, avl_node_t *node, const void *data)
 {
+	child_t child = 0;
+
 	if (NULL == node)
 	{
 		return (NULL);
 	}
 
 	if (avl->cmp(node->data, data, avl->param) != 0) 
-	{
-		if (avl->cmp(node->data, data, avl->param) > 0)
-		{
-			node = RecursiveFind(avl, node->left, data);
-		}
-		else if (avl->cmp(node->data, data, avl->param) < 0)
-		{
-			node = RecursiveFind(avl, node->right, data);
-		}
+	{	
+		/* if node->data > data go left, else go right */
+		child = avl->cmp(node->data, data, avl->param) < 0;
+		node = RecursiveFind(avl, node->child[child], data);
 	}
 	
 	return (node);
@@ -292,6 +286,7 @@ static void *RecursiveFind(const avl_t *avl, avl_node_t *node, const void *data)
 static avl_node_t *InsertNode(avl_t *avl, avl_node_t *node, void *data)
 {
 	avl_node_t *new = NULL;
+	child_t child = 0;
 	/* variable to check whether the root has been changed during rebalancing */
 	int root_swap = 0;
 
@@ -300,7 +295,7 @@ static avl_node_t *InsertNode(avl_t *avl, avl_node_t *node, void *data)
 	{
 		new = CreateNode(new, data);
 
-		if (NULL == avl->root)
+		if (AVLIsEmpty(avl))
 		{
 			avl->root = new;
 		}
@@ -308,25 +303,20 @@ static avl_node_t *InsertNode(avl_t *avl, avl_node_t *node, void *data)
 		return (new);
 	}
 	/* scanning part */
-	if (0 != avl->cmp(node->data, data, avl->param))
+	else if (0 != avl->cmp(node->data, data, avl->param)) 
 	{
-		if (avl->cmp(node->data, data, avl->param) > 0)
-		{
-			node->left = InsertNode(avl, node->left, data);		
-		}
-		else
-		{
-			node->right = InsertNode(avl, node->right, data);
-		}
-
-		if (node == avl->root)
-		{
-			root_swap = !root_swap;
-		}
-
-		/* rebalancing part */
-		node = Rebalance(node);
+		/* if node->data > data go left, else go right */
+		child = avl->cmp(node->data, data, avl->param) < 0;
+		node->child[child] = InsertNode(avl, node->child[child], data);
 	}
+
+	if (node == avl->root)
+	{
+		root_swap = !root_swap;
+	}
+
+	/* rebalancing part */
+	node = Rebalance(node);
 
 	if (root_swap)
 	{
@@ -347,7 +337,7 @@ static avl_node_t *CreateNode(avl_node_t *new, void *data)
 	}	
 
 	new->data = data;
-	new->left = new->right = NULL;
+	new->child[LEFT] = new->child[RIGHT] = NULL;
 
 	return (new);
 }
@@ -362,27 +352,27 @@ static size_t NodeHeight(avl_node_t *node)
 	size_t height = 0;
 
 	/* this condition ignores leaves so it counts only the linkes  */
-	if (NULL == node || (NULL == node->left && NULL == node->right))
+	if (NULL == node || (NULL == node->child[LEFT] && NULL == node->child[RIGHT]))
 	{
 		return 0;
 	}
 
-	height = Max(NodeHeight(node->left), NodeHeight(node->right));
+	height = Max(NodeHeight(node->child[LEFT]), NodeHeight(node->child[RIGHT]));
 
 	return ++height;
 }
 
 static int Balance(avl_node_t *node)
 {
-	return (NodeHeight(node->left) - NodeHeight(node->right));
+	return (NodeHeight(node->child[LEFT]) - NodeHeight(node->child[RIGHT]));
 }
 
 avl_node_t *LeftRotation(avl_node_t *root)
 {
-	avl_node_t *pivot = root->right;
+	avl_node_t *pivot = root->child[RIGHT];
 	
-	root->right = pivot->left;
-	pivot->left = root;
+	root->child[RIGHT] = pivot->child[LEFT];
+	pivot->child[LEFT] = root;
 
 	return (pivot);
 }
@@ -392,11 +382,11 @@ static avl_node_t *RightLeftRotation(avl_node_t *root)
 	avl_node_t *pivot = root;
 	avl_node_t *temp = NULL;
 
-	root = root->right;
-	temp = root->left;
-	root->left = temp->right;
-	temp->right = root;
-	pivot->right = temp;
+	root = root->child[RIGHT];
+	temp = root->child[LEFT];
+	root->child[LEFT] = temp->child[RIGHT];
+	temp->child[RIGHT] = root;
+	pivot->child[RIGHT] = temp;
 
 	pivot = LeftRotation(pivot);
 
@@ -405,10 +395,10 @@ static avl_node_t *RightLeftRotation(avl_node_t *root)
 
 static avl_node_t *RightRotation(avl_node_t *root)
 {
-	avl_node_t *pivot = root->left;
+	avl_node_t *pivot = root->child[LEFT];
 	
-	root->left = pivot->right;
-	pivot->right = root;
+	root->child[LEFT] = pivot->child[RIGHT];
+	pivot->child[RIGHT] = root;
 
 	return (pivot);
 }
@@ -418,11 +408,11 @@ static avl_node_t *LeftRightRotation(avl_node_t *root)
 	avl_node_t *pivot = root;
 	avl_node_t *temp = NULL;
 
-	root = root->left;
-	temp = root->right;
-	root->right = temp->left;
-	temp->left = root;
-	pivot->left = temp;
+	root = root->child[LEFT];
+	temp = root->child[RIGHT];
+	root->child[RIGHT] = temp->child[LEFT];
+	temp->child[LEFT] = root;
+	pivot->child[LEFT] = temp;
 
 	pivot = RightRotation(pivot);
 
@@ -431,14 +421,14 @@ static avl_node_t *LeftRightRotation(avl_node_t *root)
 
 static avl_node_t *GetMinClosestNode(avl_node_t *node)
 {
-	if (NULL != node->right)
+	if (NULL != node->child[RIGHT])
 	{
-		node = node->right;
+		node = node->child[RIGHT];
 	}
 	
-	while (NULL != node->left)
+	while (NULL != node->child[LEFT])
 	{
-		node = node->left;
+		node = node->child[LEFT];
 	}
 
 	return (node);	
@@ -448,7 +438,8 @@ static avl_node_t *Rebalance(avl_node_t *node)
 {
 	if (Balance(node) > 1)
 	{			
-		if (NodeHeight(node->left->left) >= NodeHeight(node->left->right))
+		if (NodeHeight(node->child[LEFT]->child[LEFT]) >= 
+			NodeHeight(node->child[LEFT]->child[RIGHT]))
 		{
 			node = RightRotation(node);
 		}
@@ -459,7 +450,8 @@ static avl_node_t *Rebalance(avl_node_t *node)
 	}
 	else if (Balance(node) < -1)
 	{
-		if (NodeHeight(node->right->right) >= NodeHeight(node->right->left))
+		if (NodeHeight(node->child[RIGHT]->child[RIGHT]) >= 
+			NodeHeight(node->child[RIGHT]->child[LEFT]))
 		{
 			node = LeftRotation(node);
 		}
@@ -488,9 +480,9 @@ int IsBalanced(avl_t *avl)
 
 static int IsBalancedRecursive(avl_node_t *node, int balance)
 {
-	if (NULL != node->left)
+	if (NULL != node->child[LEFT])
 	{
-		balance = IsBalancedRecursive(node->left, balance);
+		balance = IsBalancedRecursive(node->child[LEFT], balance);
 	}
 
 	if (balance > 1 || balance < -1)
@@ -500,9 +492,9 @@ static int IsBalancedRecursive(avl_node_t *node, int balance)
 	
 	balance = Balance(node);
 
-	if (NULL != node->right)
+	if (NULL != node->child[RIGHT])
 	{
-		balance = IsBalancedRecursive(node->right, balance);
+		balance = IsBalancedRecursive(node->child[RIGHT], balance);
 	}
 
 	return (balance);
@@ -528,16 +520,16 @@ void ChooseTraversalOrder(avl_t *avl, int num)
 
 static void InOrderTraversal(avl_node_t *node)
 {
-	if (NULL != node->left)
+	if (NULL != node->child[LEFT])
 	{
-		InOrderTraversal(node->left);
+		InOrderTraversal(node->child[LEFT]);
 	}
 	
 	printf("%d\n", *(int*)node->data);
 
-	if (NULL !=node->right)
+	if (NULL !=node->child[RIGHT])
 	{
-		InOrderTraversal(node->right);
+		InOrderTraversal(node->child[RIGHT]);
 	}
 }
 
@@ -545,27 +537,27 @@ static void PreOrderTraversal(avl_node_t *node)
 {
 	printf("%d\n", *(int*)node->data);
 
-	if (NULL != node->left)
+	if (NULL != node->child[LEFT])
 	{
-		PreOrderTraversal(node->left);
+		PreOrderTraversal(node->child[LEFT]);
 	}
 
-	if (NULL !=node->right)
+	if (NULL !=node->child[RIGHT])
 	{
-		PreOrderTraversal(node->right);
+		PreOrderTraversal(node->child[RIGHT]);
 	}
 }
 
 static void PostOrderTraversal(avl_node_t *node)
 {
-	if (NULL != node->left)
+	if (NULL != node->child[LEFT])
 	{
-		PostOrderTraversal(node->left);
+		PostOrderTraversal(node->child[LEFT]);
 	}	
 
-	if (NULL !=node->right)
+	if (NULL !=node->child[RIGHT])
 	{
-		PostOrderTraversal(node->right);
+		PostOrderTraversal(node->child[RIGHT]);
 	}
 
 	printf("%d\n", *(int*)node->data);
