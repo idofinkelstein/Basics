@@ -20,11 +20,11 @@ int MergeSort(void *arr_to_sort, size_t num_elements , size_t size,
 		return 0;
 	}
 	
-	MergeSort((char*)arr_to_sort, s_l, size, cmp, arg);
+	MergeSort(arr_to_sort, s_l, size, cmp, arg);
 
 	MergeSort((char*)arr_to_sort + middle * size, s_r, size, cmp, arg);
 		
-	Merge((char*)arr_to_sort, (char*)arr_to_sort + middle * size, s_l, s_r, cmp, size);
+	Merge(arr_to_sort, (char*)arr_to_sort + middle * size, s_l, s_r, cmp, size);
 
 	return 0;
 }
