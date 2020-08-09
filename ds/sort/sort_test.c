@@ -27,6 +27,7 @@ void StringBubbleSortingTest(void);
 void StringInsertionSortingTest(void);
 void Test(void);
 void CountingeSortTest(void);
+void MergeSortTest(void);
 
 int main()
 {
@@ -36,8 +37,9 @@ int main()
 	StringSelectionSortingTest();
 	StringInsertionSortingTest();
 	StringBubbleSortingTest();
-	Test();*/
-	CountingeSortTest();
+	Test();
+	CountingeSortTest();*/
+	MergeSortTest();
 	
 	return 0;
 }
@@ -322,6 +324,32 @@ void CountingeSortTest(void)
 	}
 
 	puts("");
+}
+
+void MergeSortTest(void)
+{
+	int arr[] = {6, 4, 3, 7, 8, 11, 5, 2};
+	size_t size = sizeof(arr) / sizeof(int);
+	int arr1[] = {6, 4, 3, 7, 8, 0 , 11};
+	size_t size1 = sizeof(arr1) / sizeof(int);
+
+	size_t i = 0;
+
+	MergeSort(arr, size, sizeof(int), Compare, NULL);
+	MergeSort(arr1, size1, sizeof(int), Compare, NULL);
+
+	for (i = 0; i < size; ++i)
+	{
+		printf("%d, ", arr[i]);
+	}
+	puts("");
+
+	for (i = 0; i < size1; ++i)
+	{
+		printf("%d, ", arr1[i]);
+	}
+	puts("");
+
 }
 
 /* compares integers */
