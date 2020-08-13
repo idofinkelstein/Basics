@@ -252,6 +252,15 @@ void *HashFind(const hash_t *hash, const void *data)
 		return (NULL);
 	}
 
+	/* chaching an element */
+	if (HashBucketSize(hash_value, var_hash) > 1)
+	{
+		SListRemove(slist, iter_data);
+		SListInsert(slist, SListBegin(slist), var_data);
+
+		return (SListGetData(SListBegin(slist)));
+	}
+
 	return (SListGetData(iter_data));
 }
 /*---------------------------------------------------------------------------*/

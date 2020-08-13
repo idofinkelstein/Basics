@@ -1,7 +1,7 @@
-/* #include <stdlib.h> */ /* malloc */
+
 #include <stdio.h> /* printf */
 #include <assert.h>
-#include <stdlib.h> /* rand */
+#include <stdlib.h> /* malloc, free */
 #include <string.h> /* strcmp */
 #include <math.h> /* pow */
 
@@ -19,16 +19,16 @@ void TestHashFind(void);
 size_t HashFunc(const void *data1, void *hash_param);
 int IsMatch(void *data, void *param);
 int Print(void *data, void *param);
-void TestCase1(void);
+void TestCase1(int argc, char *argv[]);
 /*---------------------------------------------------------------------------*/
-int main()
+int main(int argc, char *argv[])
 {
 	TestHashCreateAndDestroy();
 	TestHashInsert();
 	TestHashSizeFunctions();
 	TestHashRemove();
 	TestHashFind();
-	TestCase1();
+	TestCase1(argc, argv);
 
 	return (0);
 }
@@ -137,7 +137,7 @@ void TestHashFind(void)
 	HashDestroy(hash);	
 }
 
-void TestCase1(void)
+void TestCase1(int argc, char *argv[])
 {
 	char *file_name = "/usr/share/dict/american-english";
 	FILE *file_ptr = fopen(file_name, "r");
@@ -149,6 +149,7 @@ void TestCase1(void)
 	size_t cnt = 0;
 	size_t i = 0;
 	char **start = NULL;
+	char *find_result = NULL;
 
 	/* checks if successeded to open file */
 	if(NULL != file_ptr)
@@ -188,6 +189,21 @@ void TestCase1(void)
 	}
 
 	HashForEach(hash, Print, NULL);
+
+	if (argc > 1)
+	{
+		find_result = (char *)HashFind(hash, argv[1]);
+	}
+
+
+	if (NULL == find_result)
+	{
+		puts("not found!");
+	}
+	else
+	{
+		printf("found it! -> %s\n",find_result);
+	}
 
 	dict = start;
 
