@@ -174,6 +174,7 @@ int VectorReserve(vector_t *vector, size_t new_capacity);
 */
 void VectorShrinkToFit(vector_t *vector);
 
+void **VectorGetArray(vector_t *vector);
 /*---------------------------------------------------------------------------*/
 
 #endif /* ILRD_VECTOR_H */

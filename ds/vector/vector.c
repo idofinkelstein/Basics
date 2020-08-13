@@ -85,16 +85,16 @@ void VectorSetElement(vector_t *vector, size_t index, void *element)
 
 int VectorPushBack(vector_t *vector, void *element)
 {
-	void *tmp_data = NULL; /* temporery pointer to store the address returned
-							  by realloc. */
-	assert(vector);
+	void **tmp_data = NULL; /* temporery pointer to store the address returned
+							   by realloc. */
+	assert(vector); 
 
 	++vector->size;
 
 	/* reallocates memory in case of size is greater than current capacity. */
-	if (VectorSize(vector) > VectorCapacity(vector))
+	if (VectorSize(vector) >= VectorCapacity(vector))
 	{
-		tmp_data = realloc(vector->data,
+		tmp_data = (void**)realloc(vector->data, /* bad name */
 				   INC_FACTOR * vector->curr_capacity * sizeof(void*));
 
 		if(NULL == tmp_data)
@@ -121,6 +121,10 @@ void VectorPopBack(vector_t *vector)
 	{
 		--vector->back;
 		--vector->size;
+	}
+	else
+	{
+		return;
 	}
 
 	/* reduces capacity by 2 in case of size < (current capacity / 4) AND 
@@ -183,5 +187,10 @@ size_t VectorSize(const vector_t *vector)
 	assert(vector);
 
 	return (vector->size);
+}
+
+void **VectorGetArray(vector_t *vector)
+{
+	return (vector->data);
 }
 
