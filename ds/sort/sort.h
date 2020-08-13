@@ -24,10 +24,21 @@ void InsertionSort(void *base, size_t nmemb, size_t size,
 
 int CountingSort(int *arr, size_t size, int min, int max, int *result);
 
-int MergeSort(void *arr_to_sort,
-			  size_t num_elements ,
-			  size_t size,
-			  sort_cmp_func_t cmp,
-              void *arg);
+int MergeSort(void *arr_to_sort, 
+			 size_t num_elements, 
+			 size_t size,
+             sort_cmp_func_t cmp,
+             void *arg);
+
+int MergeSortInPlace(void *arr_to_sort,
+				     size_t num_elements,
+ 				 	 size_t size,
+                 	 sort_cmp_func_t cmp,
+                 	 void *arg);
+
+int QSort(void *base, 
+		  size_t nmemb, 
+		  size_t size,
+		  sort_cmp_func_t cmp);
 
 #endif /* ILRD_SORT_H */ 

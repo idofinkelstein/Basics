@@ -11,7 +11,7 @@ Data: 17/7/2020
 
 void SwapBytes(char *byte1, char *byte2, size_t n_bytes);
 
-void BubbleSort(void *base, size_t nmemb , size_t size ,
+void BubbleSort(void *base, size_t nmemb , size_t size,
                   sort_cmp_func_t cmp,
                   void *arg)
 {

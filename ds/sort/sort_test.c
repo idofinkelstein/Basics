@@ -17,6 +17,7 @@ int Compare(const void *data1, const void *data2, void *param);
 int DoubleCompare(const void *data1, const void *data2, void *param);
 int StrCaseCmpWrapper(const void *data1, const void *data2, void *param);
 int StrCaseCmpWrapper2(const void *data1, const void *data2, void *param);
+void StringMergeSortingTest(void);
 
 /* test function declarations */
 void BubbleSortTest(void);
@@ -28,19 +29,25 @@ void StringInsertionSortingTest(void);
 void Test(void);
 void CountingeSortTest(void);
 void MergeSortTest(void);
+void MergeSortInPlaceTest(void);
+void QSortTest(void);
 
 int main()
 {
-	/*BubbleSortTest();
+	BubbleSortTest();
 	InsertionSortTest();
 	SelectionSortTest();
 	StringSelectionSortingTest();
 	StringInsertionSortingTest();
 	StringBubbleSortingTest();
 	Test();
-	CountingeSortTest();*/
+	CountingeSortTest();
+	QSortTest();
+	StringMergeSortingTest();
+	/*MergeSortInPlaceTest();*/
 	MergeSortTest();
 	
+
 	return 0;
 }
 
@@ -274,6 +281,36 @@ void StringBubbleSortingTest(void)
 	free(str_arr);
 }
 
+void StringMergeSortingTest(void)
+{
+	size_t i = 0;
+	char **str_arr = malloc(sizeof(char*) * 5);
+	char *str1 = "hello";
+	char *str2 = "bye";
+	char *str3 = "ido";
+	char *str4 = "dog";
+	char *str5 = "cat";
+
+	*(str_arr + 0) = str1;
+	*(str_arr + 1) = str2;
+	*(str_arr + 2) = str3;
+	*(str_arr + 3) = str4;
+	*(str_arr + 4) = str5;
+
+	puts("\n*** MergeSortTest for array of char pointers ***");
+	
+	MergeSort(str_arr, 5, sizeof(void*), StrCaseCmpWrapper, NULL);
+
+	for (i = 0; i < 5; ++i)
+	{
+		printf("%s, ", str_arr[i]);
+	}
+
+	puts("");
+
+	free(str_arr);
+}
+
 void Test(void)
 {
 	size_t i = 0;
@@ -328,28 +365,140 @@ void CountingeSortTest(void)
 
 void MergeSortTest(void)
 {
-	int arr[] = {6, 4, 3, 7, 8, 11, 5, 2};
+	clock_t begin;
+	clock_t end; 
+    double time_spent;
+	int arr[] = {4 , 23, 1, 65, 4, 2, -6, 0, 41, 34, -345, 35, -76};
 	size_t size = sizeof(arr) / sizeof(int);
-	int arr1[] = {6, 4, 3, 7, 8, 0 , 11};
-	size_t size1 = sizeof(arr1) / sizeof(int);
-
+	double arr2[10000] = {0};
+	size_t size2 = sizeof(arr2) / sizeof(double);
 	size_t i = 0;
 
-	MergeSort(arr, size, sizeof(int), Compare, NULL);
-	MergeSort(arr1, size1, sizeof(int), Compare, NULL);
+	puts("\n*** MergeSortTest ***");
+
+	MergeSort(arr, size, sizeof(int) , Compare, NULL);
 
 	for (i = 0; i < size; ++i)
 	{
 		printf("%d, ", arr[i]);
 	}
+
 	puts("");
 
-	for (i = 0; i < size1; ++i)
+	for (i = 0; i < size2; ++i)
 	{
-		printf("%d, ", arr1[i]);
+		arr2[i] = (double)rand() / 100;
 	}
+
 	puts("");
 
+	begin = clock();
+	MergeSort(arr2, size2 , sizeof(double) , DoubleCompare, NULL);
+	end = clock();
+
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Time taken to sort array of size 10k with MergeSort is: %f\n",
+			time_spent);
+
+	for (i = 0; i < size2 / 100; ++i)
+	{
+
+		printf("%.2f, ", arr2[i]);
+	}
+
+	puts("");
+}
+
+void MergeSortInPlaceTest(void)
+{
+	clock_t begin;
+	clock_t end; 
+    double time_spent;
+	int arr[] = {4 , 23, 1, 65, 4, 2, -6, 0, 41, 34, -345, 35, -76};
+	size_t size = sizeof(arr) / sizeof(int);
+	int arr2[10000] = {0};
+	size_t size2 = sizeof(arr2) / sizeof(int);
+	size_t i = 0;
+
+	puts("\n*** MergeSortInPlaceTest ***");
+
+	MergeSortInPlace(arr, size, sizeof(int) , Compare, NULL);
+
+	for (i = 0; i < size; ++i)
+	{
+		printf("%d, ", arr[i]);
+	}
+
+	puts("");
+
+	for (i = 0; i < size2; ++i)
+	{
+		arr2[i] = rand() % 1000;
+	}
+
+	puts("");
+
+	begin = clock();
+	MergeSortInPlace(arr2, size2 , sizeof(int) , Compare, NULL);
+	end = clock();
+
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Time taken to sort array of size 10k with MergeSortInPlace is: %f\n",
+			time_spent);
+
+	for (i = 0; i < size2 / 100; ++i)
+	{
+
+		printf("%d, ", arr2[i]);
+	}
+
+	puts("");
+
+}
+
+void QSortTest(void)
+{
+	clock_t begin;
+	clock_t end; 
+    double time_spent;
+	int arr[] = {4 , 23, 1, 65, 4, 2, -6, 0, 41, 34, -345, 35, -76};
+	size_t size = sizeof(arr) / sizeof(int);
+	double arr2[10000] = {0};
+	size_t size2 = sizeof(arr2) / sizeof(double);
+	size_t i = 0;
+
+	puts("\n*** QSortTest ***");
+
+	QSort(arr, size, sizeof(int) , Compare);
+
+	for (i = 0; i < size; ++i)
+	{
+		printf("%d, ", arr[i]);
+	}
+
+	puts("");
+
+	for (i = 0; i < size2; ++i)
+	{
+		arr2[i] = (double)rand() / 100;
+	}
+
+	puts("");
+
+	begin = clock();
+	QSort(arr2, size2 , sizeof(double) , DoubleCompare);
+	end = clock();
+
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Time taken to sort array of size 10k with QSort is: %f\n",
+			time_spent);
+
+	for (i = 0; i < size2 / 100; ++i)
+	{
+		printf("%.2f, ", arr2[i]);
+	}
+
+	puts("");
 }
 
 /* compares integers */
@@ -357,16 +506,7 @@ int Compare(const void *data1, const void *data2, void *param)
 {
 	(void)param;
 
-	if (*(int*)data1 > *(int*)data2)
-	{
-		return 1;
-	}
-	else if (*(int*)data1 == *(int*)data2)
-	{
-		return 0;
-	}
-
-	return -1;
+	return (*(int*)data1 - *(int*)data2);
 }
 
 /* compares doubles */

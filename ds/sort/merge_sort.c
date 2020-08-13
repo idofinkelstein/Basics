@@ -16,13 +16,14 @@ Date: 10/8/2020
 
 #define MALLOC_FAILED -1
 
-void Merge(void *a,
+static void Merge(void *a,
 		   void *l,
 		   void *r,
 		   size_t size_l,
 		   size_t size_r,
  		   sort_cmp_func_t cmp,
- 		   size_t size);
+ 		   size_t size,
+		   void *arg);
 
 int MergeSort(void *arr_to_sort, 
 			 size_t num_elements, 
@@ -66,7 +67,7 @@ int MergeSort(void *arr_to_sort,
 	MergeSort(r, size_r, size, cmp, arg);
 	
 	/* combines them after sorting to the input array */
-	Merge(start_a, l, r, size_l, size_r, cmp, size);
+	Merge(start_a, l, r, size_l, size_r, cmp, size, arg);
 
 	free(l);
 	free(r);
@@ -74,13 +75,14 @@ int MergeSort(void *arr_to_sort,
 	return 0;
 }
 
-void Merge(void *a,
+static void Merge(void *a,
 		   void *l,
 		   void *r,
 		   size_t size_l,
 		   size_t size_r,
  		   sort_cmp_func_t cmp,
- 		   size_t size)
+ 		   size_t size,
+		   void *arg)
 {
 	size_t i_l = 0;
 	size_t i_r = 0;
@@ -92,7 +94,7 @@ void Merge(void *a,
 	/* merges l & r to input array */
 	while (i_l < size_l && i_r < size_r)
 	{
-		if (0 < cmp(start_l + i_l * size, start_r + i_r * size, NULL))
+		if (0 < cmp(start_l + i_l * size, start_r + i_r * size, arg))
 		{
 			memcpy(start_a + i_a * size, start_r + i_r * size, size);
 			++i_r;		

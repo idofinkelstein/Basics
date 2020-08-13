@@ -5,7 +5,7 @@
 ROOT_DIR = ../..
 
 #PROJ_SRCS = $(wildcard *.c)
-PROJ_SRCS = bubble_sort.c insertion_sort.c merge_sort4.c selection_sort.c sort_test.c swap_bytes.c counting_sort.c
+PROJ_SRCS = bubble_sort.c insertion_sort.c merge_sort.c merge_sort_in_place.c selection_sort.c sort_test.c swap_bytes.c counting_sort.c quick_sort.c
 
 # list of directories containing header files
 PROJ_INC_DIR =

@@ -9,31 +9,33 @@ Date: 10/8/2020
 
 void SwapBytes(char *byte1, char *byte2, size_t n_bytes);
 
-size_t Partion(void *base, 
+static size_t Partition(void *base, 
 			   long left, 
 			   long right, 
 			   size_t size, 
 			   sort_cmp_func_t cmp);
 
-void Sort(void *base, 
+static void Sort(void *base, 
 		  long left,
 		  long right, 
 		  size_t size,
 		  sort_cmp_func_t cmp);
 
-void QSort(void *base, 
-		   size_t nmemb, 
-		   size_t size,
-		   sort_cmp_func_t cmp)
+int QSort(void *base, 
+		  size_t nmemb, 
+		  size_t size,
+		  sort_cmp_func_t cmp)
 {
 	Sort(base, 0, nmemb - 1, size, cmp);
+
+	return 0;
 }
 
-size_t Partion(void *base, 
-			   long left, 
-			   long right, 
-			   size_t size, 
-			   sort_cmp_func_t cmp)
+static size_t Partition(void *base, 
+			     long left, 
+			     long right, 
+			     size_t size, 
+			     sort_cmp_func_t cmp)
 {
 	void *pivot = (char*)base + right * size;
 	long pi = left;
@@ -51,10 +53,10 @@ size_t Partion(void *base,
 
 	SwapBytes(pivot, (char*)base + (pi * size), size);
 
-	return pi;
+	return (pi);
 }
 
-void Sort(void *base, 
+static void Sort(void *base, 
 		  long left,
 		  long right, 
 		  size_t size,
@@ -67,7 +69,7 @@ void Sort(void *base,
 		return;
 	}
 		
-	pi = Partion(base, left, right, size, cmp);
+	pi = Partition(base, left, right, size, cmp);
 
 	Sort(base, left, pi - 1, size, cmp);
 	Sort(base,  pi + 1 , right, size, cmp);

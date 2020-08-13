@@ -1,7 +1,7 @@
 /***********************
 File name: radix_bits_sort.c
 Author: Ido Finkelstein
-Reviewer: Sharazad Tarabush
+Reviewer: Anna Poryadkov
 Date: 20/7/2020
 ************************/
 
@@ -80,7 +80,7 @@ int CountingSort(uint *arr, size_t size, uint min, uint max)
 	size_t range = max - min + 1;
 	uint *count_arr = (unsigned*)calloc(range, sizeof(unsigned));
 	uint *result_arr = (unsigned*)calloc(size, sizeof(unsigned));
-	uint to_mask = ~0; /* constant value in this function */
+	uint to_mask = ~0x0; /* constant value in this function */
 
 	if (NULL == count_arr)
 	{
