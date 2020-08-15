@@ -176,7 +176,7 @@ void *HeapRemove(heap_t *heap, void *data, heap_is_match_func_t is_match, void *
 	/* 2. run-over with last element & remove last element */
 	arr[index] = arr[HeapSize(heap) - 1];
 	HeapPop(heap);
-	parent = index / 2;
+	parent = (index - 1) / 2;
 
 	/* checks the direction of heapify */
 	/* bubbles the data to its place */
