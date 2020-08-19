@@ -36,9 +36,6 @@ int main()
 
 	SchTimerStart(sched, 2, task3, &stop);
 
-	SchTimerCancel(sched, uid2);
-	SchTimerCancel(sched, bad_uid);
-
 	uid2 = SchTimerStart(sched, 4, task2, NULL);
 
 	SchRun(sched);

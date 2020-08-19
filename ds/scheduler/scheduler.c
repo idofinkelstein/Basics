@@ -18,7 +18,7 @@ Date: 1/7/2020
 
 /* utility function declarations */
 int Compare(const void *data1, const void *data2, void *param);
-int IsMatch(const void *data, void *param);
+int IsMatch(const void *data1, const void *data2, void *param);
 
 
 typedef struct timer
@@ -176,26 +176,18 @@ int Compare(const void *data1, const void *data2, void *param)
 {
 	/* data2 is the new data */
 
-	t_t *timer1 = (t_t*)data1;
-	t_t *timer2 = (t_t*)data2;
+	t_t *timer1 = (void*)data1;
+	t_t *timer2 = (void*)data2;
+	time_t abs_time1 = (*(t_t**)timer1)->abs_time;
+	time_t abs_time2 = (*(t_t**)timer2)->abs_time;
 
 	(void)param;
-
-	if (timer1->abs_time < timer2->abs_time)
-	{
-		return -1;
-	}
-	else if (timer1->abs_time == timer2->abs_time)
-	{
-		return 0;
-	}
-	
-	return 1;
+	return (abs_time1 - abs_time2);
 }
 
-int IsMatch(const void *data, void *param)
+int IsMatch(const void *data1, const void *data2, void *param)
 {
-	t_t *timer = (t_t*)data;
+	t_t *timer = (t_t*)data1;
 	unique_id_t *to_match = param;
 
 	return (UIDIsSame(timer->uid, *to_match));

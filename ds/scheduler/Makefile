@@ -5,11 +5,10 @@
 ROOT_DIR = ../..
 
 #PROJ_SRCS = $(wildcard *.c)
-PROJ_SRCS = scheduler.c scheduler_test.c pqueue.c sorted_list.c dlist.c uid.c
+PROJ_SRCS = scheduler.c scheduler_test.c pqueue.c heap.c  uid.c vector.c heapify.c swap_bytes.c
 
 # list of directories containing header files
-PROJ_INC_DIR = $(ROOT_DIR)/ds/pqueue $(ROOT_DIR)/ds/sorted_list\
-			   $(ROOT_DIR)/ds/dlist $(ROOT_DIR)/ds/uid 
+PROJ_INC_DIR = $(ROOT_DIR)/ds/uid $(ROOT_DIR)/ds/pqueue_based_heap
 			   
 
 # the executable file
@@ -33,7 +32,7 @@ PROJ_LIBS =
 PROJ_LDFLAGS =
 
 # list of projects (makefiles) this project depends on
-PROJ_DEPENDS  = $(ROOT_DIR)/ds/pqueue/Makefile $(ROOT_DIR)/ds/uid/Makefile
+PROJ_DEPENDS  = $(ROOT_DIR)/ds/pqueue_based_heap/Makefile $(ROOT_DIR)/ds/uid/Makefile
 				
 
 include $(ROOT_DIR)/make/Project.mak
