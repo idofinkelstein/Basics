@@ -38,7 +38,10 @@ struct dhcp_node
 unsigned EndianMirror(unsigned num);
 unsigned SetBit(unsigned num, int index, int state);
 dhcp_node_t *CreateAddress(dhcp_node_t *node, int height, uint32_t *ip_address);
+dhcp_node_t *CreateReservedAddress(dhcp_node_t *node, int height, int first_bit, int last_bit);
+dhcp_node_t *CreateNode(dhcp_node_t *node);
 int HasAvailableAddress(dhcp_t *dhcp);
+int Height(dhcp_t *dhcp);
 dhcp_node_t *ReleaseAddress(dhcp_t *dhcp, dhcp_node_t *node, int height, uint32_t ip_address);
 int IsAddressExist(dhcp_node_t *node, int height, uint32_t ip_address, int status);
 void DestroyNode(dhcp_node_t *node);
@@ -47,7 +50,6 @@ dhcp_t *DhcpCreate(const char *net_address, unsigned int mask_bits_size)
 {
 	dhcp_t *dhcp = NULL;
 	
-
 	dhcp = (dhcp_t*)malloc(sizeof(dhcp_t));
 
 	if (NULL == dhcp)
@@ -66,6 +68,11 @@ dhcp_t *DhcpCreate(const char *net_address, unsigned int mask_bits_size)
 
 	inet_ntop(AF_INET, &dhcp->net_address, str, INET_ADDRSTRLEN);
 
+	/* allocates reserved addresses */
+	CreateReservedAddress(dhcp->root, Height(dhcp), 0, 0);
+	CreateReservedAddress(dhcp->root, Height(dhcp), 1, 0);
+	CreateReservedAddress(dhcp->root, Height(dhcp), 1, 1);
+	
 	return (dhcp);
 }
 
@@ -78,14 +85,14 @@ void DhcpDestroy(dhcp_t *dhcp)
 }
 
 int DhcpGetAddress(dhcp_t *dhcp, uint32_t* ip_address)
-{
-	int height = 32 - dhcp->mask_bit_size;
-	
+{	
 	assert(dhcp);
 
 	if (HasAvailableAddress(dhcp))
 	{	
-		CreateAddress(dhcp->root, height, ip_address);
+		CreateAddress(dhcp->root, Height(dhcp), ip_address);
+
+		/**ip_address = *ip_address + (*ip_address & ((1u << Height(dhcp)) - 1));*/
 		
 		*ip_address = EndianMirror(*ip_address) | dhcp->net_address;
 	
@@ -101,18 +108,19 @@ int DhcpGetAddress(dhcp_t *dhcp, uint32_t* ip_address)
 
 void DhcpReleaseAddress(dhcp_t *dhcp, uint32_t ip_address)
 {
-	int height = 32 - dhcp->mask_bit_size;
 	int status = 0;
+
+	assert(dhcp);
 
 	inet_ntop(AF_INET, &ip_address, str, INET_ADDRSTRLEN);
 
 	ip_address = EndianMirror(ip_address);
 
-	ip_address = ip_address & ((1u << height) - 1);
+	ip_address = ip_address & ((1u << Height(dhcp)) - 1);
 
-	if (IsAddressExist(dhcp->root, height, ip_address, status))
+	if (IsAddressExist(dhcp->root, Height(dhcp), ip_address, status))
 	{
-		ReleaseAddress(dhcp, dhcp->root, height, ip_address);
+		ReleaseAddress(dhcp, dhcp->root, Height(dhcp), ip_address);
 	}
 
 	return;
@@ -152,13 +160,10 @@ dhcp_node_t *CreateAddress(dhcp_node_t *node, int height, uint32_t *ip_address)
 	{
 		if (!node->child[LEFT])
 		{
-			node->child[LEFT] = malloc(sizeof(dhcp_node_t));
-			node->child[LEFT]->child[0] = node->child[LEFT]->child[1] = NULL;
-			node->child[LEFT]->node_state = VACANT;		
+			node->child[LEFT] = CreateNode(node->child[LEFT]);
 		}
 
-		*ip_address <<= 1;
-		*ip_address = SetBit(*ip_address, 0, LEFT);
+		*ip_address = SetBit(*ip_address << 1, 0, LEFT);
 		 
 		node->child[LEFT] = CreateAddress(node->child[LEFT], height - 1, ip_address);		
 	}
@@ -168,17 +173,14 @@ dhcp_node_t *CreateAddress(dhcp_node_t *node, int height, uint32_t *ip_address)
 	{
 		if (!node->child[RIGHT])
 		{
-			node->child[RIGHT] = malloc(sizeof(dhcp_node_t));
-			node->child[RIGHT]->child[RIGHT] = node->child[RIGHT]->child[LEFT] = NULL;
-			node->child[RIGHT]->node_state = VACANT;			
+			node->child[RIGHT] = CreateNode(node->child[RIGHT]);
 		}
 
-		*ip_address <<= 1;
-		*ip_address = SetBit(*ip_address, 0, RIGHT);
-		node->child[RIGHT] = CreateAddress(node->child[RIGHT], height - 1, ip_address);
-		
+		*ip_address = SetBit(*ip_address << 1, 0, RIGHT);
+
+		node->child[RIGHT] = CreateAddress(node->child[RIGHT], height - 1, ip_address);		
 	}
-	
+		
 	/* sets the branch to OCCUPIED if both children are OCCUPIED */
 	if ((node->child[LEFT] && node->child[RIGHT]) &&
 		 node->child[LEFT]->node_state == OCCUPIED && 
@@ -229,6 +231,65 @@ int IsAddressExist(dhcp_node_t *node, int height, uint32_t ip_address, int statu
 	}
 
 	return 0;
+}
+
+dhcp_node_t *CreateNode(dhcp_node_t *node)
+{
+	node = malloc(sizeof(dhcp_node_t));
+
+	if (NULL == node)
+	{
+		return (NULL);
+	}
+
+	node->child[RIGHT] = node->child[LEFT] = NULL;
+	node->node_state = VACANT;	
+
+	return (node);		
+}
+
+dhcp_node_t *CreateReservedAddress(dhcp_node_t *node, int height, int first_bit, int last_bit)
+{
+	if (height == 0)
+	{
+		node->node_state = OCCUPIED;
+
+		return (node);
+	}
+
+	if (height == 1)
+	{
+		if (!node->child[last_bit])
+		{
+			node->child[last_bit] = CreateNode(node->child[last_bit]);
+		}
+
+		node->child[last_bit] = CreateReservedAddress(node->child[last_bit], height - 1, first_bit, last_bit);
+	}
+	else
+	{
+		if (!node->child[first_bit])
+		{
+			node->child[first_bit] = CreateNode(node->child[first_bit]);
+		}
+
+		node->child[first_bit] = CreateReservedAddress(node->child[first_bit], height - 1, first_bit, last_bit);
+	}
+
+	/* sets the branch to OCCUPIED if both children are OCCUPIED */
+	if ((node->child[LEFT] && node->child[RIGHT]) &&
+		 node->child[LEFT]->node_state == OCCUPIED && 
+		 node->child[RIGHT]->node_state == OCCUPIED)
+	{
+		node->node_state = OCCUPIED;
+	}
+
+	return (node);
+}
+
+int Height(dhcp_t *dhcp)
+{
+	return (32 - dhcp->mask_bit_size);
 }
 
 int HasAvailableAddress(dhcp_t *dhcp)

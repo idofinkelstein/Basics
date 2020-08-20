@@ -8,7 +8,7 @@ int main()
 	uint32_t ip_address[20] = {0};
 	uint32_t  new_ip = 0;
 
-	dhcp = DhcpCreate("192.168.1.0", 28);
+	dhcp = DhcpCreate("192.168.1.0", 27);
 
 	DhcpGetAddress(dhcp, &ip_address[0]);
 	
@@ -54,6 +54,8 @@ int main()
 	DhcpGetAddress(dhcp, &ip_address[17]);
 
 	DhcpGetAddress(dhcp, &ip_address[18]);
+
+	DhcpGetAddress(dhcp, &ip_address[19]);
 
 	DhcpDestroy(dhcp);
 
