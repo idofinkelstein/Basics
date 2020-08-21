@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <arpa/inet.h>  /* inet_ntop	*/
 
 #include "dhcp.h"
 
@@ -7,41 +8,20 @@ int main()
 	dhcp_t *dhcp = NULL;
 	uint32_t ip_address[20] = {0};
 	uint32_t  new_ip = 0;
+	size_t size = sizeof(ip_address) / sizeof(uint32_t);
+	size_t i = 0;
+	char str[INET_ADDRSTRLEN] = {0};
+	int status = 0;
 
-	dhcp = DhcpCreate("192.168.1.0", 27);
+	dhcp = DhcpCreate("192.168.1.0", 28);
 
-	DhcpGetAddress(dhcp, &ip_address[0]);
-	
-	DhcpGetAddress(dhcp, &ip_address[1]);
-	
-	DhcpGetAddress(dhcp, &ip_address[2]);
+	for (i = 0; (i < size) && !status; ++i)
+	{
+		status = DhcpGetAddress(dhcp, &ip_address[i]);
+		inet_ntop(AF_INET, &ip_address[i], str, INET_ADDRSTRLEN);
+		puts(str);
+	}
 
-	DhcpGetAddress(dhcp, &ip_address[3]);
-
-	DhcpGetAddress(dhcp, &ip_address[4]);
-
-	DhcpGetAddress(dhcp, &ip_address[5]);
-
-	DhcpGetAddress(dhcp, &ip_address[6]);
-
-	DhcpGetAddress(dhcp, &ip_address[7]);
-
-	DhcpGetAddress(dhcp, &ip_address[8]);
-
-	DhcpGetAddress(dhcp, &ip_address[9]);
-
-	DhcpGetAddress(dhcp, &ip_address[10]);
-
-	DhcpGetAddress(dhcp, &ip_address[11]);
-
-	DhcpGetAddress(dhcp, &ip_address[12]);
-
-	DhcpGetAddress(dhcp, &ip_address[13]);
-
-	DhcpGetAddress(dhcp, &ip_address[14]);
-
-	DhcpGetAddress(dhcp, &ip_address[15]);
-	
 	DhcpReleaseAddress(dhcp, ip_address[5]);
 	DhcpReleaseAddress(dhcp, ip_address[2]);
 	DhcpReleaseAddress(dhcp, ip_address[5]);
@@ -49,14 +29,15 @@ int main()
 
 	DhcpGetAddress(dhcp, &new_ip);
 
-	DhcpGetAddress(dhcp, &ip_address[16]);
+	inet_ntop(AF_INET, &new_ip, str, INET_ADDRSTRLEN);
+	puts(str);
+	new_ip = 0;
 
-	DhcpGetAddress(dhcp, &ip_address[17]);
+	DhcpGetAddress(dhcp, &new_ip);
 
-	DhcpGetAddress(dhcp, &ip_address[18]);
-
-	DhcpGetAddress(dhcp, &ip_address[19]);
-
+	inet_ntop(AF_INET, &new_ip, str, INET_ADDRSTRLEN);
+	puts(str);
+	
 	DhcpDestroy(dhcp);
 
 	return 0;
