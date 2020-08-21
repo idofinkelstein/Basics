@@ -46,26 +46,31 @@ struct dhcp_node
 
 /*-----------------------------Utility functions declaration----------------------------*/
 
-unsigned EndianMirror(unsigned num);
-unsigned SetBit(unsigned num, int index, int state);
-dhcp_node_t *CreateAddress(dhcp_node_t *node, int height, uint32_t *ip_address);
+static unsigned EndianMirror(unsigned num);
+static unsigned SetBit(unsigned num, int index, int state);
+static void DestroyNode(dhcp_node_t *node);
+static dhcp_node_t *CreateNode(dhcp_node_t *node);
+static int HasAvailableAddress(dhcp_t *dhcp);
+static int Height(dhcp_t *dhcp);
 
-dhcp_node_t *CreateReservedAddress(dhcp_node_t *node, 
-								   int height, 
-								   int first_bit, 
-								   int last_bit);
+static dhcp_node_t *CreateReservedAddress(dhcp_node_t *node, 
+								   		  int height, 
+								   		  int first_bit, 
+								   		  int last_bit);
 
-dhcp_node_t *CreateNode(dhcp_node_t *node);
-int HasAvailableAddress(dhcp_t *dhcp);
-int Height(dhcp_t *dhcp);
+static dhcp_node_t *CreateAddress(dhcp_node_t *node,
+								  int height,
+								  uint32_t *ip_address);
 
-dhcp_node_t *ReleaseAddress(dhcp_t *dhcp,
-						    dhcp_node_t *node,
-						    int height,
-						    uint32_t ip_address);
+static dhcp_node_t *ReleaseAddress(dhcp_t *dhcp,
+								   dhcp_node_t *node,
+						    	   int height,
+						    	   uint32_t ip_address);
 
-int IsAddressExist(dhcp_node_t *node, int height, uint32_t ip_address, int status);
-void DestroyNode(dhcp_node_t *node);
+static int IsAddressExist(dhcp_node_t *node,
+						  int height,
+						  uint32_t ip_address,
+						  int status);
 
 /*-----------------------------------------------------------------------------*/
 
@@ -153,7 +158,7 @@ unsigned int DhcpRenewAddress(dhcp_t *dhcp, uint32_t ip_address)
 
 /*-----------------------------------------------------------------------------*/
 
-void DestroyNode(dhcp_node_t *node)
+static void DestroyNode(dhcp_node_t *node)
 {
 	if (node == NULL)
 	{
@@ -167,7 +172,7 @@ void DestroyNode(dhcp_node_t *node)
 
 /*-----------------------------------------------------------------------------*/
 
-dhcp_node_t *CreateAddress(dhcp_node_t *node, int height, uint32_t *ip_address)
+static dhcp_node_t *CreateAddress(dhcp_node_t *node, int height, uint32_t *ip_address)
 {
 	if (height == 0)
 	{
@@ -219,10 +224,10 @@ dhcp_node_t *CreateAddress(dhcp_node_t *node, int height, uint32_t *ip_address)
 
 /*-----------------------------------------------------------------------------*/
 
-dhcp_node_t *ReleaseAddress(dhcp_t *dhcp, 
-							dhcp_node_t *node,
-							int height,
-							uint32_t ip_address)
+static dhcp_node_t *ReleaseAddress(dhcp_t *dhcp, 
+								   dhcp_node_t *node,
+								   int height,
+								   uint32_t ip_address)
 {
 	uint32_t side = !!(ip_address & (1u << ((uint32_t)height - 1)));
 	
@@ -251,7 +256,10 @@ dhcp_node_t *ReleaseAddress(dhcp_t *dhcp,
 
 /*-----------------------------------------------------------------------------*/
 
-int IsAddressExist(dhcp_node_t *node, int height, uint32_t ip_address, int status)
+static int IsAddressExist(dhcp_node_t *node,
+						  int height,
+						  uint32_t ip_address,
+						  int status)
 {
 	uint32_t side = !!(ip_address & (1u << ((uint32_t)height - 1)));
 
@@ -270,7 +278,7 @@ int IsAddressExist(dhcp_node_t *node, int height, uint32_t ip_address, int statu
 
 /*-----------------------------------------------------------------------------*/
 
-dhcp_node_t *CreateNode(dhcp_node_t *node)
+static dhcp_node_t *CreateNode(dhcp_node_t *node)
 {
 	node = malloc(sizeof(dhcp_node_t));
 
@@ -287,10 +295,10 @@ dhcp_node_t *CreateNode(dhcp_node_t *node)
 
 /*-----------------------------------------------------------------------------*/
 
-dhcp_node_t *CreateReservedAddress(dhcp_node_t *node,
-								   int height,
-								   int first_bit,
-								   int last_bit)
+static dhcp_node_t *CreateReservedAddress(dhcp_node_t *node,
+								   		  int height,
+								   		  int first_bit,
+								   		  int last_bit)
 {
 	if (height == 0)
 	{
@@ -337,28 +345,28 @@ dhcp_node_t *CreateReservedAddress(dhcp_node_t *node,
 
 /*-----------------------------------------------------------------------------*/
 
-int Height(dhcp_t *dhcp)
+static int Height(dhcp_t *dhcp)
 {
 	return (32 - dhcp->mask_bit_size);
 }
 
 /*-----------------------------------------------------------------------------*/
 
-int HasAvailableAddress(dhcp_t *dhcp)
+static int HasAvailableAddress(dhcp_t *dhcp)
 {
 	return (dhcp->root->node_state);
 }
 
 /*-----------------------------------------------------------------------------*/
 
-unsigned SetBit(unsigned num, int index, int state)
+static unsigned SetBit(unsigned num, int index, int state)
 {
 	return ((num & ~(1ul << index)) | (state << index));
 } 
 
 /*-----------------------------------------------------------------------------*/
 
-unsigned EndianMirror(unsigned num)
+static unsigned EndianMirror(unsigned num)
 {
 	num = ((num << 16) | (num >> 16));
 
@@ -366,6 +374,10 @@ unsigned EndianMirror(unsigned num)
 
 	return (num);
 }
+
+
+
+
 
 /*
 		tmp = EndianMirror(tmp) & ((1u << Height(dhcp)) - 1);
