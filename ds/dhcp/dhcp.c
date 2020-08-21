@@ -88,6 +88,12 @@ dhcp_t *DhcpCreate(const char *net_address, unsigned int mask_bits_size)
 	inet_pton(AF_INET, net_address, &dhcp->net_address);
 
 	dhcp->root = malloc(sizeof(dhcp_node_t));
+
+	if (NULL == dhcp->root)
+	{
+		free(dhcp);
+		return (NULL);
+	}
 	
 	dhcp->mask_bit_size = mask_bits_size;
 	
