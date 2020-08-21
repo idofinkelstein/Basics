@@ -1,9 +1,21 @@
-#include <stdio.h>
+/**************************
+File name: dhcp_test.c
+Author: Ido Finkelstein
+Date: 21/8/2020
+Reviewer:
+***************************/
+
 #include <stdlib.h> 	/* malloc, free */
 #include <arpa/inet.h>  /* inet_ntop, inet_pton	*/
 #include <assert.h>
 
 #include "dhcp.h"
+
+enum status
+{
+	SUCCESS = 0,
+	FAILURE
+};
 
 enum node_state
 {
@@ -107,10 +119,10 @@ int DhcpGetAddress(dhcp_t *dhcp, uint32_t* ip_address)
 		
 		*ip_address = EndianMirror(*ip_address) | dhcp->net_address;
 	
-		return 0;
+		return (SUCCESS);
 	}
 
-	return 1;
+	return (FAILURE);
 }
 
 /*-----------------------------------------------------------------------------*/
@@ -121,9 +133,7 @@ void DhcpReleaseAddress(dhcp_t *dhcp, uint32_t ip_address)
 
 	assert(dhcp);
 
-	ip_address = EndianMirror(ip_address);
-
-	ip_address = ip_address & ((1u << Height(dhcp)) - 1);
+	ip_address = EndianMirror(ip_address) & ((1u << Height(dhcp)) - 1);
 
 	if (IsAddressExist(dhcp->root, Height(dhcp), ip_address, status))
 	{
@@ -138,7 +148,7 @@ unsigned int DhcpRenewAddress(dhcp_t *dhcp, uint32_t ip_address)
 	(void)ip_address;
 	(void)dhcp;
 
-	return 0xFFFFFFFF;
+	return (0xFFFFFFFF);
 }
 
 /*-----------------------------------------------------------------------------*/

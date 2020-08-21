@@ -1,9 +1,26 @@
-#include <stdio.h>
+/**************************
+File name: dhcp_test.c
+Author: Ido Finkelstein
+Date: 21/8/2020
+Reviewer:
+***************************/
+
+#include <stdio.h>		/* printf */
 #include <arpa/inet.h>  /* inet_ntop	*/
 
 #include "dhcp.h"
 
+void TestCase1(void);
+
 int main()
+{
+	TestCase1();	
+
+	return 0;
+}
+
+/* allocates and deallocates ip addresses */
+void TestCase1(void)
 {
 	dhcp_t *dhcp = NULL;
 	uint32_t ip_address[20] = {0};
@@ -39,6 +56,4 @@ int main()
 	puts(str);
 	
 	DhcpDestroy(dhcp);
-
-	return 0;
 }
