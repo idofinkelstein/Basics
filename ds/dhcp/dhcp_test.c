@@ -23,15 +23,16 @@ int main()
 void TestCase1(void)
 {
 	dhcp_t *dhcp = NULL;
-	uint32_t ip_address[20] = {0};
+	uint32_t ip_address[100] = {0};
 	uint32_t  new_ip = 0;
 	size_t size = sizeof(ip_address) / sizeof(uint32_t);
 	size_t i = 0;
 	char str[INET_ADDRSTRLEN] = {0};
 	int status = 0;
 
-	dhcp = DhcpCreate("192.168.1.0", 28);
+	dhcp = DhcpCreate("192.168.1.0", 26);
 
+	/* allocates addresses until pool is full */
 	for (i = 0; (i < size) && !status; ++i)
 	{
 		status = DhcpGetAddress(dhcp, &ip_address[i]);
@@ -41,6 +42,8 @@ void TestCase1(void)
 
 	DhcpReleaseAddress(dhcp, ip_address[5]);
 	DhcpReleaseAddress(dhcp, ip_address[2]);
+	
+	/* tries to release already released addresses */
 	DhcpReleaseAddress(dhcp, ip_address[5]);
 	DhcpReleaseAddress(dhcp, ip_address[2]);
 

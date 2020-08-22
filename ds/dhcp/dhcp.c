@@ -4,7 +4,7 @@ Author: Ido Finkelstein
 Date: 21/8/2020
 Reviewer:
 ***************************/
-
+#include <stdio.h>
 #include <stdlib.h> 	/* malloc, free */
 #include <arpa/inet.h>  /* inet_ntop, inet_pton	*/
 #include <assert.h>
@@ -72,6 +72,11 @@ static int IsAddressExist(dhcp_node_t *node,
 						  uint32_t ip_address,
 						  int status);
 
+dhcp_node_t *ReleaseBranch(dhcp_t *dhcp, 
+						   dhcp_node_t *node,
+						   int height,
+						   uint32_t ip_address);
+
 /*-----------------------------------------------------------------------------*/
 
 dhcp_t *DhcpCreate(const char *net_address, unsigned int mask_bits_size)
@@ -122,18 +127,29 @@ void DhcpDestroy(dhcp_t *dhcp)
 
 int DhcpGetAddress(dhcp_t *dhcp, uint32_t* ip_address)
 {	
+	int status = 0;
+
 	assert(dhcp);
 
-	if (HasAvailableAddress(dhcp))
+	if (!HasAvailableAddress(dhcp))
 	{	
-		CreateAddress(dhcp->root, Height(dhcp), ip_address);
-		
-		*ip_address = EndianMirror(*ip_address) | dhcp->net_address;
-	
-		return (SUCCESS);
+		return (FAILURE);
 	}
 
-	return (FAILURE);
+	CreateAddress(dhcp->root, Height(dhcp), ip_address);
+		
+	*ip_address = EndianMirror(*ip_address) | dhcp->net_address;
+	
+	/* in case address allocation failed, releases the nodes along the branch
+	   if possible */ 			
+	if (!IsAddressExist(dhcp->root, Height(dhcp), *ip_address, status))
+	{
+		ReleaseBranch(dhcp, dhcp->root, Height(dhcp), *ip_address);
+
+		return (FAILURE);
+	}
+
+	return (SUCCESS);
 }
 
 /*-----------------------------------------------------------------------------*/
@@ -180,6 +196,13 @@ static void DestroyNode(dhcp_node_t *node)
 
 static dhcp_node_t *CreateAddress(dhcp_node_t *node, int height, uint32_t *ip_address)
 {
+	/* allocation failed */
+	if (NULL == node)
+	{
+		return (node);
+	}
+
+	/* address was created */
 	if (height == 0)
 	{
 		node->node_state = OCCUPIED;
@@ -239,7 +262,6 @@ static dhcp_node_t *ReleaseAddress(dhcp_t *dhcp,
 	
 	if (height == 0)
 	{
-		node->node_state = VACANT;
 		free(node);
 		return (NULL);
 	}
@@ -313,6 +335,7 @@ static dhcp_node_t *CreateReservedAddress(dhcp_node_t *node,
 		return (node);
 	}
 
+	/* goes in same direction until the last turn */
 	if (height == 1)
 	{
 		if (!node->child[last_bit])
@@ -347,6 +370,37 @@ static dhcp_node_t *CreateReservedAddress(dhcp_node_t *node,
 	}
 
 	return (node);
+}
+
+/*-----------------------------------------------------------------------------*/
+
+dhcp_node_t *ReleaseBranch(dhcp_t *dhcp, 
+						   dhcp_node_t *node,
+						   int height,
+						   uint32_t ip_address)
+{
+	uint32_t side = !!(ip_address & (1u << ((uint32_t)height - 1)));
+
+	if (node == NULL)
+	{
+		return (node);
+	}
+
+	node->child[side] = ReleaseBranch(dhcp,
+									  node->child[side],
+									  height - 1,
+									  ip_address);
+	
+	/* releases the node if it's not the root or it has no children */
+	if (node != dhcp->root && !node->child[LEFT] && !node->child[RIGHT])
+	{
+		free(node);
+		return (NULL);
+	}
+
+	node->node_state = VACANT;
+
+	return (node);	
 }
 
 /*-----------------------------------------------------------------------------*/
