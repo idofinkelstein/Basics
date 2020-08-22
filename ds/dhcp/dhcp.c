@@ -2,7 +2,7 @@
 File name: dhcp_test.c
 Author: Ido Finkelstein
 Date: 21/8/2020
-Reviewer:
+Reviewer: Ori Komemie
 ***************************/
 
 #include <stdlib.h> 	/* malloc, free */
@@ -195,8 +195,8 @@ static void DestroyNode(dhcp_node_t *node)
 		return;	
 	}
 
-	DestroyNode(node->child[0]);
-	DestroyNode(node->child[1]);
+	DestroyNode(node->child[LEFT]);
+	DestroyNode(node->child[RIGHT]);
 	free(node);
 }
 

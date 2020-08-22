@@ -2,7 +2,7 @@
 File name: dhcp_test.c
 Author: Ido Finkelstein
 Date: 21/8/2020
-Reviewer:
+Reviewer: Ori Komemie
 ***************************/
 
 #include <stdio.h>		/* printf */
