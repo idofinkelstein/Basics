@@ -4,7 +4,7 @@ Author: Ido Finkelstein
 Date: 21/8/2020
 Reviewer:
 ***************************/
-#include <stdio.h>
+
 #include <stdlib.h> 	/* malloc, free */
 #include <arpa/inet.h>  /* inet_ntop, inet_pton	*/
 #include <assert.h>
@@ -56,7 +56,8 @@ static int Height(dhcp_t *dhcp);
 static dhcp_node_t *CreateReservedAddress(dhcp_node_t *node, 
 								   		  int height, 
 								   		  int first_bit, 
-								   		  int last_bit);
+								   		  int last_bit,
+										  int *status);
 
 static dhcp_node_t *CreateAddress(dhcp_node_t *node,
 								  int height,
@@ -82,6 +83,7 @@ dhcp_node_t *ReleaseBranch(dhcp_t *dhcp,
 dhcp_t *DhcpCreate(const char *net_address, unsigned int mask_bits_size)
 {
 	dhcp_t *dhcp = NULL;
+	int status = 0;
 	
 	dhcp = (dhcp_t*)malloc(sizeof(dhcp_t));
 
@@ -92,7 +94,7 @@ dhcp_t *DhcpCreate(const char *net_address, unsigned int mask_bits_size)
 
 	inet_pton(AF_INET, net_address, &dhcp->net_address);
 
-	dhcp->root = malloc(sizeof(dhcp_node_t));
+	dhcp->root = (dhcp_node_t*)malloc(sizeof(dhcp_node_t));
 
 	if (NULL == dhcp->root)
 	{
@@ -106,9 +108,15 @@ dhcp_t *DhcpCreate(const char *net_address, unsigned int mask_bits_size)
 	dhcp->root->node_state = VACANT;
 
 	/* allocates reserved addresses (first and last two) */
-	CreateReservedAddress(dhcp->root, Height(dhcp), 0, 0);
-	CreateReservedAddress(dhcp->root, Height(dhcp), 1, 0);
-	CreateReservedAddress(dhcp->root, Height(dhcp), 1, 1);
+	CreateReservedAddress(dhcp->root, Height(dhcp), 0, 0, &status);
+	CreateReservedAddress(dhcp->root, Height(dhcp), 1, 0, &status);
+	CreateReservedAddress(dhcp->root, Height(dhcp), 1, 1, &status);
+
+	if (FAILURE == status)
+	{
+		DhcpDestroy(dhcp);
+		dhcp = NULL;
+	}
 	
 	return (dhcp);
 }
@@ -326,8 +334,15 @@ static dhcp_node_t *CreateNode(dhcp_node_t *node)
 static dhcp_node_t *CreateReservedAddress(dhcp_node_t *node,
 								   		  int height,
 								   		  int first_bit,
-								   		  int last_bit)
+								   		  int last_bit,
+										  int *status)
 {
+	if (NULL == node)
+	{
+		*status = FAILURE;
+		return (node);
+	} 
+
 	if (height == 0)
 	{
 		node->node_state = OCCUPIED;
@@ -346,7 +361,8 @@ static dhcp_node_t *CreateReservedAddress(dhcp_node_t *node,
 		node->child[last_bit] = CreateReservedAddress(node->child[last_bit],
 													  height - 1,
 													  first_bit,
-													  last_bit);
+													  last_bit,
+													  status);
 	}
 	else
 	{
@@ -358,7 +374,8 @@ static dhcp_node_t *CreateReservedAddress(dhcp_node_t *node,
 		node->child[first_bit] = CreateReservedAddress(node->child[first_bit],
 													   height - 1,
 													   first_bit,
-													   last_bit);
+													   last_bit,
+													   status);
 	}
 
 	/* sets the branch to OCCUPIED if both children are OCCUPIED */
@@ -436,14 +453,3 @@ static unsigned EndianMirror(unsigned num)
 }
 
 
-
-
-
-/*
-		tmp = EndianMirror(tmp) & ((1u << Height(dhcp)) - 1);
-		printf("tmp = %u\n", tmp);
-		printf("ip = %u\n", *ip_address);
-		*ip_address += tmp; 
-
-		*ip_address = EndianMirror(*ip_address) | dhcp->net_address;
-*/
