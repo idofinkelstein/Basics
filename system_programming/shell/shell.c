@@ -1,22 +1,22 @@
-#include <stdio.h>		/* scanf, exit, EXIT_FAILURE */
+#include <stdio.h>		/* scanf, printf */
 #include <stdlib.h>		/* exit */
-#include <string.h>		/* strtok */
+#include <string.h>		/* strtok, strcmp */
+#include <signal.h>		/* signal */
 #include <sys/types.h>	/* fork */
-#include <sys/wait.h>
-#include <unistd.h>		
+#include <sys/wait.h>   /* wait */
+#include <unistd.h>		/* exec, fork */
 
 #include "shell.h"		/* API functions */
 /*---------------------------------------------------------------------------*/
-enum creation_status
-{
-	CREATION_FAILED = -1
-}
+
 /*---------------------------------------------------------------------------*/
 
 /*---------------------------------------------------------------------------*/
 /* Utils functions declarations */
 /*---------------------------------------------------------------------------*/
 void CreateProcess(char *input);
+char **BreakInput(char *input);
+void CleanUp(char **arg);
 /*---------------------------------------------------------------------------*/
 /* API functions definitions */
 /*---------------------------------------------------------------------------*/
@@ -24,9 +24,16 @@ void Shell(void)
 {
 	char input[200];
 
+	if (signal(SIGINT, SIG_IGN) == SIG_ERR)
+	{
+		fprintf (stderr, "Cannot handle SIGINT!\n");
+		exit(EXIT_FAILURE);
+	}
+
+
 	while (1)	
 	{
-		scanf("%s", input);
+		scanf("%[^\n]%*c", input);
 		CreateProcess(input);
 	}
 }
@@ -37,7 +44,9 @@ void CreateProcess(char *input)
 {
 	pid_t pid = 0;
 	int status = 0;
-
+	
+	char **arg = BreakInput(input);
+	
 	/* fork() returns the process identifier (pid) of the child process in the
  	   parent, and returns 0 in the child. */
 	pid = fork();
@@ -46,9 +55,9 @@ void CreateProcess(char *input)
 	{
 		exit(0);
 	}
+	;;;
 
-
-	if (CREATION_FAILED == pid)
+	if (-1 == pid)
 	{
 		exit(EXIT_FAILURE);
 	}
@@ -56,7 +65,7 @@ void CreateProcess(char *input)
 	if (pid == 0)
 	{			
 		/* goes in only from the child process */
-		execlp(input, input, (char *)NULL);	
+		execvp(arg[0], arg);	
 		exit(0);
 	}
 	else
@@ -64,6 +73,38 @@ void CreateProcess(char *input)
 		wait(&status);
 	}
 	
+	free(arg);
 }
+
 /*----------------------------------------------------------------------------*/
+
+char **BreakInput(char *input)
+{
+	char **arg = NULL;
+	char *str = NULL;
+	char **start = NULL;
+
+	arg = (char**)malloc(sizeof(char*) * 10);
+
+	if(NULL == arg)
+	{
+		return (NULL);
+	}
+
+	start = arg;
+
+	str = strtok(input, " ");
+	
+ 
+   /* walk through other tokens */
+	while(str != NULL)
+	{
+		*arg++ = str;
+		str = strtok(NULL, " ");			
+	}
+
+	*arg = 0;
+	
+	return(start);
+}
 
