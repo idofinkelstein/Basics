@@ -32,7 +32,6 @@ void Shell(void)
 	char **argv_array = NULL;
 	vector_t *argv = NULL;
 
-
 	if (signal(SIGINT, SIG_IGN) == SIG_ERR)
 	{
 		fprintf (stderr, "Cannot handle SIGINT!\n");
@@ -64,14 +63,11 @@ void Shell(void)
 			foreground = true;
 			*(input + len - 1) = '\0';
 		}
-
 	
 	 /* fork() returns the process identifier (pid) of the child process in the
  	    parent, and returns 0 in the child. */
 
 		pid = fork();
-		argv = BreakInput(input);
-		argv_array = (char**)VectorGetArray(argv);
 		
 		if (-1 == pid)
 		{
@@ -81,6 +77,9 @@ void Shell(void)
 		if (pid == 0)
 		{			
 			/* goes in only from the child process */
+			argv = BreakInput(input);
+			argv_array = (char**)VectorGetArray(argv);
+
 			execvp(argv_array[0], argv_array);	
 			VectorDestroy(argv);
 			puts("unknown command");
@@ -96,13 +95,11 @@ void Shell(void)
 		else if (foreground)
 		{
 			/* goes in only from parent */
-			puts("process running in the foreground");
+			puts("process running in the background");
 			foreground = !foreground;
 		}
 		
 		waitpid(-1, &status, WNOHANG);
-
-		VectorDestroy(argv);
 	}
 }
 /*---------------------------------------------------------------------------*/
@@ -132,7 +129,7 @@ vector_t *BreakInput(char *input)
 		str = strtok(NULL, " ");			
 	}
 
-	VectorPushBack(argv, (char*)0);
+	VectorPushBack(argv, NULL);
 	
 	return(argv);
 }
