@@ -7,6 +7,7 @@
 #include <sys/wait.h>   /* wait */
 #include <unistd.h>		/* exec, fork */
 
+#include "vector.h"
 #include "shell.h"		/* API functions */
 /*---------------------------------------------------------------------------*/
 
@@ -16,8 +17,8 @@
 /* Utils functions declarations */
 /*---------------------------------------------------------------------------*/
 void CreateProcess(char *input);
-char **BreakInput(char *input);
-void CleanUp(char **arg);
+vector_t *BreakInput(char *input);
+
 /*---------------------------------------------------------------------------*/
 /* API functions definitions */
 /*---------------------------------------------------------------------------*/
@@ -26,9 +27,10 @@ void Shell(void)
 	char input[200];
 	pid_t pid = 0;
 	int status = 0;
-	int background = false;
+	int foreground = false;
 	size_t len = 0;
-	char **arg = NULL;
+	char **argv_array = NULL;
+	vector_t *argv = NULL;
 
 
 	if (signal(SIGINT, SIG_IGN) == SIG_ERR)
@@ -39,7 +41,16 @@ void Shell(void)
 
 	while (1)	
 	{
-		scanf("%[^\n]%*c", input);
+		printf(">>>");
+	
+		fgets(input, 200, stdin);
+		input[strlen(input) - 1] = '\0';
+
+		/* in case of empty input continue to next iteration */
+		if (*input == '\0')
+		{
+			continue;
+		}
 
 		len = strlen(input);
 
@@ -50,16 +61,18 @@ void Shell(void)
 
 		if ('&' == *(input + len - 1))
 		{
-			background = true;
+			foreground = true;
 			*(input + len - 1) = '\0';
 		}
 
-		arg = BreakInput(input);
 	
-		/* fork() returns the process identifier (pid) of the child process in the
- 		   parent, and returns 0 in the child. */
-		pid = fork();
+	 /* fork() returns the process identifier (pid) of the child process in the
+ 	    parent, and returns 0 in the child. */
 
+		pid = fork();
+		argv = BreakInput(input);
+		argv_array = (char**)VectorGetArray(argv);
+		
 		if (-1 == pid)
 		{
 			exit(EXIT_FAILURE);
@@ -68,24 +81,28 @@ void Shell(void)
 		if (pid == 0)
 		{			
 			/* goes in only from the child process */
-			execvp(arg[0], arg);	
+			execvp(argv_array[0], argv_array);	
+			VectorDestroy(argv);
+			puts("unknown command");
 			exit(0);
 		}
-		else
+		else if (!foreground && pid > 0)
 		{
-			if (background)
-			{
-				waitpid(pid,&status, WNOHANG);
-				background = !background;
-			}
-			else
-			{
-				waitpid(pid,&status, 0);
-				
-			}
+			/* goes in only from the parent process 
+			   and if command is running in background */
+			waitpid(pid, &status, 0);
+			puts("process terminated");
 		}
-	
-		free(arg);
+		else if (foreground)
+		{
+			/* goes in only from parent */
+			puts("process running in the foreground");
+			foreground = !foreground;
+		}
+		
+		waitpid(-1, &status, WNOHANG);
+
+		VectorDestroy(argv);
 	}
 }
 /*---------------------------------------------------------------------------*/
@@ -94,32 +111,29 @@ void Shell(void)
 
 /*----------------------------------------------------------------------------*/
 
-char **BreakInput(char *input)
-{
-	char **arg = NULL;
+vector_t *BreakInput(char *input)
+{	
 	char *str = NULL;
-	char **start = NULL;
+	vector_t *argv = NULL;
 
-	arg = (char**)malloc(sizeof(char*) * 20);
+	argv = VectorCreate(10);
 
-	if(NULL == arg)
+	if (NULL == argv)
 	{
 		return (NULL);
 	}
-
-	start = arg;
 
 	str = strtok(input, " ");
 	 
    /* walk through other tokens */
 	while(str != NULL)
 	{
-		*arg++ = str;
+		VectorPushBack(argv, str);
 		str = strtok(NULL, " ");			
 	}
 
-	*arg = 0;
+	VectorPushBack(argv, (char*)0);
 	
-	return(start);
+	return(argv);
 }
 

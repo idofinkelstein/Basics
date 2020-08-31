@@ -4,11 +4,11 @@
 # the parrent dir of "arch" dir
 ROOT_DIR = ../..
 
-PROJ_SRCS = $(wildcard *.c)
-#PROJ_SRCS = aaa.c bbb.cpp
+#PROJ_SRCS = $(wildcard *.c)
+PROJ_SRCS = shell.c shell_test.c vector.c
 
 # list of directories containing header files
-PROJ_INC_DIR =
+PROJ_INC_DIR = $(ROOT_DIR)/ds/vector
 
 # the executable file
 PROJ_OUT = shell.out
@@ -31,6 +31,6 @@ PROJ_LIBS =
 PROJ_LDFLAGS =
 
 # list of projects (makefiles) this project depends on
-PROJ_DEPENDS  =
+PROJ_DEPENDS  = $(ROOT_DIR)/ds/vector/Makefile
 
 include $(ROOT_DIR)/make/Project.mak
