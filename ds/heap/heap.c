@@ -8,9 +8,9 @@ Date: 13/8/2020
 #include <stdlib.h> /* malloc, free */
 #include <assert.h>
 #ifdef NDEBUG
-#include <stdio.h> /* printf */
+ /* printf */
 #endif
-
+#include <stdio.h>
 #include "heap.h"
 #include "vector.h"
 #include "heapify.h"
@@ -102,15 +102,15 @@ int HeapPush(heap_t *heap, void *data)
 	int status = 0;
 
 	assert(heap);
-
+	
 	status = VectorPushBack(heap->vector, data);
-
+	
 	if (!status) /* 0 is success */
 	{
 		/* realloc func could change the address of arr, so the assignment
 		   comes after VectorPushBack */
 		arr = VectorGetArray(heap->vector); 
-
+		
 		HeapifyUp(arr,
 				  HeapSize(heap),
 				  HeapSize(heap) - 1, 
@@ -161,7 +161,7 @@ void *HeapRemove(heap_t *heap, void *data, heap_is_match_func_t is_match, void *
 	size_t parent = 0;
 	void *matched_data = NULL;
 	void **arr = NULL;
-
+	
 	assert(heap);
 	/* finds index of desired data and checks if it's valid and saves data */
 	index = FindIndex(heap, data, is_match, param);
@@ -180,7 +180,7 @@ void *HeapRemove(heap_t *heap, void *data, heap_is_match_func_t is_match, void *
 
 	/* checks the direction of heapify */
 	/* bubbles the data to its place */
-	if (0 < heap->cmp(arr[index], arr[parent], param))
+	if (0 < heap->cmp(&arr[index], &arr[parent], param))
 	{
 		HeapifyUp(arr,
 			      HeapSize(heap),

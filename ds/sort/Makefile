@@ -5,10 +5,10 @@
 ROOT_DIR = ../..
 
 #PROJ_SRCS = $(wildcard *.c)
-PROJ_SRCS = bubble_sort.c insertion_sort.c merge_sort.c merge_sort_in_place.c selection_sort.c sort_test.c swap_bytes.c counting_sort.c quick_sort.c
+PROJ_SRCS = bubble_sort.c insertion_sort.c merge_sort.c merge_sort_in_place.c selection_sort.c sort_test.c swap_bytes.c counting_sort.c quick_sort.c heap_sort.c heapify.c 
 
 # list of directories containing header files
-PROJ_INC_DIR =
+PROJ_INC_DIR = $(ROOT_DIR)/ds/heap
 
 # the executable file
 PROJ_OUT = sort.out
@@ -31,6 +31,6 @@ PROJ_LIBS =
 PROJ_LDFLAGS =
 
 # list of projects (makefiles) this project depends on
-PROJ_DEPENDS  =
+PROJ_DEPENDS  = $(ROOT_DIR)/ds/heap/Makefile
 
 include $(ROOT_DIR)/make/Project.mak

@@ -6,6 +6,7 @@ Date: 13/8/2020
 ********************************/
 
 #include "heapify.h"
+#include <stdio.h>
 
 void SwapBytes(char *byte1, char *byte2, size_t n_bytes);
 static void *Max(void *data1, void *data2, heapify_cmp_func_t cmp, void *arg);
@@ -18,9 +19,10 @@ void HeapifyUp(void *base,
 			   void *param)
 {
 	long parent = (((long)index - 1) / 2);
-
+	
 	if (0 >= index)
 	{
+	
 		return;
 	}
 	else if (0 < cmp((char*)base + index * elem_size,  /* current node */
@@ -33,6 +35,7 @@ void HeapifyUp(void *base,
 
 		HeapifyUp(base, nmemb, parent, elem_size, cmp, param);
 	}
+	
 }
 
 /*------------------------------------------------------------------------------------------*/

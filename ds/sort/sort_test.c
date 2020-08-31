@@ -12,8 +12,11 @@ Data: 17/7/2020
 
 #include "sort.h"
 
+#define _GNU_SOURCE
+
 /* compare function declarations */
 int Compare(const void *data1, const void *data2, void *param);
+int CompareHeap(const void *data1, const void *data2, void *param);
 int DoubleCompare(const void *data1, const void *data2, void *param);
 int StrCaseCmpWrapper(const void *data1, const void *data2, void *param);
 int StrCaseCmpWrapper2(const void *data1, const void *data2, void *param);
@@ -31,10 +34,13 @@ void CountingeSortTest(void);
 void MergeSortTest(void);
 void MergeSortInPlaceTest(void);
 void QSortTest(void);
+void HeapSortTest(void);
+void ComparisonTest(void);
+void InitArray(int arr[], size_t size);
 
 int main()
 {
-	BubbleSortTest();
+	/*BubbleSortTest();
 	InsertionSortTest();
 	SelectionSortTest();
 	StringSelectionSortingTest();
@@ -44,8 +50,10 @@ int main()
 	CountingeSortTest();
 	QSortTest();
 	StringMergeSortingTest();
-	/*MergeSortInPlaceTest();*/
+	MergeSortInPlaceTest();
 	MergeSortTest();
+	HeapSortTest();*/
+	ComparisonTest();
 	
 
 	return 0;
@@ -501,12 +509,168 @@ void QSortTest(void)
 	puts("");
 }
 
+void HeapSortTest(void)
+{
+	clock_t begin;
+	clock_t end; 
+    double time_spent;
+	int arr[] = {4 , 23, 1, 65, 4, 2, -6, 0, 41, 34, -345, 35, -76};
+	size_t size = sizeof(arr) / sizeof(int);
+	double arr2[10000] = {0};
+	size_t size2 = sizeof(arr2) / sizeof(double);
+	size_t i = 0;
+
+	puts("\n*** HeapSortTest ***");
+
+	MergeSort(arr, size, sizeof(int) , Compare, NULL);
+
+	for (i = 0; i < size; ++i)
+	{
+		printf("%d, ", arr[i]);
+	}
+
+	puts("");
+
+	for (i = 0; i < size2; ++i)
+	{
+		arr2[i] = (double)rand() / 100;
+	}
+
+	puts("");
+
+	begin = clock();
+	HeapSort(arr2, size2 , sizeof(double) , DoubleCompare, NULL);
+	end = clock();
+
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Time taken to sort array of size 10k with HeapSort is: %f\n",
+			time_spent);
+
+	for (i = 0; i < size2 / 100; ++i)
+	{
+
+		printf("%.2f, ", arr2[i]);
+	}
+
+	puts("");
+}
+
+void ComparisonTest(void)
+{
+	clock_t begin;
+	clock_t end; 
+    double time_spent;
+	size_t i = 0;
+	int arr1[10000] = {0};
+	int arr2[10000] = {0};
+	int arr3[10000] = {0};
+	int arr4[10000] = {0};
+	int arr5[10000] = {0};
+	int arr6[10000] = {0};
+	int arr7[10000] = {0};
+	int arr8[10000] = {0};
+	int res[10000] = {0};
+	size_t size = sizeof(arr1) / sizeof(int);
+
+	InitArray(arr1, size);
+	InitArray(arr2, size);
+	InitArray(arr3, size);
+	InitArray(arr4, size);
+	InitArray(arr5, size);
+	InitArray(arr6, size);
+	InitArray(arr7, size);
+
+	arr8[0] = 0;
+	arr8[1] = 10000;
+
+	for (i = 2; i < size; ++i)
+	{
+		arr8[i] = rand() & 10000;
+	}
+	
+
+	begin = clock();
+	BubbleSort(arr1, size, sizeof(int) , Compare, NULL);
+	end = clock();
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Time taken to sort array of size 10k with BubbleSort is: %f[s]\n",
+			time_spent);
+
+	begin = clock();
+	InsertionSort(arr2, size, sizeof(int) , Compare, NULL);
+	end = clock();
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Time taken to sort array of size 10k with InsertionSort is: %f[s]\n",
+			time_spent);
+
+	begin = clock();
+	SelectionSort(arr3, size , sizeof(int) , Compare, NULL);
+	end = clock();
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Time taken to sort array of size 10k with SelectionSort is: %f[s]\n",
+			time_spent);
+
+	begin = clock();
+	MergeSort(arr4, size, sizeof(int) , Compare, NULL);
+	end = clock();
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Time taken to sort array of size 10k with MergeSort is: %f[s]\n",
+			time_spent);
+
+	begin = clock();
+	QSort(arr5, size, sizeof(int) , Compare);
+	end = clock();
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Time taken to sort array of size 10k with QSort is: %f[s]\n",
+			time_spent);
+
+	begin = clock();
+	HeapSort(arr6, size, sizeof(int) , CompareHeap, NULL);
+	end = clock();
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Time taken to sort array of size 10k with HeapSort is: %f[s]\n",
+			time_spent);
+
+	begin = clock();
+	qsort_r(arr7, size, sizeof(int) , Compare, NULL);
+	end = clock();
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Time taken to sort array of size 10k with qsort_r is: %f[s]\n",
+			time_spent);
+	
+	begin = clock();
+	CountingSort(arr8, size, 0, 100000, res);
+	end = clock();
+	time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+	printf("Time taken to sort array of size 10k with CountingSort is: %f[s]\n",
+			time_spent);
+
+}
+
+void InitArray(int arr[], size_t size)
+{
+	size_t i = 0;
+
+	for (i = 0; i < size; ++i)
+	{
+		arr[i] = rand();
+	}
+
+}
+
 /* compares integers */
 int Compare(const void *data1, const void *data2, void *param)
 {
 	(void)param;
 
 	return (*(int*)data1 - *(int*)data2);
+}
+
+int CompareHeap(const void *data1, const void *data2, void *param)
+{
+	(void)param;
+
+	return (*(int*)data2 - *(int*)data1);
 }
 
 /* compares doubles */

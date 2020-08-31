@@ -10,6 +10,8 @@ Date: 13/8/2020
 
 #include "heap.h"
 
+int HeapSort(void *arr, size_t nmemb, size_t size, heap_cmp_func_t cmp, void *arg);
+
 /* Utility functions declaration */
 int CompareMax(const void *data1, const void *data2, void *param);
 int CompareMin(const void *data1, const void *data2, void *param);
@@ -19,10 +21,12 @@ int IsMatch(const void *data1, const void *data2, void *param);
 void TestCase1(void); 
 void TestCase2(void);
 
+
 int main()
 {
 	TestCase1(); /* test max heap */
 	TestCase2(); /* test min heap */
+
 
 	return 0;
 }
@@ -100,6 +104,7 @@ void TestCase2(void)
 
 	HeapDestroy(heap);
 }
+
 
 /* compares integers */
 int CompareMax(const void *data1, const void *data2, void *param)
