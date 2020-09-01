@@ -13,17 +13,19 @@ typedef struct sigaction sigact_t;
 
 static void ParentHandler ()
 {
-	sleep(3);
+	sleep(1);
 	puts("ping");
 	kill(getppid(), SIGUSR2);
+	sleep(1);
 	
 }
 
 static void ChildHandler ()
 {	
-	sleep(3);
+	sleep(1);
 	puts("pong");
 	kill(pid, SIGUSR1);	
+	sleep(1);
 }
 
 int PingPong()
