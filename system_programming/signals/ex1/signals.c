@@ -1,4 +1,4 @@
-#define _POSIX_C_SOURCE 100
+#define _POSIX_C_SOURCE 199309L
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,16 +11,15 @@ static pid_t pid = 0;
 
 typedef struct sigaction sigact_t;
 
-static void ParentHandler ()
+static void ParentHandler()
 {
 	sleep(1);
 	puts("ping");
 	kill(getppid(), SIGUSR2);
-	sleep(1);
-	
+	sleep(1);	
 }
 
-static void ChildHandler ()
+static void ChildHandler()
 {	
 	sleep(1);
 	puts("pong");
@@ -55,8 +54,7 @@ int PingPong()
 	{		
 		kill(getppid(), SIGUSR2);
 		sleep(1);
-		pause();
-		
+		pause();		
 	}
 
 	return(EXIT_SUCCESS);

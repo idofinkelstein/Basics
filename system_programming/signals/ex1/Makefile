@@ -2,10 +2,10 @@
 # make clean/all CONFIG=Debug/Release ARCH=linux64/raspi ECHO=0/1
 
 # the parrent dir of "arch" dir
-ROOT_DIR = ../..
+ROOT_DIR = ../../..
 
-PROJ_SRCS = $(wildcard *.c)
-#PROJ_SRCS = aaa.c bbb.cpp
+#PROJ_SRCS = $(wildcard *.c)
+PROJ_SRCS = signals_test.c signals.c
 
 # list of directories containing header files
 PROJ_INC_DIR =
