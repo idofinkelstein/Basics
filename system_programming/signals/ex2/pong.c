@@ -1,39 +1,34 @@
-#define _POSIX_SOURCE
-/******************************************************************************
-* Project name:					 	Pingpong_ex2
-* Developer: 						Matan Yankovich
-* Project Lauch: 					Aug 31, 2020
-* Submitted for review:				02/09/2020
+/******************************
+* Project name:	pong.c
+* Developer: Ido Finkelstein
+* Date:
 * Reviewer:
-******************************************************************************/
+*******************************/
 
-/**********************   PREPROCESSOR DIRECTIVES   **************************/
+#define _POSIX_SOURCE
 
-#include <stdio.h>
+#include <stdio.h> 		/* printf, perror */
+#include <stdlib.h> 	/* exit 		  */
 #include <errno.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
+#include <signal.h> 	/* signal 		  */
+#include <sys/types.h>  /* waitpid, fork  */
+#include <sys/wait.h>   /* waitpid 		  */
+#include <unistd.h> 	/* fork 		  */
 
 /****************************   DECLARATIONS   *******************************/
 
 void Sigusr1Handler(int signal_num);
-sig_atomic_t nof_pings = 0;
 
-/********************************  MAIN  *************************************/
+/*---------------------------------------------------------------------------*/
 
 int main(void)
 {
-    signal(SIGUSR1, Sigusr1Handler);
     
-    while (nof_pings < 10)
-    {
-        signal(SIGUSR1, Sigusr1Handler);
-        pause();
-    }
-    
-    printf("10 pings received! Child process terminating\n");
+	signal(SIGUSR1, Sigusr1Handler);
+	
+	pause();    
+	
+
 
     return (0);
 }
@@ -42,19 +37,21 @@ int main(void)
 
 void Sigusr1Handler(int signal_num)
 {
-    int status = 0;
-    (void)signal_num;
+	int status = 0;
+	(void)signal_num;
 
-    ++nof_pings;
+	
+	
+	sleep(1);
+	printf("pong\n");
+	status = kill(getppid(), SIGUSR2);
 
-    printf("pong\n");
+	if (0 != status)
+	{
+		perror("Error: kill parent sigusr2");
+	}
 
-    status = kill(getppid(), SIGUSR2);
-    
-    if (0 != status)
-    {
-        perror("Error: kill parent sigusr2");
-    }
+
 }
 
 /*****************************************************************************/

@@ -1,21 +1,20 @@
-#define _POSIX_SOURCE
-/******************************************************************************
-* Project name:					 	Pingpong_ex2
-* Developer: 						Matan Yankovich
-* Project Lauch: 					Aug 31, 2020
-* Submitted for review:				02/09/2020
+
+/******************************
+* Project name:	Ping.c
+* Developer: Ido Finkelstein
+* Date:
 * Reviewer:
-******************************************************************************/
+*******************************/
 
-/**********************   PREPROCESSOR DIRECTIVES   **************************/
+#define _POSIX_SOURCE
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <stdio.h> 		/* printf, perror */
+#include <stdlib.h> 	/* exit 		  */
 #include <errno.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
+#include <signal.h> 	/* signal 		  */
+#include <sys/types.h>  /* waitpid, fork  */
+#include <sys/wait.h>   /* waitpid 		  */
+#include <unistd.h> 	/* fork 		  */
 
 /****************************   DECLARATIONS   *******************************/
 
@@ -23,13 +22,14 @@ void Sigusr2Handler(int signal_num);
 void Sigusr1Handler(int signal_num);
 void SendSigToChild(int child_pid);
 
-/********************************  MAIN  *************************************/
+/*---------------------------------------------------------------------------*/
 
 int main(void)
 {
     int child_pid;
     int child_status;
 
+    signal(SIGUSR2, Sigusr2Handler);
     child_pid = fork();
 
     if (child_pid < 0)
@@ -41,19 +41,17 @@ int main(void)
     /* inside child */
     else if (0 == child_pid)
     {
-        execl("./pong.out", "./pong.out", (char *)NULL);
-        perror("Error: evecl");
-        abort();
+        execl("./b.out", "./b.out", (char *)NULL);
+        perror("Error: evecl"); /* can't exec */
+        exit(EXIT_FAILURE);
     }
     
-    /* inside parent 
-    else
-    {*/
-    signal(SIGUSR2, Sigusr2Handler);
+    /* inside parent */
+ 
     sleep(1);
     SendSigToChild(child_pid);
-    waitpid(child_pid, &child_status, 1);
-    /*}*/
+    waitpid(child_pid, &child_status, 0);
+
 
     printf("Parent process terminating\n");  
     return (0);
@@ -63,8 +61,15 @@ int main(void)
 
 void SendSigToChild(int child_pid)
 {
+	int status = 0;
+
     printf("ping\n");
-    kill(child_pid, SIGUSR1);
+    status = kill(child_pid, SIGUSR1);
+
+	if (0 != status)
+	{
+		perror("Error: kill parent sigusr1");
+	}
 }
 
 /*---------------------------------------------------------------------------*/
@@ -72,7 +77,11 @@ void SendSigToChild(int child_pid)
 void Sigusr2Handler(int signal_num)
 {
     (void)signal_num;
+	sleep(1);
     printf("ping\n");
+	
+	
+	
 }
 
 /*****************************************************************************/
