@@ -1,11 +1,11 @@
 #define _POSIX_C_SOURCE 199309L
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <unistd.h>
-#include <sys/types.h>	/* fork */
-#include <sys/wait.h>   /* wait */
+#include <stdio.h>		/* puts */
+#include <stdlib.h>		/* EXIT_STATUS */
+#include <signal.h>		/* sigaction, kill */
+#include <unistd.h>		/* sleep, fork, pause */
+#include <sys/types.h>	/* fork, waitpid */
+#include <sys/wait.h>   /* waitpid */
 
 static pid_t pid = 0;
 
