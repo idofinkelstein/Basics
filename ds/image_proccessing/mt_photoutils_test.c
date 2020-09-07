@@ -6,6 +6,8 @@
 
 #define filterWidth 3
 #define filterHeight 3
+#define NUM_OF_TRHEADS 4
+static const unsigned num_of_threads = NUM_OF_TRHEADS;
 
 typedef struct image_thread it_t;
 
@@ -15,8 +17,6 @@ struct image_thread
 	BMP_IMAGE *new_image;
 	int height_start;
 	int height_stop;	
-	int width_start;
-	int width_stop;
 };
 
 it_t *CreateThreadStruct(BMP_IMAGE *image,
@@ -49,24 +49,46 @@ double somebias = 0.0;
 
 double factor = 1.0;
 double bias = 60.0;
-static double* Filter = (double*)somefilter;
+static double* Filter = (double*)embossFilter;
 
 int main()
 {
-	pthread_t t1, t2, t3, t4;
-	it_t *t_info1 = NULL;
-	it_t *t_info2 = NULL;
-	it_t *t_info3 = NULL;
-	it_t *t_info4 = NULL;
+	pthread_t t[NUM_OF_TRHEADS];
+	it_t *t_info = NULL;
 	BMP_IMAGE *image = NULL;
 	BMP_IMAGE *new_image = NULL;
 	FILE *file = NULL;
 	FILE *new_file = NULL;
+	int status = 0;
 	int height = 0;
 	int width = 0;
+	int num_of_lines = 0;
+	int line_reminder = 0;
+	unsigned i = 0;
+
+	t_info = (it_t*)malloc(sizeof(it_t) * num_of_threads);
+
+	if (NULL == t_info)
+	{
+		return(EXIT_FAILURE);
+	}
 
 	file = fopen("simphsons.bmp", "r");
+	
+	if (NULL == file)
+	{
+		free(t_info);
+		return(EXIT_FAILURE);
+	}
+
 	new_file = fopen("newSimphsons.bmp", "w");
+
+	if (NULL == new_file)
+	{
+		free(t_info);
+		fclose(file);
+		return(EXIT_FAILURE);
+	}
 
 	image = LoadImage(file);
 	height = image->Header.height;
@@ -75,78 +97,44 @@ int main()
 	printf("width = %d\n", width);
 	new_image = ConstructImage(image);
 
-	t_info1 = CreateThreadStruct(image,
-						 		   new_image,
-						           0,
-								   height / 2,	
-								   0,
-								   width / 2);
-	if (NULL == t_info1)
+	/* sections the image height according to number of threads */
+	num_of_lines += height / num_of_threads;	
+	line_reminder = height % num_of_threads;
+
+	for (i = 0; i < num_of_threads; ++i)
 	{
-		DestructImage(image);
-		DestructImage(new_image);
-		return (EXIT_FAILURE);
+		(t_info + i)->height_start = num_of_lines * i;
+		(t_info + i)->height_stop = num_of_lines * (i + 1);
+		(t_info + i)->image = image;
+		(t_info + i)->new_image = new_image;
 	}
 
+	/* adds the remain lines to last thread */
+	(t_info + --i)->height_stop += line_reminder;
 
-	t_info2 = CreateThreadStruct(image,
-						 		   new_image,
-						           0,
-								   height / 2,	
-								   width / 2,
-								   width);
-	if (NULL == t_info2)
+	SetFilterParams(Filter, filterHeight, filterWidth, factor, bias);
+
+	for (i = 0; i < num_of_threads && !status; ++i)
 	{
-		free(t_info1);
-		DestructImage(image);
-		DestructImage(new_image);
-		return (EXIT_FAILURE);
+		status = pthread_create(&t[i], NULL, FilterImage, t_info + i);
 	}
 
-	t_info3 = CreateThreadStruct(image,
-						 		   new_image,
-						           height / 2,
-								   height,	
-								   0,
-								   width / 2);
-	if (NULL == t_info3)
+	if (status) /* at least one thread creation failed */
 	{
-		free(t_info1);
-		free(t_info2);
+		fclose(file);
+		fclose(new_file);
+
 		DestructImage(image);
 		DestructImage(new_image);
-		return (EXIT_FAILURE);
-	}
+		free(t_info);
 
-	t_info4 = CreateThreadStruct(image,
-						 		   new_image,
-						           height / 2,
-								   height,	
-								   width / 2,
-								   width);
-	if (NULL == t_info4)
+		return(EXIT_FAILURE);
+	}
+	
+	for (i = 0; i < num_of_threads; ++i)
 	{
-		free(t_info1);
-		free(t_info2);
-		free(t_info3);
-		DestructImage(image);
-		DestructImage(new_image);
-		return (EXIT_FAILURE);
+		pthread_join(t[i], NULL);
 	}
-
-
-	SetFilterParams(Filter, 5, 5, somefactor, somebias);
-
-	pthread_create(&t1, NULL, FilterImage, t_info1);
-	pthread_create(&t2, NULL, FilterImage, t_info2);
-	pthread_create(&t3, NULL, FilterImage, t_info3);
-	pthread_create(&t4, NULL, FilterImage, t_info4);
-
-	pthread_join(t1, NULL);
-	pthread_join(t2, NULL);
-	pthread_join(t3, NULL);
-	pthread_join(t4, NULL);
-
 
 	StoreImage(new_file, new_image);
 
@@ -155,10 +143,7 @@ int main()
 
 	DestructImage(image);
 	DestructImage(new_image);
-	free(t_info1);
-	free(t_info2);
-	free(t_info3);
-	free(t_info4);
+	free(t_info);
 
 	return 0;
 }
@@ -175,12 +160,11 @@ void *FilterImage(void *image_thread)
 	int j = 0;
 	int height_start = t_info->height_start;
 	int height_stop = t_info->height_stop;	
-	int width_start = t_info->width_start;
-	int width_stop = t_info->width_stop; 
-	
+	int width = image->Header.width;
+		
 	for(i = height_start; i < height_stop; ++i)
 	{
-		for (j = width_start; j < width_stop; ++j)
+		for (j = 0; j < width; ++j)
 		{
 			pixel = ApplyFilter(image, i, j);
 			SetPixel(new_image, height - i - 1, j, pixel);
@@ -190,28 +174,4 @@ void *FilterImage(void *image_thread)
 	return (new_image);
 }
 
-it_t *CreateThreadStruct(BMP_IMAGE *image,
-						 BMP_IMAGE *new_image,
-						 int height_start,
-						 int height_stop,	
-						 int width_start,
-						 int width_stop)
-{
-	it_t *t_info = NULL;
-	
-	t_info = (it_t*)malloc(sizeof(it_t));
 
-	if (NULL == t_info)
-	{
-		return (NULL);
-	}
-
-	t_info->image = image;
-	t_info->new_image = new_image;
-	t_info->height_start = height_start;
-	t_info->height_stop = height_stop;
-	t_info->width_start = width_start;
-	t_info->width_stop = width_stop;
-
-	return (t_info);
-}
