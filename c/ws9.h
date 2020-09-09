@@ -8,6 +8,8 @@ Date: 31/5/2020
 #ifndef __WS9_H__
 #define __WS9_H__
 
+
+#include <stddef.h>
 /* fills the first n bytes of the memory area pointed to by
    str with the constant byte c. */
 void *MemSet(void *str, int c, size_t n);
@@ -16,6 +18,7 @@ void *MemSet(void *str, int c, size_t n);
   The memory areas must not overlap. Use memmove(3) if the
   memory areas do overlap. */
 void *MemCpy(void *dest, const void *src, size_t n);
+void *MT_MemCpy(void *dest, const void *src, size_t n);
 
 /* copies n bytes from memory area src to memory area dest.
    The memory areas may overlap */
