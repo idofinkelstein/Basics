@@ -17,8 +17,8 @@ union semun
 };
 /*-----------------------------------------------------------------------------*/
 
-void InitSops(sembuf_t *sops, unsigned short sem_num, short sem_op, short sem_flg);
-char **BreakInput(char *input);
+static void InitSops(sembuf_t *sops, unsigned short sem_num, short sem_op, short sem_flg);
+static char **BreakInput(char *input);
 
 /*-----------------------------------------------------------------------------*/
 
@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
 /*-----------------------------------------------------------------------------*/
 
 /* initializes struct by which command is passing to semop */
-void InitSops(sembuf_t *sops, unsigned short sem_num, short sem_op, short sem_flg)
+static void InitSops(sembuf_t *sops, unsigned short sem_num, short sem_op, short sem_flg)
 {
 	sops->sem_num = sem_num;        
 	sops->sem_op = sem_op;         
@@ -155,7 +155,7 @@ void InitSops(sembuf_t *sops, unsigned short sem_num, short sem_op, short sem_fl
 }
 /*-----------------------------------------------------------------------------*/
 
-char **BreakInput(char *input)
+static char **BreakInput(char *input)
 {	
 	char *str = NULL;
 	char **command = NULL;
