@@ -2,7 +2,7 @@
 * Project name:	pong.c
 * Developer: Ido Finkelstein
 * Date:
-* Reviewer:
+* Reviewer: Matan Yankovich
 *******************************/
 
 #define _POSIX_SOURCE
@@ -28,8 +28,6 @@ int main(void)
 	
 	pause();    
 	
-
-
     return (0);
 }
 

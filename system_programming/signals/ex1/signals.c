@@ -6,6 +6,7 @@
 #include <unistd.h>		/* sleep, fork, pause */
 #include <sys/types.h>	/* fork, waitpid */
 #include <sys/wait.h>   /* waitpid */
+#include <errno.h> 		/* errno, perror */
 
 static pid_t pid = 0;
 
@@ -15,7 +16,7 @@ static void ParentHandler()
 {
 	sleep(1);
 	puts("ping");
-	kill(getppid(), SIGUSR2);
+	kill(pid, SIGUSR1);	
 	sleep(1);	
 }
 
@@ -23,7 +24,7 @@ static void ChildHandler()
 {	
 	sleep(1);
 	puts("pong");
-	kill(pid, SIGUSR1);	
+	kill(getppid(), SIGUSR2);
 	sleep(1);
 }
 
@@ -32,8 +33,8 @@ int PingPong()
 	sigact_t sa1 = {0};
 	sigact_t sa2 = {0};
 	
-	sa1.sa_handler = ParentHandler;
-	sa2.sa_handler = ChildHandler;
+	sa1.sa_handler = ChildHandler;
+	sa2.sa_handler = ParentHandler;
 	sigaction(SIGUSR1, &sa1, NULL);
 	sigaction(SIGUSR2, &sa2, NULL);
 
@@ -41,6 +42,7 @@ int PingPong()
 
 	if (-1 == pid)
 	{
+		perror("fork failed\n");
 		return(EXIT_FAILURE);
 	}
 	else if (pid > 0)/* in the parent process */
@@ -52,7 +54,6 @@ int PingPong()
 	}
 	else
 	{		
-		kill(getppid(), SIGUSR2);
 		sleep(1);
 		pause();		
 	}

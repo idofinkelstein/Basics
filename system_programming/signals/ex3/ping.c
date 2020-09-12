@@ -1,9 +1,9 @@
 #define _DEFAULT_SOURCE
-/******************************************************************************
-* File name:					 	ping.c
-* Developer: 						IdoFinkelstein
-* Reviewer:
-******************************************************************************/
+/*****************************
+* File name: ping.c
+* Developer: IdoFinkelstein
+* Reviewer:  Matan Yancovich		
+******************************/
 
 #include <stdio.h>  	/* printf, perror		  */
 #include <stdlib.h> 	/* sleep 				  */
@@ -13,6 +13,7 @@
 #include <sys/types.h>  /* getpid, kill			  */
 #include <sys/wait.h>
 
+/* Function declarations */
 void Sigusr2Handler(int signal_num, siginfo_t *info, void *context);
 
 

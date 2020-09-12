@@ -1,9 +1,9 @@
 #define _DEFAULT_SOURCE
-/******************************************************************************
-* File name:					 	ping.c
-* Developer: 						IdoFinkelstein
-* Reviewer:
-******************************************************************************/
+/*****************************
+* File name: ping.c
+* Developer: IdoFinkelstein
+* Reviewer:  Matan Yancovich		
+******************************/
 
 #include <stdio.h>  	/* printf, perror		  */
 #include <stdlib.h> 	/* sleep 				  */
@@ -13,11 +13,12 @@
 #include <sys/types.h>  /* getpid, kill			  */
 #include <sys/wait.h>
 
-
+/* Function declarations */
 void Sigusr1Handler(int signal_num, siginfo_t *info, void *context);
+
+
 sig_atomic_t nof_pings = 0;
 
-/********************************  MAIN  *************************************/
 
 int main(int argc, char const *argv[])
 {
