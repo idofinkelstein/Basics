@@ -61,15 +61,17 @@ void *Consumer(void *data)
 
 	while (1)
 	{
-		/*pthread_mutex_lock(&consumer_mutex);*/
+		pthread_mutex_lock(&consumer_mutex);
 
-		while(SListIsEmpty(slist));
+		while(!SListIsEmpty(slist))
+		{
+			SListRemove(slist, SListBegin(slist));
 		
-		SListRemove(slist, SListBegin(slist));
-		
-		puts("consumed");
+			puts("consumed");
 
-		/*pthread_mutex_unlock(&consumer_mutex);*/
+		}
+			
+		pthread_mutex_unlock(&consumer_mutex);
 	}
 
 	return (NULL);
