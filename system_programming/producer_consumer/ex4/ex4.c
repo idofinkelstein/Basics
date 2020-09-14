@@ -133,15 +133,21 @@ void *Producer(void *data)
 	{
 		pthread_mutex_lock(&thread_info->mutex); /* lock all threads */
 		puts("Producer locked the resource");
-		sem_wait(&thread_info->sem_empty);		
 
-		if (0 != FSQWrite(fsq, rand()))
+		if (!FSQIsFULL(fsq))
+		{
+			sem_wait(&thread_info->sem_empty);	
+			FSQWrite(fsq, rand());	
+			puts("Produced");
+			sem_post(&thread_info->sem_full);
+		}
+		else
 		{
 			puts("The Queue is full");
 		}
-		puts("Produced");
-		sem_post(&thread_info->sem_full);
 		pthread_mutex_unlock(&thread_info->mutex); /* unlock other threads */
+	
+		
 	}
 
 	return (NULL);
@@ -156,10 +162,14 @@ void *Consumer(void *data)
 	{
 		pthread_mutex_lock(&thread_info->mutex); /* lock all threads */
 		puts("Consumer locked the resource");
-		sem_wait(&thread_info->sem_full);
-		FSQRead(fsq);
-		puts("Consumed");
-		sem_post(&thread_info->sem_empty);
+
+		if (!FSQIsEmpty(fsq))
+		{		
+			sem_wait(&thread_info->sem_full);
+			FSQRead(fsq);
+			puts("Consumed");
+			sem_post(&thread_info->sem_empty);
+		}
 
 		pthread_mutex_unlock(&thread_info->mutex); /* unlock other threads */
 	}
