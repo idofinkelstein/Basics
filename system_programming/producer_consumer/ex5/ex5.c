@@ -61,6 +61,10 @@ int main(void)
 
 	free(thr_arr);
 	FSQDestroy(thread_info->fsq);
+	pthread_mutex_destroy(&thread_info->prod_mutex);
+	pthread_mutex_destroy(&thread_info->cons_mutex);
+	sem_destroy(&thread_info->sem_empty);
+	sem_destroy(&thread_info->sem_full);
 	free(thread_info);
 
     return (0);
@@ -123,9 +127,9 @@ void *Producer(void *data)
 
 	while (1)
 	{
-		pthread_mutex_lock(&thread_info->prod_mutex); /* lock producers */
-
 		sem_wait(&thread_info->sem_empty);		
+
+		pthread_mutex_lock(&thread_info->prod_mutex); /* lock producers */
 
 		if (0 != FSQWrite(fsq, rand()))
 		{
@@ -134,6 +138,7 @@ void *Producer(void *data)
 		puts("Produced");
 		sem_post(&thread_info->sem_full);
 		pthread_mutex_unlock(&thread_info->prod_mutex); /* unlock producers */
+		sleep(1);
 	}
 
 	return (NULL);
@@ -146,9 +151,9 @@ void *Consumer(void *data)
 
 	while (1)
 	{
+		sem_wait(&thread_info->sem_full);
 		pthread_mutex_lock(&thread_info->cons_mutex); /* lock consumers */
 
-		sem_wait(&thread_info->sem_full);
 		FSQRead(fsq);
 		puts("Consumed");
 		sem_post(&thread_info->sem_empty);
