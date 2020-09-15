@@ -131,12 +131,11 @@ void *Producer(void *data)
 
 	while (1)
 	{
+		sem_wait(&thread_info->sem_empty);	
 		pthread_mutex_lock(&thread_info->mutex); /* lock all threads */
-		puts("Producer locked the resource");
 
 		if (!FSQIsFULL(fsq))
 		{
-			sem_wait(&thread_info->sem_empty);	
 			FSQWrite(fsq, rand());	
 			puts("Produced");
 			sem_post(&thread_info->sem_full);
@@ -160,12 +159,12 @@ void *Consumer(void *data)
 
 	while (1)
 	{
+		sem_wait(&thread_info->sem_full);
 		pthread_mutex_lock(&thread_info->mutex); /* lock all threads */
-		puts("Consumer locked the resource");
+
 
 		if (!FSQIsEmpty(fsq))
 		{		
-			sem_wait(&thread_info->sem_full);
 			FSQRead(fsq);
 			puts("Consumed");
 			sem_post(&thread_info->sem_empty);
