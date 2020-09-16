@@ -90,22 +90,17 @@ void MMI(char **argv)
 		pthread_join(t, NULL);
 	}
 
-
-	
-
-	
-	
-	
-	
-	
-#if 0
-	
-		
-#endif
+	SchDestroy(thread_info->sched);
+	sem_unlink("/sem");
+	free(thread_info);
 }
 
 void Sigusr1Handler(int signal_num, siginfo_t *info, void *context)
 {
+	(void)signal_num;
+	(void)info;
+	(void)context;	
+
 	are_u_there_g = true;
 	puts("flag was raised");
 }
@@ -114,6 +109,9 @@ int SendPulse(sch_t *sch, unique_id_t uid, void *param) /* task 1 */
 {
 	keep_alive_info_t *thread_info = (keep_alive_info_t*)param;
 	pid_t partner_pid = thread_info->pid;
+
+	(void)sch;
+	(void)uid;
 	
 	kill(partner_pid, SIGUSR1);
 	printf("massage was sent to process %d\n", (int)partner_pid);
@@ -124,7 +122,10 @@ int SendPulse(sch_t *sch, unique_id_t uid, void *param) /* task 1 */
 }
 int CheckPulse(sch_t *sch, unique_id_t uid, void *param) /* task 2 */
 {
-	keep_alive_info_t *thread_info = (keep_alive_info_t*)param;
+	/*keep_alive_info_t *thread_info = (keep_alive_info_t*)param;*/
+	(void)sch;
+	(void)uid;
+	(void)param;
 
 	if (are_u_there_g == true)
 	{

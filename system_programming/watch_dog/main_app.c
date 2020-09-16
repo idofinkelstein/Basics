@@ -4,8 +4,8 @@
 
 int main(int argc, char **argv)
 {
-
 	int i = 0;
+	(void)argc;
 /*	registration
 	.
 	.
@@ -38,6 +38,7 @@ int main(int argc, char **argv)
 	for (i = 0; i < 10000000; ++i);
 	for (i = 0; i < 10000000; ++i);
 	for (i = 0; i < 10000000; ++i);
+
 	puts("main process terminated properly");
 
 
