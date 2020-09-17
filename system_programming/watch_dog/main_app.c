@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <unistd.h>
 
 #include "keep_alive.h"
 
@@ -14,30 +15,10 @@ int main(int argc, char **argv)
 
 	MMI(argv);
 
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
-	for (i = 0; i < 10000000; ++i);
+	for (i = 0; i < 10; ++i)
+	sleep(1);
+	
+
 
 	puts("main process terminated properly");
 
