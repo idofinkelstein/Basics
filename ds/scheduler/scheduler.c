@@ -133,6 +133,8 @@ int SchRun(sch_t *sch)
 			sleep(timer->abs_time - time(NULL));
 		}
 
+		timer = (t_t *)PQDequeue(sch->pqueue);
+
 		task_result = timer->task_func(sch, timer->uid, timer->param);
 		
 		/* runs repeated tasks until recieves a stop signal */
@@ -141,12 +143,11 @@ int SchRun(sch_t *sch)
 			timer->abs_time = timer->interval + time(NULL);
 
 			PQEnqueue(sch->pqueue, timer);
-
-			PQDequeue(sch->pqueue);			
+		
 		}
 		else if (STOP == task_result)
 		{
-			free(PQDequeue(sch->pqueue));
+			free(timer);
 		}
 	}
 			
@@ -182,13 +183,14 @@ int Compare(const void *data1, const void *data2, void *param)
 	time_t abs_time2 = (*(t_t**)timer2)->abs_time;
 
 	(void)param;
-	return (abs_time1 - abs_time2);
+	return -(abs_time1 - abs_time2);
 }
 
 int IsMatch(const void *data1, const void *data2, void *param)
 {
 	t_t *timer = (t_t*)data1;
-	unique_id_t *to_match = param;
+	unique_id_t *to_match = param;	
+	(void)data2;
 
 	return (UIDIsSame(timer->uid, *to_match));
 }
