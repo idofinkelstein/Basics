@@ -1,7 +1,7 @@
 #ifndef __KEEP_ALIVE_H__
 #define __KEEP_ALIVE_H__
 
-void MMI(char **argv);
+int MMI(char **argv);
 
 void DNR();
 

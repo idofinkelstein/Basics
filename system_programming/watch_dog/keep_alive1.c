@@ -5,18 +5,18 @@
 #include <signal.h> 	/* sigaction, sigemptyset */
 #include <errno.h>		/* errno, perror		  */
 #include <unistd.h> 	/* pause 				  */
-#include <semaphore.h>	/* semaphore API		  */
-#include <stdbool.h>	/* true, false			  */
-#include <pthread.h>	/* pthread API			  */
+#include <semaphore.h>
+#include <stdbool.h>
+#include <pthread.h>
 #include <sys/types.h>  /* getpid, kill			  */
-#include <sys/wait.h>	/* wait					  */
-#include <fcntl.h>      /* For O_* constants 	  */
-#include <sys/stat.h>   /* For mode constants 	  */
+#include <sys/wait.h>
+#include <fcntl.h>           /* For O_* constants */
+#include <sys/stat.h>        /* For mode constants */
 
 #include "scheduler.h" /* scheduler API */
 #include "uid.h"
 
-static const char *process_files[] = {"./main_app.Debug.out", "./watch.Debug.out"};
+static const char *process_files[] = {"./main_app.Debug.out", "./watch_dog.Debug.out"};
 
 typedef struct keep_alive_info
 {
@@ -28,81 +28,77 @@ typedef struct keep_alive_info
 
 }keep_alive_info_t;
 
-/* function declarations */
 void Sigusr1Handler(int signal_num, siginfo_t *info, void *context);
-void Sigusr2Handler(int signal_num, siginfo_t *info, void *context);
 void *KeepAlive(void *arg);
 keep_alive_info_t *InitThreadInfo(char **argv, pid_t pid, int creator);
 int CreateProcess(keep_alive_info_t *thread_info);
 
-static sig_atomic_t shut_down_g = false;
 static sig_atomic_t are_u_there_g = false;
-static sig_atomic_t partner_pid_g = 0;
 
 int MMI(char **argv)
 {
-	struct sigaction sigusr1action;
 	struct sigaction sigusr2action;
 	pid_t pid = 0;
 	keep_alive_info_t *thread_info = NULL;
 	int creator = 0;
 	pthread_t t;
 
-	/* initializing signal handler 1 */
-	sigusr1action.sa_sigaction = Sigusr1Handler;
-	sigusr1action.sa_flags = SA_SIGINFO; 
-	sigemptyset(&sigusr1action.sa_mask);
-	sigaction(SIGUSR1, &sigusr1action, NULL);
-
-	/* initializing signal handler 2 */
-	sigusr2action.sa_sigaction = Sigusr2Handler;
-	sigusr2action.sa_flags = SA_SIGINFO;
+	/* initializing signal handler */
+	sigusr2action.sa_sigaction = Sigusr1Handler;
+	sigusr2action.sa_flags = SA_SIGINFO; 
 	sigemptyset(&sigusr2action.sa_mask);
-	sigaction(SIGUSR2, &sigusr2action, NULL);
+	sigaction(SIGUSR1, &sigusr2action, NULL);
 
-	/* checks if the user's env does't exists, if so fork and exec WD process */
+	/* checks if the user's env  not exists, if so fork and exec WD process */
 	if(!getenv("VAR"))
 	{
-	 	if (0 != putenv("VAR=1"))
-		{
-			return(1);
-		}
+	 	putenv("VAR=1");
 		pid = fork();
-		creator = 1;
 
+	
 		if (-1 == pid)
 		{
 			exit(1);
 		}
 		else if(pid == 0) /* in child process */
 		{
-			if (-1 == execlp("./watch.Debug.out", "./watch.Debug.out", NULL))
+			execlp("watch.Debug.out", "watch.Debug.out", NULL);
+			puts("exec failed");
+			exit(1);
+		}
+		else if (pid > 0) /* in parent process */
+		{
+			creator = 1;
+			
+			if (NULL == thread_info)
 			{
-				perror("execlp: execlp failed");
-				exit(1);
+				perror("error: init thread_info failed");
+				return 1;
 			}
-		}		
-	}
 
-	if (pid == 0)
+		/*	pthread_create(&t, NULL, KeepAlive, thread_info); to communicate with WD */
+			/*pthread_join(t, NULL);*/			
+		}
+	} 	
+	/*else
 	{
-		pid = getppid();
-	}
+ 		puts("env exist");
+		thread_info = InitThreadInfo(argv, getppid(), 0);
+		if (NULL == thread_info)
+		{
+			perror("error: init thread_info failed");
+			return 1;
+		}
 
-	partner_pid_g = pid;
-	thread_info = InitThreadInfo(argv, partner_pid_g, creator);
-	if (NULL == thread_info)
-	{
-		exit(1);
-	}
-
-	if (0 != pthread_create(&t, NULL, KeepAlive, thread_info))
-	{
-		SchDestroy(thread_info->sched);
-		free(thread_info);
-		perror("pthread_create: pthread_create failed");
-		exit(1);
-	}
+		puts("child was born");
+		
+		pthread_join(t, NULL);
+	}*/
+	thread_info = InitThreadInfo(argv, pid, creator);
+	pthread_create(&t, NULL, KeepAlive, thread_info);
+	/*SchDestroy(thread_info->sched);
+	sem_unlink("/sem");
+	free(thread_info);*/
 
 	return 0;
 }
@@ -114,7 +110,8 @@ void Sigusr1Handler(int signal_num, siginfo_t *info, void *context)
 	(void)context;	
 
 	are_u_there_g = true;
-	puts("pulse checked");
+	__atomic_store_n(&are_u_there_g, 1, __ATOMIC_SEQ_CST);
+	puts("flag was raised");
 }
 
 int SendPulse(sch_t *sch, unique_id_t uid, void *param) /* task 1 */
@@ -125,49 +122,38 @@ int SendPulse(sch_t *sch, unique_id_t uid, void *param) /* task 1 */
 	(void)sch;
 	(void)uid;
 	
-	printf("pulse sent (task1) to %d\n", (int)partner_pid); 
-
 	kill(partner_pid, SIGUSR1);
+	printf("massage was sent to process %d\n", (int)partner_pid);
 
 	return 1;
 }
 int CheckPulse(sch_t *sch, unique_id_t uid, void *param) /* task 2 */
 {
 	keep_alive_info_t *thread_info = (keep_alive_info_t*)param;
-	pid_t partner_pid = thread_info->pid;
 
 	(void)sch;
 	(void)uid;
+	
 
-	 printf("in task2, the pid is: %d\n", (int)getpid()); 
-
-	if (shut_down_g == true)
-	{
-		/* free everything */
-		SchDestroy(thread_info->sched);
-		free(thread_info);
-		thread_info = NULL;
-		sem_post(thread_info->sem);
-		kill(partner_pid, SIGUSR2);
-		
-		pthread_exit(NULL);
-		puts("passed 'pthread_exit'"); 
-		/*exit(0);*/
-	}
+	puts("in task2");
 
 	if (are_u_there_g == true)
 	{
 		are_u_there_g = false;
+		 __atomic_store_n(&are_u_there_g, 0, __ATOMIC_SEQ_CST);
+		puts("got the massage");
 	}
 	else
 	{
+		/* resurrect the dead process */
 		puts("the process is dead");
+		/*
+		fork + exec
+		sem_wait
 		
+		*/
 		CreateProcess(thread_info);
-		if (-1 == sem_wait(thread_info->sem))
-		{
-			exit(1);
-		}
+		sem_wait(thread_info->sem);
 	}
 
 	return 1;
@@ -177,26 +163,19 @@ void *KeepAlive(void *arg)
 {
 	keep_alive_info_t *thread_info = (keep_alive_info_t*)arg;
 
-	SchTimerStart(thread_info->sched, 1, SendPulse, thread_info);
-	SchTimerStart(thread_info->sched, 3, CheckPulse, thread_info);
+	
 
 	if (thread_info->creator == 1)
 	{
-		printf("pid in thread (wait): %d\n", (int)getpid());
-		if (-1 == sem_wait(thread_info->sem))
-		{
-			exit(1);
-		}		
+		sem_wait(thread_info->sem);
 	}
 	else
 	{
-		if (-1 == sem_post(thread_info->sem))
-		{
-			exit(1);
-		}
+		sem_post(thread_info->sem);
 	}
 
 	SchRun(thread_info->sched);
+	
 
 	return (NULL);
 }
@@ -214,6 +193,8 @@ keep_alive_info_t *InitThreadInfo(char **argv, pid_t pid, int creator)
 
 	thread_info->sched = SchCreate();
 
+	SchTimerStart(thread_info->sched, 2, SendPulse, thread_info);
+	SchTimerStart(thread_info->sched, 2, CheckPulse, thread_info);
 
 	if (NULL == thread_info->sched)
 	{
@@ -221,7 +202,7 @@ keep_alive_info_t *InitThreadInfo(char **argv, pid_t pid, int creator)
 		return (NULL);
 	}
 
-	thread_info->sem = sem_open("/sem", O_CREAT | O_EXCL, 0664, 0);
+	thread_info->sem = sem_open("/sem", O_CREAT, 0664, 0);
 
 	if (NULL == thread_info->sem)
 	{
@@ -233,26 +214,13 @@ keep_alive_info_t *InitThreadInfo(char **argv, pid_t pid, int creator)
 	thread_info->argv = argv;
 	thread_info->pid = pid;
 	thread_info->creator = creator;
-	
-	
+
 	return (thread_info);
-}
-
-void Sigusr2Handler(int signal_num, siginfo_t *info, void *context)
-{
-	(void)signal_num;
-	(void)info;
-	(void)context;	
-
-	shut_down_g = true;
 }
 
 void DNR()
 {
-	sem_t *sem = sem_open("/sem", O_CREAT, 0664, 0);
 
-	kill(partner_pid_g, SIGUSR2);
-	sem_wait(sem);
 }
 
 int CreateProcess(keep_alive_info_t *thread_info)
@@ -261,7 +229,7 @@ int CreateProcess(keep_alive_info_t *thread_info)
     int is_user_app = 0;
 	char **argv = thread_info->argv;
 
-    /* creates watchdog process */
+    /* create watchdog process */
     child_pid = fork();
 
     if(-1 == child_pid)
@@ -271,20 +239,20 @@ int CreateProcess(keep_alive_info_t *thread_info)
     if(0 == child_pid)
     {
 		puts("creating new process");
-        /* checks if argv is equal to user app file - "./app.Debug.out" */
+        /* check if argv is equal to user app file - "./app.Debug.out" */
        is_user_app = !strcmp(process_files[0], argv[0]);
 
         /* exec process to the right program - if the process is user app - run 
         watchdog. if the process is watchdog - run user app */
        if (-1 == execlp(process_files[is_user_app], process_files[is_user_app], NULL))
        {
-			perror("failed to create process");
+			puts("failed to create process");
             return(1);
-       }	
+       }
+		puts("failed to create process");
     }
 
-	printf("pid of new process: %d\n", (int)child_pid);
-	thread_info->pid = child_pid;
+   thread_info->pid = child_pid;
 
     return(0);
 }
