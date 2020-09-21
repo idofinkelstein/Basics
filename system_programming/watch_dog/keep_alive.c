@@ -48,6 +48,8 @@ int MMI(char **argv)
 	int creator = 0;
 	pthread_t t;
 
+
+	printf("process's pid is: %d\n", (int)getpid());
 	/* initializing signal handler 1 */
 	sigusr1action.sa_sigaction = Sigusr1Handler;
 	sigusr1action.sa_flags = SA_SIGINFO; 
@@ -69,6 +71,7 @@ int MMI(char **argv)
 		}
 		pid = fork();
 		creator = 1;
+		printf("child pid is: %d\n", (int)pid);
 
 		if (-1 == pid)
 		{
@@ -89,6 +92,7 @@ int MMI(char **argv)
 		pid = getppid();
 	}
 
+
 	partner_pid_g = pid;
 	thread_info = InitThreadInfo(argv, partner_pid_g, creator);
 	if (NULL == thread_info)
@@ -96,8 +100,10 @@ int MMI(char **argv)
 		exit(1);
 	}
 
+	
 	if (0 != pthread_create(&t, NULL, KeepAlive, thread_info))
 	{
+	
 		SchDestroy(thread_info->sched);
 		free(thread_info);
 		perror("pthread_create: pthread_create failed");
@@ -135,6 +141,7 @@ int CheckPulse(sch_t *sch, unique_id_t uid, void *param) /* task 2 */
 {
 	keep_alive_info_t *thread_info = (keep_alive_info_t*)param;
 	pid_t partner_pid = thread_info->pid;
+	sem_t *sem = thread_info->sem;
 
 	(void)sch;
 	(void)uid;
@@ -143,16 +150,12 @@ int CheckPulse(sch_t *sch, unique_id_t uid, void *param) /* task 2 */
 
 	if (shut_down_g == true)
 	{
-		/* free everything */
+		SchStop(thread_info->sched);
 		SchDestroy(thread_info->sched);
 		free(thread_info);
-		thread_info = NULL;
-		sem_post(thread_info->sem);
-		kill(partner_pid, SIGUSR2);
-		
-		pthread_exit(NULL);
-		puts("passed 'pthread_exit'"); 
-		/*exit(0);*/
+		sem_post(sem);
+		kill(partner_pid, SIGUSR2);		
+		pthread_exit(NULL); 
 	}
 
 	if (are_u_there_g == true)
@@ -179,6 +182,8 @@ void *KeepAlive(void *arg)
 
 	SchTimerStart(thread_info->sched, 1, SendPulse, thread_info);
 	SchTimerStart(thread_info->sched, 3, CheckPulse, thread_info);
+
+		puts("hi");
 
 	if (thread_info->creator == 1)
 	{
@@ -221,11 +226,11 @@ keep_alive_info_t *InitThreadInfo(char **argv, pid_t pid, int creator)
 		return (NULL);
 	}
 
-	thread_info->sem = sem_open("/sem", O_CREAT | O_EXCL, 0664, 0);
+	thread_info->sem = sem_open("/sem", O_CREAT, 0664, 0);
 
 	if (NULL == thread_info->sem)
 	{
-		free(thread_info->sched);
+		SchDestroy(thread_info->sched);
 		free(thread_info);
 		return (NULL);
 	}
@@ -253,6 +258,8 @@ void DNR()
 
 	kill(partner_pid_g, SIGUSR2);
 	sem_wait(sem);
+	sem_close(sem);
+	sem_unlink("/sem");
 }
 
 int CreateProcess(keep_alive_info_t *thread_info)

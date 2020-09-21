@@ -15,7 +15,7 @@ int main(int argc, char **argv)
 
 	MMI(argv);
 
-	for (i = 0; i < 20; ++i)
+	for (i = 0; i < 12; ++i)
 	sleep(1);
 	
 	puts("main process terminated properly");
