@@ -5,10 +5,10 @@
 ROOT_DIR = ../..
 
 #PROJ_SRCS = $(wildcard *.c)
-PROJ_SRCS = shuffle.c shuffle_test.c
+PROJ_SRCS = shuffle.c shuffle_test.c merge_sort.c bubble_sort.c insertion_sort.c selection_sort.c
 
 # list of directories containing header files
-PROJ_INC_DIR =
+PROJ_INC_DIR = $(ROOT_DIR)/ds/sort
 
 # the executable file
 PROJ_OUT = shuffle.out
@@ -31,6 +31,6 @@ PROJ_LIBS =
 PROJ_LDFLAGS = -pthread
 
 # list of projects (makefiles) this project depends on
-PROJ_DEPENDS  =
+PROJ_DEPENDS  = $(ROOT_DIR)/ds/sort/Makefile
 
 include $(ROOT_DIR)/make/Project.mak

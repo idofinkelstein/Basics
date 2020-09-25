@@ -4,6 +4,7 @@ Author: Ido Finkelstein
 Reviewer: Shiran Hodeda
 Data: 17/7/2020
 **********************/
+#define _GNU_SOURCE
 
 #include <stdio.h>   /* printf, puts */
 #include <stdlib.h>  /* malloc, free */
@@ -12,7 +13,7 @@ Data: 17/7/2020
 
 #include "sort.h"
 
-#define _GNU_SOURCE
+
 
 /* compare function declarations */
 int Compare(const void *data1, const void *data2, void *param);

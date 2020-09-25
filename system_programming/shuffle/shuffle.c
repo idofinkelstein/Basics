@@ -1,12 +1,14 @@
 
 #include <stdio.h> 			/* printf, puts, fopen, fread, fclose */
-#include <stdlib.h> 		/* malloc, free, rand, qsort 			   */
+#include <stdlib.h> 		/* malloc, free, rand, QSort 			   */
 #include <string.h> 		/* strlen, memcpy 						   */
 #include <strings.h>		/* strcasecmp 							   */
 #include <pthread.h> 		/* pthread_create, pthread_join 	   */
 #include <sys/types.h> 	/* stat, struct stat 						   */
 #include <sys/stat.h> 	/* stat, struct stat						   */
 #include <unistd.h> 		/* stat, struct stat 						   */
+
+#include "shuffle.h"
 
 typedef struct thread_info
 {
@@ -23,16 +25,22 @@ char **CreatePointersArray(char *array, size_t num_of_words, size_t dup);
 int Mix(const void *data1, const void *data2);
 char *ReadDic(size_t num_of_chars, size_t *num_of_words);
 int StrCaseCmpWrapper(const void *data1, const void *data2);
+int StrCaseCmpWrapper2(const void *data1, const void *data2, void *param);
 void* Qsort_wraper(void *data);
-void* MT_Qsort(void *arr,
-			 		   size_t nmemb,
-			 		   size_t num_of_threads);
+void* MergeSortWraper(void *data);
+void* SelectionSortWraper(void *data);
+void* InsertionSortWraper(void *data);
+void* BubbleSortWraper(void *data);
+void* MT_Sort(void *arr,
+			 		  size_t nmemb,
+			 		  size_t num_of_threads,
+					  int sorting_alghorithm);
 
 int Merge(thread_info_t *arrays, size_t num_of_arrays);
 void SwapBytes(char *byte1, char *byte2, size_t n_bytes);
 /*---------------------------------------------------------------------------*/
 
-void *ShuffleAndSort(size_t num_of_threads)
+void *ShuffleAndSort(size_t num_of_threads, int sorting_alghorithm)
 {
 	char *file_name = "/usr/share/dict/american-english";
 	char *dict = NULL;
@@ -58,9 +66,10 @@ void *ShuffleAndSort(size_t num_of_threads)
 	qsort(p_arr, dup * num_of_words, sizeof(char*), Mix);
 
 	/* sorts sections of p_arr separately as the number of threads and merges them */
-	MT_Qsort(p_arr,
+	MT_Sort(p_arr,
 					dup * num_of_words,
-					num_of_threads);
+					num_of_threads, 
+					sorting_alghorithm);
 
 	for (i = 0; i < num_of_words * dup; ++i)
 	{
@@ -164,9 +173,10 @@ char **CreatePointersArray(char *array, size_t num_of_words, size_t dup)
 
 /*---------------------------------------------------------------------------*/
 
-void* MT_Qsort(void *arr,
-					   size_t nmemb,
-			 		   size_t num_of_threads)
+void* MT_Sort(void *arr,
+					  size_t nmemb,
+			 		  size_t num_of_threads,
+					  int sorting_alghorithm)
 {
 	thread_info_t *info = NULL;
 	int status = 0;
@@ -175,6 +185,25 @@ void* MT_Qsort(void *arr,
 	size_t elem_reminder = nmemb % num_of_threads;
 	size_t elem_correction = elem_in_thread + elem_reminder;
 	char **p_arr = (char**)arr;
+	void* (*sorting_func)(void*)  =  Qsort_wraper;
+
+	switch (sorting_alghorithm)
+	{
+		case 1:
+			sorting_func = MergeSortWraper;
+			break;
+		case 2:
+			sorting_func = BubbleSortWraper;
+			break;
+		case 3:
+			sorting_func = InsertionSortWraper;
+			break;
+		case 4:
+			sorting_func = SelectionSortWraper;
+			break;
+		default:
+			break;
+	}
 
 	info = (thread_info_t*)malloc(sizeof(thread_info_t) * num_of_threads);
 
@@ -194,7 +223,7 @@ void* MT_Qsort(void *arr,
 
 		elem_correction = elem_in_thread;
 
-		status = pthread_create(&(info + i)->thread, NULL, Qsort_wraper, info + i);
+		status = pthread_create(&(info + i)->thread, NULL, sorting_func, info + i);
 	}
 
 	if (status)
@@ -226,7 +255,53 @@ void* Qsort_wraper(void *data)
 
 	return (arr);
 }
+/*---------------------------------------------------------------------------*/
 
+void* MergeSortWraper(void *data)
+{
+	thread_info_t *info = (thread_info_t*)data;
+	size_t word_in_thread = info->words_in_thread;
+	char** arr = info->p_arr;
+
+	MergeSort(arr, word_in_thread, sizeof(char*), StrCaseCmpWrapper2 ,NULL);
+
+	return (arr);
+}
+/*---------------------------------------------------------------------------*/
+
+void* BubbleSortWraper(void *data)
+{
+	thread_info_t *info = (thread_info_t*)data;
+	size_t word_in_thread = info->words_in_thread;
+	char** arr = info->p_arr;
+
+	BubbleSort(arr, word_in_thread, sizeof(char*), StrCaseCmpWrapper2 ,NULL);
+
+	return (arr);
+}
+/*---------------------------------------------------------------------------*/
+
+void* InsertionSortWraper(void *data)
+{
+	thread_info_t *info = (thread_info_t*)data;
+	size_t word_in_thread = info->words_in_thread;
+	char** arr = info->p_arr;
+
+	InsertionSort(arr, word_in_thread, sizeof(char*), StrCaseCmpWrapper2 ,NULL);
+
+	return (arr);
+}
+/*---------------------------------------------------------------------------*/
+void* SelectionSortWraper(void *data)
+{
+	thread_info_t *info = (thread_info_t*)data;
+	size_t word_in_thread = info->words_in_thread;
+	char** arr = info->p_arr;
+
+	SelectionSort(arr, word_in_thread, sizeof(char*), StrCaseCmpWrapper2 ,NULL);
+
+	return (arr);
+}
 /*---------------------------------------------------------------------------*/
 
 int Merge(thread_info_t *arrays, size_t num_of_arrays)
@@ -291,6 +366,14 @@ int Mix(const void *data1, const void *data2)
 
 int StrCaseCmpWrapper(const void *data1, const void *data2)
 {
+	return (strcasecmp(*(const char**)data1, *(const char**)data2));
+}
+/*---------------------------------------------------------------------------*/
+
+int StrCaseCmpWrapper2(const void *data1, const void *data2, void *param)
+{
+	(void)param;
+
 	return (strcasecmp(*(const char**)data1, *(const char**)data2));
 }
 /*---------------------------------------------------------------------------*/
