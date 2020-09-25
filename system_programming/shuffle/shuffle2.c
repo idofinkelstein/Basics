@@ -16,12 +16,13 @@ typedef struct thread_info
 
 }thread_info_t;
 
-typedef struct index_limit
+typedef struct arr_info
 {
-	size_t start;
-	size_t end;
+	char **arr;
+	size_t stop_index;
+	size_t curr_index;
 
-}index_limit_t;
+}arr_info_t;
 
 /* Function Declarations */
 char **CreatePointersArray(char *array, size_t num_of_words, size_t dup);
@@ -35,6 +36,7 @@ void* MT_Qsort(void *arr,
 			  size_t num_of_threads);
 
 void Merge(char **sorted, size_t num_of_words, size_t num_of_threads);
+void SwapBytes(char *byte1, char *byte2, size_t n_bytes);
 
 void *ShuffleAndSort(size_t num_of_threads)
 {
@@ -157,6 +159,7 @@ void* MT_Qsort(void *arr,
 			  size_t num_of_threads)
 {
 	thread_info_t *info = NULL;
+	int status = 0;
 	size_t i = 0;
 	size_t num_of_words = nmemb;
 	size_t elem_in_thread = num_of_words / num_of_threads;
@@ -175,7 +178,7 @@ void* MT_Qsort(void *arr,
 		return (NULL);
 	}
 
-	for(i = 0; i < num_of_threads; ++i)
+	for(i = 0; i < num_of_threads && !status; ++i)
 	{
 		(info + i)->p_arr = p_arr;
 		(info + i)->words_in_thread = elem_correction;
@@ -183,7 +186,13 @@ void* MT_Qsort(void *arr,
 
 		elem_correction = elem_in_thread;
 
-		pthread_create(&(info + i)->thread, NULL, Qsort_wraper, info + i);
+		status = pthread_create(&(info + i)->thread, NULL, Qsort_wraper, info + i);
+	}
+
+	if (status)
+	{
+		free(info);
+		return (NULL);
 	}
 
 	for(i = 0; i < num_of_threads; ++i)
@@ -228,10 +237,6 @@ char **CreatePointersArray(char *array, size_t num_of_words, size_t dup)
 		array = start;
 	}
 
-	/*for (i = 0; i < num_of_words * dup; ++i)
-	{
-		printf("%s\n", p_arr[i]);
-	}*/
 
 	return (p_arr);
 }
@@ -283,62 +288,77 @@ void GetNumOfWordsAndCharacters(size_t *num_of_words, size_t *num_of_chars)
 
 void Merge(char **sorted, size_t num_of_words, size_t num_of_threads)
 {
+	arr_info_t *to_merge = NULL;
 	char **merged = NULL;
-	index_limit_t *index = NULL;
 	size_t elem_in_thread = num_of_words / num_of_threads;
 	size_t elem_reminder = num_of_words % num_of_threads;
 	size_t elem_correction = elem_in_thread + elem_reminder;
 	size_t i = 0;
 	size_t j = 0;
-	size_t min_index = 0;
 	size_t num_of_index = 0;
 	
+	to_merge = (arr_info_t*)malloc(num_of_words * sizeof(arr_info_t));
+
+	if (NULL == to_merge)
+	{
+		return;
+	}
+
 	merged = (char**)malloc(num_of_words * sizeof(char*));
 
 	if (NULL == merged)
 	{
+		free(to_merge);
 		return;
 	}
 
-	index = (index_limit_t*)malloc(num_of_threads * sizeof(index_limit_t));
-
-	if (NULL == index)
-	{
-		free(merged);
-		return;
-	}
-
-	index->start = 0;
-	index->end = elem_correction;
+	to_merge->arr = sorted;
+	to_merge->stop_index = elem_correction;
+	(to_merge)->curr_index =  0;
+	
 	for (i =  1; i < num_of_threads; ++i)
 	{
-		(index + i)->start = elem_correction;
-		(index + i)->end = (index + i)->start + elem_correction;
+		(to_merge + i)->arr = sorted + elem_correction;
+		(to_merge + i)->curr_index =  0;
 		elem_correction += elem_in_thread;
+
+		(to_merge + i)->stop_index = elem_in_thread;
+
 	}
-
+		 
 	for (i = 0; i < num_of_words; ++i)
-	{
-		min_index = (index + 0)->start;
-		num_of_index = 0;
+	{		
+		char *elem = "\xFF";
 
-		for (j = 0; j < num_of_threads - 1; ++j)
+		for (j = 0; j < num_of_threads; ++j)
 		{
-			if ((index + j)->start < (index + j)->end 		  &&
-				(index + j + 1)->start < (index + j + 1)->end &&
-				0 < StrCaseCmpWrapper(&sorted[(index + j)->start], &sorted[(index + j + 1)->start]))
+			if ((to_merge + j)->curr_index < (to_merge + j)->stop_index &&
+				0 < StrCaseCmpWrapper(&elem , &(to_merge + j)->arr[(to_merge + j)->curr_index]))
 			{
-				min_index = (index + j + 1)->start;
-				num_of_index = j + 1;
+				elem = (to_merge + j)->arr[(to_merge + j)->curr_index];
+				num_of_index = j;
 			}
 		}
-
-		merged[i] = sorted[min_index];
-		++(index + num_of_index)->start;
+		merged[i] = elem;
+		++(to_merge + num_of_index)->curr_index;
 	}
 
 	memcpy(sorted, merged, num_of_words * sizeof(char*));
 
 	free(merged);
-	free(index);
+	free(to_merge);
+}
+
+void SwapBytes(char *byte1, char *byte2, size_t n_bytes)
+{
+	char temp = 0;
+
+	while (n_bytes)
+	{
+		temp = *byte1; 
+   	 	*byte1++ = *byte2;
+    	*byte2++ = temp;
+
+		--n_bytes;
+	}
 }

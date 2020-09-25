@@ -1,42 +1,36 @@
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <strings.h>
-#include <pthread.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#include <stdio.h> 			/* printf, puts, fopen, fread, fclose */
+#include <stdlib.h> 		/* malloc, free, rand, qsort 			   */
+#include <string.h> 		/* strlen, memcpy 						   */
+#include <strings.h>		/* strcasecmp 							   */
+#include <pthread.h> 		/* pthread_create, pthread_join 	   */
+#include <sys/types.h> 	/* stat, struct stat 						   */
+#include <sys/stat.h> 	/* stat, struct stat						   */
+#include <unistd.h> 		/* stat, struct stat 						   */
 
 typedef struct thread_info
 {
 	char **p_arr;
-	size_t words_in_thread;
+	size_t words_in_thread; 
+	size_t index;
 	pthread_t thread;
 
 }thread_info_t;
 
-typedef struct arr_info
-{
-	char **arr;
-	size_t stop_index;
-	size_t curr_index;
-
-}arr_info_t;
 
 /* Function Declarations */
 char **CreatePointersArray(char *array, size_t num_of_words, size_t dup);
-int Compare(const void *data1, const void *data2);
+int Mix(const void *data1, const void *data2);
 char *ReadDic(size_t num_of_chars, size_t *num_of_words);
-void GetNumOfWordsAndCharacters(size_t *num_of_words, size_t *num_of_chars);
 int StrCaseCmpWrapper(const void *data1, const void *data2);
 void* Qsort_wraper(void *data);
 void* MT_Qsort(void *arr,
-			  size_t nmemb,
-			  size_t num_of_threads);
+			 		   size_t nmemb,
+			 		   size_t num_of_threads);
 
-void Merge(char **sorted, size_t num_of_words, size_t num_of_threads);
+int Merge(thread_info_t *arrays, size_t num_of_arrays);
 void SwapBytes(char *byte1, char *byte2, size_t n_bytes);
+/*---------------------------------------------------------------------------*/
 
 void *ShuffleAndSort(size_t num_of_threads)
 {
@@ -46,32 +40,29 @@ void *ShuffleAndSort(size_t num_of_threads)
 	size_t num_of_words = 0;
 	size_t num_of_chars = 0;
 	size_t i = 0;
-	size_t dup = 3;
+	size_t dup = 5; 	   /* amount of duplications */
 	struct stat statbuf; /* obtains file size from stat() */
 	
 	stat(file_name, &statbuf);
 	num_of_chars = (size_t)statbuf.st_size;
 
+	/* reads all words in dictionary to a buffer */
+	/* this function also gets the number of words in dictionary through
+	   num_of_words parameter */
 	dict = ReadDic(num_of_chars, &num_of_words);
 
-	printf("chars = %ld\n", num_of_chars);
-	printf("words = %ld\n", num_of_words);	
-
+	/* creates array of pointers to the words in buffer and duplicates it dup times */
 	p_arr = CreatePointersArray(dict, num_of_words, dup);
 
-	qsort(p_arr, dup * num_of_words, sizeof(char*), Compare);
+	/* mixes the words */
+	qsort(p_arr, dup * num_of_words, sizeof(char*), Mix);
 
-	/*for (i = 0; i < num_of_words * 3; ++i)
-	{
-		printf("%s\n", p_arr[i]);
-	}*/
-
-
+	/* sorts sections of p_arr separately as the number of threads and merges them */
 	MT_Qsort(p_arr,
-			 dup * num_of_words,
-			 num_of_threads);
+					dup * num_of_words,
+					num_of_threads);
 
-	for (i = 0; i < num_of_words * 3; ++i)
+	for (i = 0; i < num_of_words * dup; ++i)
 	{
 		printf("%s\n", p_arr[i]);
 	}
@@ -97,7 +88,7 @@ char *ReadDic(size_t num_of_chars, size_t *num_of_words)
 	/* checks if successeded to open file */
 	if(NULL != file_ptr)
 	{
-		puts("SECCESS");
+		puts("SUCCESS");
 	}
 	else
 	{
@@ -139,76 +130,7 @@ char *ReadDic(size_t num_of_chars, size_t *num_of_words)
 
 	return (start);
 }
-
 /*---------------------------------------------------------------------------*/
-
-void* Qsort_wraper(void *data)
-{
-	thread_info_t *info = (thread_info_t*)data;
-	size_t word_in_thread = info->words_in_thread;
-	char** arr = info->p_arr;
-
-	qsort(arr, word_in_thread, sizeof(char*), StrCaseCmpWrapper);
-
-	return (arr);
-}
-/*---------------------------------------------------------------------------*/
-
-void* MT_Qsort(void *arr,
-			  size_t nmemb,
-			  size_t num_of_threads)
-{
-	thread_info_t *info = NULL;
-	int status = 0;
-	size_t i = 0;
-	size_t num_of_words = nmemb;
-	size_t elem_in_thread = num_of_words / num_of_threads;
-	size_t elem_reminder = num_of_words % num_of_threads;
-	size_t elem_correction = elem_in_thread + elem_reminder;
-	char **p_arr = (char**)arr;
-
-	printf("elem in thr = %ld\n", elem_in_thread);
-	printf("elem in thr + reminder = %ld\n", elem_correction);	
-	printf("reminder = %ld\n", elem_reminder);	
-
-	info = (thread_info_t*)malloc(sizeof(thread_info_t) * num_of_threads);
-
-	if (info == NULL)
-	{
-		return (NULL);
-	}
-
-	for(i = 0; i < num_of_threads && !status; ++i)
-	{
-		(info + i)->p_arr = p_arr;
-		(info + i)->words_in_thread = elem_correction;
-		p_arr += elem_correction;
-
-		elem_correction = elem_in_thread;
-
-		status = pthread_create(&(info + i)->thread, NULL, Qsort_wraper, info + i);
-	}
-
-	if (status)
-	{
-		free(info);
-		return (NULL);
-	}
-
-	for(i = 0; i < num_of_threads; ++i)
-	{
-		pthread_join((info + i)->thread, NULL);
-	}
-	
-	/*Merge(arr, num_of_words, num_of_threads);*/
-
-	free(info);
-
-	return (arr);
-}
-
-/*---------------------------------------------------------------------------*/
-
 
 char **CreatePointersArray(char *array, size_t num_of_words, size_t dup)
 {
@@ -237,153 +159,150 @@ char **CreatePointersArray(char *array, size_t num_of_words, size_t dup)
 		array = start;
 	}
 
-	/*for (i = 0; i < num_of_words * dup; ++i)
-	{
-		printf("%s\n", p_arr[i]);
-	}*/
-
 	return (p_arr);
 }
 
 /*---------------------------------------------------------------------------*/
-int Compare(const void *data1, const void *data2)
+
+void* MT_Qsort(void *arr,
+					   size_t nmemb,
+			 		   size_t num_of_threads)
+{
+	thread_info_t *info = NULL;
+	int status = 0;
+	size_t i = 0;
+	size_t elem_in_thread = nmemb / num_of_threads;
+	size_t elem_reminder = nmemb % num_of_threads;
+	size_t elem_correction = elem_in_thread + elem_reminder;
+	char **p_arr = (char**)arr;
+
+	info = (thread_info_t*)malloc(sizeof(thread_info_t) * num_of_threads);
+
+	if (info == NULL)
+	{
+		return (NULL);
+	}
+
+	/* assigns relevant data to info array to pass to thread's function */
+	/* info[o] gets extra words because of the reminder 					  */
+	for(i = 0; i < num_of_threads && !status; ++i)
+	{
+		(info + i)->p_arr = p_arr;
+		(info + i)->index = 0;
+		(info + i)->words_in_thread = elem_correction;
+		p_arr += elem_correction;
+
+		elem_correction = elem_in_thread;
+
+		status = pthread_create(&(info + i)->thread, NULL, Qsort_wraper, info + i);
+	}
+
+	if (status)
+	{
+		free(info);
+		return (NULL);
+	}
+
+	for(i = 0; i < num_of_threads; ++i)
+	{
+		pthread_join((info + i)->thread, NULL);
+	}
+	
+	Merge(info, num_of_threads);
+
+	free(info);
+
+	return (arr);
+}
+/*---------------------------------------------------------------------------*/
+
+void* Qsort_wraper(void *data)
+{
+	thread_info_t *info = (thread_info_t*)data;
+	size_t word_in_thread = info->words_in_thread;
+	char** arr = info->p_arr;
+
+	qsort(arr, word_in_thread, sizeof(char*), StrCaseCmpWrapper);
+
+	return (arr);
+}
+
+/*---------------------------------------------------------------------------*/
+
+int Merge(thread_info_t *arrays, size_t num_of_arrays)
+{
+	char **merged = NULL;
+	size_t num_of_words = 0;
+	size_t i = 0;
+	size_t j = 0;
+	size_t num_of_index = 0;
+	
+	for (i = 0; i < num_of_arrays; ++i)
+	{
+		num_of_words += (arrays + i)->words_in_thread;
+	}
+	
+	/* temporary buffer for the merged arrays */ 
+	merged = (char**)malloc(num_of_words * sizeof(char*));
+
+	if (NULL == merged)
+	{
+		return 1;
+	}
+
+	for (i = 0; i < num_of_words; ++i)
+	{		
+		char *elem = "\xFF"; /* string of 1 char with the heighest ascii value */
+
+		for (j = 0; j < num_of_arrays; ++j)
+		{
+			/* checks if current index is in bound and compares the corresponding
+				element */
+			if ((arrays + j)->index < (arrays + j)->words_in_thread &&
+				0 < StrCaseCmpWrapper(&elem , &(arrays + j)->p_arr[(arrays + j)->index]))
+			{
+				elem = (arrays + j)->p_arr[(arrays + j)->index];
+
+				/* saves the index of smallest element for incrementing
+					corresopnding array index*/
+				num_of_index = j;
+			}
+		}
+		merged[i] = elem;
+		++(arrays + num_of_index)->index;
+	}
+
+	memcpy(arrays->p_arr, merged, num_of_words * sizeof(char*));
+
+	free(merged);
+
+	return 0;
+}
+/*---------------------------------------------------------------------------*/
+
+int Mix(const void *data1, const void *data2)
 {
 	(void)data1;
 	(void)data2;
 
 	return (1 - rand() % 2);
 }
-
 /*---------------------------------------------------------------------------*/
 
-/* compares array of pointers to char (char**) */
 int StrCaseCmpWrapper(const void *data1, const void *data2)
 {
 	return (strcasecmp(*(const char**)data1, *(const char**)data2));
 }
 /*---------------------------------------------------------------------------*/
-void GetNumOfWordsAndCharacters(size_t *num_of_words, size_t *num_of_chars)
-{
-	char *file_name = "/usr/share/dict/american-english";
-	FILE *file_ptr = fopen(file_name, "r");
-	char c = '\0';
-
-	if(NULL != file_ptr)
-	{
-		puts("SECCESS");
-	}
-	else
-	{
-		puts("failed");
-		return;
-	}
-
-	while((c = fgetc(file_ptr)) && c != EOF)
-	{
-		++*num_of_chars;
-		if ('\n' == c)
-		{ 
-			++*num_of_words; 
-		}
-	}	
-
-	fclose(file_ptr);
-}
-
-void Merge(char **sorted, size_t num_of_words, size_t num_of_threads)
-{
-	arr_info_t *to_merge = NULL;
-	char **merged = NULL;
-	size_t elem_in_thread = num_of_words / num_of_threads;
-	size_t elem_reminder = num_of_words % num_of_threads;
-	size_t elem_correction = elem_in_thread + elem_reminder;
-	size_t i = 0;
-	size_t j = 0;
-	size_t start_index = 0;
-	size_t min_index = 0;
-	size_t num_of_index = 0;
-	char *elem = NULL;
-	
-	to_merge = (arr_info_t*)malloc(num_of_words * sizeof(arr_info_t));
-
-	if (NULL == to_merge)
-	{
-		return;
-	}
-
-	merged = (char**)malloc(num_of_words * sizeof(char*));
-
-	if (NULL == merged)
-	{
-		free(to_merge);
-		return;
-	}
-
-	to_merge->arr = sorted;
-	to_merge->stop_index = elem_correction;
-	
-	for (i =  1; i < num_of_threads; ++i)
-	{
-		(to_merge + i)->arr = sorted + elem_correction;
-		(to_merge + i)->curr_index =  0;
-		elem_correction += elem_in_thread;
-
-		(to_merge + i)->stop_index = elem_in_thread;
-
-	}
-		
-	for (i = 0; i < num_of_words/10; ++i)
-	{
-		min_index = (to_merge)->curr_index;
-		num_of_index = 0;
-		elem = to_merge->arr[min_index];
-
-
-
-		for (j = 0; j < num_of_threads - 1; ++j)
-		{
-			if ((to_merge + j + 1)->curr_index < (to_merge + j + 1)->stop_index &&
-				0 < StrCaseCmpWrapper(&elem , &(to_merge + j + 1)->arr[(to_merge + j + 1)->curr_index]))
-			{
-				elem = (to_merge + j + 1)->arr[(to_merge + j + 1)->curr_index];
-				min_index = (to_merge + j + 1)->curr_index;
-				num_of_index = j + 1;
-			}
-	
-
-			/*for (j = 0; j < num_of_threads - 1; ++j)
-			{
-				 if ((to_merge + j + 1)->curr_index >= (to_merge + j + 1)->stop_index)
-				{
-					SwapBytes((char*)(to_merge + j + 1), 
-									   (char*)(to_merge + num_of_threads - 1),
-										sizeof(arr_info_t));
-					--num_of_threads;
-				}
-			}*/
-
-
-		}
-		merged[i] = elem;
-		++(to_merge + num_of_index)->curr_index;
-	}
-
-	memcpy(sorted, merged, num_of_words * sizeof(char*));
-
-	/*free(merged);
-	free(to_merge);*/
-}
 
 void SwapBytes(char *byte1, char *byte2, size_t n_bytes)
 {
 	char temp = 0;
 
-	while (n_bytes)
+	while (n_bytes--)
 	{
 		temp = *byte1; 
    	 	*byte1++ = *byte2;
     	*byte2++ = temp;
-
-		--n_bytes;
 	}
 }
