@@ -1,9 +1,18 @@
+/*****************************
+File Name: shuffle.c
+Author: Ido Finkelstein
+Reviewer: 
+Date: 24/9/2020
+******************************/
+
+#define _POSIX_C_SOURCE  199309L /* clock_gettime is posix std */
 
 #include <stdio.h> 			/* printf, puts, fopen, fread, fclose */
-#include <stdlib.h> 		/* malloc, free, rand, QSort 			   */
+#include <stdlib.h> 		/* malloc, free, rand, QSort 		   */
 #include <string.h> 		/* strlen, memcpy 						   */
 #include <strings.h>		/* strcasecmp 							   */
 #include <pthread.h> 		/* pthread_create, pthread_join 	   */
+#include <time.h>			/* clock_gettime, struct timespec	   */
 #include <sys/types.h> 	/* stat, struct stat 						   */
 #include <sys/stat.h> 	/* stat, struct stat						   */
 #include <unistd.h> 		/* stat, struct stat 						   */
@@ -34,13 +43,13 @@ void* BubbleSortWraper(void *data);
 void* MT_Sort(void *arr,
 			 		  size_t nmemb,
 			 		  size_t num_of_threads,
-					  int sorting_alghorithm);
+					  int sorting_algorithm);
 
 int Merge(thread_info_t *arrays, size_t num_of_arrays);
 void SwapBytes(char *byte1, char *byte2, size_t n_bytes);
 /*---------------------------------------------------------------------------*/
 
-void *ShuffleAndSort(size_t num_of_threads, int sorting_alghorithm)
+void *ShuffleAndSort(size_t num_of_threads, int sorting_algorithm)
 {
 	char *file_name = "/usr/share/dict/american-english";
 	char *dict = NULL;
@@ -48,7 +57,7 @@ void *ShuffleAndSort(size_t num_of_threads, int sorting_alghorithm)
 	size_t num_of_words = 0;
 	size_t num_of_chars = 0;
 	size_t i = 0;
-	size_t dup = 5; 	   /* amount of duplications */
+	size_t dup = 4; 	   /* amount of duplications */
 	struct stat statbuf; /* obtains file size from stat() */
 	
 	stat(file_name, &statbuf);
@@ -69,7 +78,7 @@ void *ShuffleAndSort(size_t num_of_threads, int sorting_alghorithm)
 	MT_Sort(p_arr,
 					dup * num_of_words,
 					num_of_threads, 
-					sorting_alghorithm);
+					sorting_algorithm);
 
 	for (i = 0; i < num_of_words * dup; ++i)
 	{
@@ -95,17 +104,13 @@ char *ReadDic(size_t num_of_chars, size_t *num_of_words)
 	file_ptr = fopen(file_name, "r");
 
 	/* checks if successeded to open file */
-	if(NULL != file_ptr)
-	{
-		puts("SUCCESS");
-	}
-	else
+	if(NULL == file_ptr)
 	{
 		puts("failed");
 		return (NULL);
 	}
 
-	dict = (char*)malloc(num_of_chars);	
+	dict = (char*)malloc(num_of_chars * sizeof(char));	
 
 	if (NULL == dict)
 	{
@@ -176,7 +181,7 @@ char **CreatePointersArray(char *array, size_t num_of_words, size_t dup)
 void* MT_Sort(void *arr,
 					  size_t nmemb,
 			 		  size_t num_of_threads,
-					  int sorting_alghorithm)
+					  int sorting_algorithm)
 {
 	thread_info_t *info = NULL;
 	int status = 0;
@@ -186,8 +191,11 @@ void* MT_Sort(void *arr,
 	size_t elem_correction = elem_in_thread + elem_reminder;
 	char **p_arr = (char**)arr;
 	void* (*sorting_func)(void*)  =  Qsort_wraper;
+	clockid_t clk = 0;
+	struct timespec start;
+	struct timespec stop;
 
-	switch (sorting_alghorithm)
+	switch (sorting_algorithm)
 	{
 		case 1:
 			sorting_func = MergeSortWraper;
@@ -211,6 +219,8 @@ void* MT_Sort(void *arr,
 	{
 		return (NULL);
 	}
+
+	clock_gettime(clk, &start);
 
 	/* assigns relevant data to info array to pass to thread's function */
 	/* info[o] gets extra words because of the reminder 					  */
@@ -237,7 +247,11 @@ void* MT_Sort(void *arr,
 		pthread_join((info + i)->thread, NULL);
 	}
 	
+	clock_gettime(clk, &stop);
+
 	Merge(info, num_of_threads);
+
+	printf("time measured = %f\n", ((double)stop.tv_nsec - start.tv_nsec)/10e8);
 
 	free(info);
 
@@ -322,7 +336,7 @@ int Merge(thread_info_t *arrays, size_t num_of_arrays)
 
 	if (NULL == merged)
 	{
-		return 1;
+		return (EXIT_FAILURE);
 	}
 
 	for (i = 0; i < num_of_words; ++i)

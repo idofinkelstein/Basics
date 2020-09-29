@@ -28,7 +28,7 @@ PROJ_ADD_OBJS =
 PROJ_LIBS =
 
 # linker flags
-PROJ_LDFLAGS = -pthread
+PROJ_LDFLAGS = -pthread #-lrt
 
 # list of projects (makefiles) this project depends on
 PROJ_DEPENDS  = $(ROOT_DIR)/ds/sort/Makefile

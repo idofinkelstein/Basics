@@ -4,7 +4,7 @@
 
 int main()
 {
-	ShuffleAndSort(1, 4);
+	ShuffleAndSort(1, 1);
 
 	return 0;
 }
