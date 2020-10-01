@@ -26,11 +26,12 @@ Int64_t Int64(const char *val);
 
 Int64_t Int64Add(Int64_t num1, Int64_t num2);
 
-Int64_t Int64Assign(Int64_t num1, Int64_t num2);
+void Int64Assign(Int64_t *num1, Int64_t num2);
 
 Int64_t I64CompAdd(Int64_t num1, Int64_t num2);
 
 Int64_t I64Shiftl(Int64_t num, int shift);
+Int64_t I64Shiftl2(Int64_t num, int shift);
 
 int I64IsEqual(Int64_t num1, Int64_t num2);
 

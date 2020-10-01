@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "int64.h"
 
@@ -18,7 +19,6 @@ Int64_t Int64(const char *val)
 		sign = -sign;
 		++val;
 	}
-
 
 	for (i = 0; i < len; ++i)
 	{
@@ -61,6 +61,37 @@ Int64_t I64Shiftl(Int64_t num, int shift)
 	}
 
 	return (num);
+}
+
+Int64_t I64Shiftl2(Int64_t num, int shift)
+{
+	unsigned mask = ((~0u << (32 - shift)) & num.lsi) >> (32 - shift);
+	
+
+	
+
+	if (shift > 31)
+	{
+		num.msi = num.lsi << (shift -  32);
+		num.lsi = 0;
+	}
+	else
+	{
+		num.msi = (num.msi << shift) | mask;
+		num.lsi <<= shift;
+	}
+
+
+	/*printf("num.lsi = %d\n", num.lsi);*/
+
+	return (num);
+}
+
+Int64_t Int64Add(Int64_t num1, Int64_t num2)
+{
+	Int64_t res = {0, 0};
+
+	return (res);
 }
 
 static unsigned SetBit(unsigned num, int index, int state)
