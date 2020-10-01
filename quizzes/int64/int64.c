@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <stddef.h>
 #include <string.h>
 
 #include "int64.h"
@@ -57,8 +57,7 @@ Int64_t I64Shiftl(Int64_t num, int shift)
 		bit_state = BitState(num.lsi, 31);
 		num.msi = SetBit(num.msi, 0, bit_state);
 
-		num.lsi <<= 1;
-	
+		num.lsi <<= 1;	
 	}
 
 	return (num);
