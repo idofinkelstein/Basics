@@ -38,6 +38,11 @@ fsa_t *FSAInit(void *mem_pool, size_t pool_size, size_t block_size)
 	
 	assert(mem_pool);
 
+	if (pool_size < ActualBlockSize(block_size))
+	{
+		return (NULL);
+	}
+
 	/* The complement for the unalligned address */
 	padding = !((size_t)mem_pool & unalligned_address_mask) ? 
 			  0 											: 

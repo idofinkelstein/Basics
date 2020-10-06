@@ -23,7 +23,7 @@ typedef struct dhcp dhcp_t;
 *
 * Args:
 *	- net_address - the base IP address prefix for all addresses in the pool
-*   - net_mask - number of bits set in the IP address to assign.
+*   - net_mask - number of set bits in the IP address to assign.
 *
 * Return Value:
 *   - returns a hanlde to the dhcp, or NULL if failed.

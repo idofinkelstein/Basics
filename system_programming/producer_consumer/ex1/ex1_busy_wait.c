@@ -34,7 +34,7 @@ void *Producer(void *data)
 	{
 		while(flag == 1);
 
-		 __atomic_store_n (&flag, 1, __ATOMIC_SEQ_CST);
+		 __atomic_store_n(&flag, 1, __ATOMIC_SEQ_CST);
 		puts("produced");
 	}
 
@@ -49,7 +49,7 @@ void *Consumer(void *data)
 	{
 		while(flag == 0);
 		
-		 __atomic_store_n (&flag, 0, __ATOMIC_SEQ_CST);
+		 __atomic_store_n(&flag, 0, __ATOMIC_SEQ_CST);
 		puts("consumed");
 	}
 

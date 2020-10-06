@@ -13,25 +13,23 @@ size_t ListSize(node_t *head);
 
 node_t *Flip(node_t *head)
 {
-	node_t *curr = head->next;
-	node_t *next = head->next;
+	/*
+	 the idea is to keep 3 pointers - one for the current node, one for the
+	   previous node and one for the next node. (head is the previous) 
+	*/
 
-	head->next = NULL;
-	/* the idea is to keep 3 pointers - one for the current node, one for the
-	   previous node and one for the next node. (head is the previous) */
-	while(curr)
+	node_t *curr = NULL;
+	node_t *next = NULL;
+
+	while (head)
 	{
-		/* make sure i'm not incrementing a NULL pointer */
-		if (next)
-		{
-			next = curr->next;
-		}
-		curr->next = head;
-		head = curr;
-		curr = next;
+		next = head->next;
+		head->next = curr;
+		curr = head;
+		head = next;	
 	}
 
-	return (head);
+	return (curr);
 }
 
 int HasLoop(const node_t *head)

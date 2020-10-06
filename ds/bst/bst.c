@@ -34,7 +34,7 @@ struct bst_node
 	
 };
 
-bst_t *BSTtCreate(bst_cmp_func_t cmp, void *param)
+bst_t *BSTCreate(bst_cmp_func_t cmp, void *param)
 {
 	bst_t *bst = NULL;
 	bst_iter_t dummy = {NULL};

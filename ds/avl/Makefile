@@ -4,8 +4,8 @@
 # the parrent dir of "arch" dir
 ROOT_DIR = ../..
 
-PROJ_SRCS = $(wildcard *.c)
-#PROJ_SRCS = aaa.c bbb.cpp
+#PROJ_SRCS = $(wildcard *.c)
+PROJ_SRCS = avl.c avl_test.c
 
 # list of directories containing header files
 PROJ_INC_DIR =
@@ -19,7 +19,7 @@ PROJ_CFLAGS =
 PROJ_CPPFLAGS =
 
 #PROJ_MACROS = _BSD_SOURCE
-PROJ_MACROS =
+PROJ_MACROS = NDEBUG
 
 # additional object files (created by other projects)
 PROJ_ADD_OBJS =

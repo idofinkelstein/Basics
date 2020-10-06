@@ -63,7 +63,7 @@ void *Consumer(void *data)
 	{
 		pthread_mutex_lock(&consumer_mutex);
 
-		while(!SListIsEmpty(slist))
+		if(!SListIsEmpty(slist))
 		{
 			SListRemove(slist, SListBegin(slist));
 		

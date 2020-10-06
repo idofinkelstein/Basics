@@ -5,7 +5,7 @@
 ROOT_DIR = ../..
 
 #PROJ_SRCS = $(wildcard *.c)
-PROJ_SRCS = scheduler.c scheduler_test.c pqueue.c heap.c  uid.c vector.c heapify.c swap_bytes.c
+PROJ_SRCS = scheduler.c scheduler_test2.c pqueue.c heap.c  uid.c vector.c heapify.c swap_bytes.c
 
 # list of directories containing header files
 PROJ_INC_DIR = $(ROOT_DIR)/ds/uid $(ROOT_DIR)/ds/pqueue_based_heap

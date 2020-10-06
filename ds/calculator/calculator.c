@@ -5,6 +5,7 @@ Reviewer: Ori Barak
 Date: 29/7/2020
 ***********************/
 
+#include <stdio.h>
 #include <stdlib.h> /* malloc, free, strtod */
 #include <string.h> /* strlen */
 #include <assert.h>
@@ -24,11 +25,17 @@ typedef struct token
 }token_t;
 
 /* utility functions declaration */
+static void Add(f_stack_t *numbers, c_stack_t *operators);
+static void Subtruct(f_stack_t *numbers, c_stack_t *operators);
+static void Multiply(f_stack_t *numbers, c_stack_t *operators);
+static void Divide(f_stack_t *numbers, c_stack_t *operators);
 static void DoNothing(f_stack_t *numbers, c_stack_t *operators);
+
 static char *PushOperator(f_stack_t *numbers, c_stack_t *operators, char *input);
 static char *CalculateAndPushOperator(f_stack_t *numbers, c_stack_t *operators, char *input);
 static char *OpenBracket(f_stack_t *numbers, c_stack_t *operators, char *input);
 static char *CloseBracket(f_stack_t *numbers, c_stack_t *operators, char *input);
+static char *EndOfString(f_stack_t *numbers, c_stack_t *operators, char *input);
 static char *ToDo(f_stack_t *numbers, c_stack_t *operators, char *input);
 static void Operate(f_stack_t *numbers, c_stack_t *operators);
 static char *Insert(f_stack_t *numbers, c_stack_t *operators, char *input);
@@ -56,9 +63,12 @@ float Calculator(const char *input)
 		input = g_lut[(size_t)*input].char_check(numbers, operators, (char*)input);
 	}
 
+
+
 	while (!CStackIsEmpty(operators))
 	{
-		Operate(numbers,operators);
+		g_lut[(size_t)CStackPeek(operators)].operation(numbers, operators);
+	
 	}
 
 	sum = FStackPeek(numbers);
@@ -90,10 +100,28 @@ static char *CloseBracket(f_stack_t *numbers, c_stack_t *operators, char *input)
 
 	while ('(' != CStackPeek(operators))
 	{
-		Operate(numbers, operators);
+		g_lut[(size_t)CStackPeek(operators)].operation(numbers, operators);
 	}
 
 	CStackPop(operators);
+
+	return (input);
+}
+
+static char *EndOfString(f_stack_t *numbers, c_stack_t *operators, char *input)
+{
+	assert(numbers);
+	assert(operators);
+
+	/*++input;*/
+
+	while (!CStackIsEmpty(operators))
+	{
+		g_lut[(size_t)CStackPeek(operators)].operation(numbers, operators);
+
+	}
+
+		CStackPop(operators);
 
 	return (input);
 }
@@ -109,8 +137,9 @@ static char *Insert(f_stack_t *numbers, c_stack_t *operators, char *input)
 	return (input);
 }
 
-static void Operate(f_stack_t *numbers, c_stack_t *operators)
+static void Add(f_stack_t *numbers, c_stack_t *operators)
 {
+	
 	float l_operand = 0;
 	float r_operand = 0;
 	float ret = 0;
@@ -124,13 +153,81 @@ static void Operate(f_stack_t *numbers, c_stack_t *operators)
 	l_operand = FStackPeek(numbers);
 	FStackPop(numbers);
 
-	ret = (l_operand * r_operand) * (CStackPeek(operators) == MULTI) +
-		  (l_operand / r_operand) * (CStackPeek(operators) == DIV) +
-		  (l_operand + r_operand) * (CStackPeek(operators) == ADD) +
-		  (l_operand - r_operand) * (CStackPeek(operators) == SUB);
+	ret = l_operand + r_operand;
+		 
+	FStackPush(numbers, ret);
+	CStackPop(operators);
+}
+
+static void Subtruct(f_stack_t *numbers, c_stack_t *operators)
+{
+	
+	float l_operand = 0;
+	float r_operand = 0;
+	float ret = 0;
+
+	assert(numbers);
+	assert(operators);
+	 
+	r_operand = FStackPeek(numbers);
+	FStackPop(numbers);
+
+	l_operand = FStackPeek(numbers);
+	FStackPop(numbers);
+
+	ret = l_operand - r_operand;
 
 	FStackPush(numbers, ret);
 	CStackPop(operators);
+}
+
+static void Multiply(f_stack_t *numbers, c_stack_t *operators)
+{
+	
+	float l_operand = 0;
+	float r_operand = 0;
+	float ret = 0;
+
+	assert(numbers);
+	assert(operators);
+	 
+	r_operand = FStackPeek(numbers);
+	FStackPop(numbers);
+
+	l_operand = FStackPeek(numbers);
+	FStackPop(numbers);
+
+	ret = l_operand * r_operand;
+		  
+	FStackPush(numbers, ret);
+	CStackPop(operators);
+}
+
+static void Divide(f_stack_t *numbers, c_stack_t *operators)
+{
+	
+	float l_operand = 0;
+	float r_operand = 0;
+	float ret = 0;
+
+	assert(numbers);
+	assert(operators);
+	 
+	r_operand = FStackPeek(numbers);
+	FStackPop(numbers);
+
+	l_operand = FStackPeek(numbers);
+	FStackPop(numbers);
+
+	ret = l_operand / r_operand;
+
+	FStackPush(numbers, ret);
+	CStackPop(operators);
+}
+
+static void Operate(f_stack_t *numbers, c_stack_t *operators)
+{
+	g_lut[(size_t)CStackPeek(operators)].operation(numbers, operators);
 }
 
 static char *ToDo(f_stack_t *numbers, c_stack_t *operators, char *input)
@@ -146,11 +243,15 @@ static char *ToDo(f_stack_t *numbers, c_stack_t *operators, char *input)
 			 	 g_lut[(size_t)CStackPeek(operators)].precedene) || CStackIsEmpty(operators);
 	
 	/* chooses operation according to result of previous statement */
-	g_lut[operation].operation(numbers, operators);
 
+	
+
+
+	g_lut[operation].operation(numbers, operators);
+	
 	/*checks again to decide next step: pushing or calculating + pushing */
 	operation = (g_lut[(size_t)*input].precedene > 
-			 	 g_lut[(size_t)CStackPeek(operators)].precedene);
+			 	 g_lut[(size_t)CStackPeek(operators)].precedene) || CStackIsEmpty(operators);
 	
 	input = g_lut[operation].char_check(numbers, operators, (char*)input);
 	
@@ -176,9 +277,7 @@ static char *CalculateAndPushOperator(f_stack_t *numbers, c_stack_t *operators, 
 
 	assert(operators);
 
-	Operate(numbers,operators);
-
-	CStackPush(operators, *input);
+	g_lut[(size_t)*input].char_check(numbers, operators, (char*)input);
 
 	return (input);
 }
@@ -196,6 +295,8 @@ static void InitArray()
 	g_lut[1].char_check = PushOperator;
 	g_lut[1].operation = DoNothing;
 
+
+/*	g_lut[';'].char_check = EndOfString;*/
 	g_lut['*'].char_check = ToDo;
 	g_lut['/'].char_check = ToDo;
 	g_lut['+'].char_check = ToDo;
@@ -213,13 +314,14 @@ static void InitArray()
 	g_lut['8'].char_check = Insert;
 	g_lut['9'].char_check = Insert;
 	g_lut['.'].char_check = Insert;
+	
 
-	g_lut['*'].operation = Operate;
-	g_lut['/'].operation = Operate;
-	g_lut['+'].operation = Operate;
-	g_lut['-'].operation = Operate;
-	g_lut['('].operation = Operate;
-	g_lut[')'].operation = Operate;
+	g_lut['*'].operation = Multiply;
+	g_lut['/'].operation = Divide;
+	g_lut['+'].operation = Add;
+	g_lut['-'].operation = Subtruct;
+	g_lut['('].operation = NULL;
+	g_lut[')'].operation = NULL;
 	g_lut['0'].operation = NULL;
 	g_lut['1'].operation = NULL;
 	g_lut['2'].operation = NULL;

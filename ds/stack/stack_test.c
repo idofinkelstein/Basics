@@ -75,5 +75,6 @@ void StackPeekTest(stack_t *stk)
 	if(NULL != StackPeek(stk))
 	{
 		printf("%s\n", (char*)StackPeek(stk));
+		
 	}
 }

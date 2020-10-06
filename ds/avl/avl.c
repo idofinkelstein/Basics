@@ -4,7 +4,7 @@ Author: Ido Finkelstein
 Reviewer: Guy Chen
 Date: 1/8/2020
 *********************************/
-#ifndef NDEBUG
+#ifdef NDEBUG
 #include <stdio.h> /* printf */
 #endif
 

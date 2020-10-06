@@ -48,7 +48,7 @@ int FSQRead(fsq_t *fsq)
 {
 	int temp = 0;
 
-	if (fsq->size == 0)
+	if (FSQIsEmpty(fsq))
 	{
 		errno = ENODATA;
 		return (ERROR);
@@ -63,7 +63,7 @@ int FSQRead(fsq_t *fsq)
 /*---------------------------------------------------------------------------*/
 int FSQWrite(fsq_t *fsq, int num)
 {
-	if (fsq->size == fsq->capacity)
+	if (FSQIsFULL(fsq))
 	{
 		errno = ENOBUFS;
 		return (ERROR);
@@ -77,5 +77,13 @@ int FSQWrite(fsq_t *fsq, int num)
 	return (0);
 }
 /*---------------------------------------------------------------------------*/
-
-
+int FSQIsEmpty(const fsq_t *fsq)
+{
+	return (0 == fsq->size);
+}
+/*---------------------------------------------------------------------------*/
+int FSQIsFULL(const fsq_t *fsq)
+{
+	return (fsq->capacity == fsq->size);
+}
+/*---------------------------------------------------------------------------*/

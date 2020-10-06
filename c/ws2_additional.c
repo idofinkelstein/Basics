@@ -31,13 +31,12 @@ int IsPalindrome(const char *str)
 }
 
 
-void SwapPointers(int *ptr1, int *ptr2)
+void SwapPointers(int **ptr1, int **ptr2)
 {
-	int *tmp_ptr = NULL;
+	int *tmp_ptr = *ptr1;
 
-	tmp_ptr = ptr1;
-	ptr1 = ptr2;
-	ptr2 = tmp_ptr;
+	*ptr1 = *ptr2;
+	*ptr2 = tmp_ptr;
 }
 
 void SevenBoom(int from, int to)

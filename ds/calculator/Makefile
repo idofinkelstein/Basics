@@ -4,8 +4,8 @@
 # the parrent dir of "arch" dir
 ROOT_DIR = ../..
 
-PROJ_SRCS = $(wildcard *.c)
-#PROJ_SRCS = aaa.c bbb.cpp
+#PROJ_SRCS = $(wildcard *.c)
+PROJ_SRCS = calculator.c calculator_test.c c_stack.c f_stack.c
 
 # list of directories containing header files
 PROJ_INC_DIR =

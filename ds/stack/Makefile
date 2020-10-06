@@ -11,7 +11,7 @@ PROJ_SRCS = $(wildcard *.c)
 PROJ_INC_DIR = $(PWD)
 
 # the executable file
-PROJ_OUT = a.out
+PROJ_OUT = stack.out
 
 # list of compiler flags (prepended with "-" sign)
 #PROJ_CFLAGS = -Wunused-but-set-variable

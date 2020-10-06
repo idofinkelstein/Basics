@@ -20,7 +20,7 @@ int main()
 	sch_t *sched = SchCreate();
 	sch_task_func_t task_func = task1;
 	unique_id_t uid1 = SchTimerStart(sched, 1, task_func , NULL);
-	unique_id_t bad_uid = {0, -1, -1};
+	/*unique_id_t bad_uid = {0, -1, -1};*/
 	unique_id_t uid2;
 	int stop = true;
 	int run = false;

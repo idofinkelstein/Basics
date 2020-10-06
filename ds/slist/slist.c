@@ -261,7 +261,7 @@ int SListForEach(const slist_iter_t from,
 	{
 		if (NULL == curr)	
 		{
-			return 0;
+			return do_action(curr->data, param);
 		}
 
 		do_action(curr->data, param);
@@ -269,7 +269,7 @@ int SListForEach(const slist_iter_t from,
 		curr = SlistNext(curr);	
 	}
 
-	return 1;
+	return 0;
 }
 
 void SListAppend(slist_t *dest, slist_t *src)

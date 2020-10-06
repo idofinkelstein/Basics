@@ -3,6 +3,9 @@
 
 #except:
 !*.[ch]
+!*.cpp
+!*.hpp
 !/**/
-
+!*mak
+!Makefile
 !.gitignore

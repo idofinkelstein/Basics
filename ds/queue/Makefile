@@ -2,16 +2,16 @@
 # make clean/all CONFIG=Debug/Release ARCH=linux64/raspi ECHO=0/1
 
 # the parrent dir of "arch" dir
-ROOT_DIR = ../../..
+ROOT_DIR = ../..
 
-#PROJ_SRCS = $(wildcard *.c)
-PROJ_SRCS = aaa.c bbb.cpp
+PROJ_SRCS = $(wildcard *.c)
+#PROJ_SRCS = aaa.c bbb.cpp
 
 # list of directories containing header files
-PROJ_INC_DIR =
+PROJ_INC_DIR = $(ROOT_DIR)/ds/slist
 
 # the executable file
-PROJ_OUT = app.out
+PROJ_OUT = queue.out
 
 # list of compiler flags (prepended with "-" sign)
 #PROJ_CFLAGS = -Wunused-but-set-variable
@@ -22,7 +22,7 @@ PROJ_CPPFLAGS =
 PROJ_MACROS =
 
 # additional object files (created by other projects)
-PROJ_ADD_OBJS =
+PROJ_ADD_OBJS = slist.o
 
 # additional libraries
 PROJ_LIBS =
@@ -31,6 +31,6 @@ PROJ_LIBS =
 PROJ_LDFLAGS =
 
 # list of projects (makefiles) this project depends on
-PROJ_DEPENDS  =
+PROJ_DEPENDS  = $(ROOT_DIR)/ds/slist/Makefile
 
 include $(ROOT_DIR)/make/Project.mak

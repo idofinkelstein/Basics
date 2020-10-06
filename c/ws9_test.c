@@ -329,12 +329,12 @@ static int ItoaTest(void)
 	int num2 = -77724309;
 	char str1[32];
 	char str2[32];
-	int num3 = 2017156714;
+	int num3 = 1493;
 	char *str3 = malloc(33);
 
 	ItoaBin(num1, str2);
 	Itoa(num2, str1);
-	ItoaAny(num3, str3, 24);
+	ItoaAny(num3, str3, 16);
 
 	puts("*** testing Itoa ***");
 	printf("%s\n", str1);

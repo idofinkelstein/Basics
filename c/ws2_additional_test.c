@@ -37,7 +37,7 @@ void SwapPointersTest(void)
 
 	printf("p_num1 -> %d\n", *p_num1);
 	printf("p_num2 -> %d\n", *p_num2);
-	SwapPointers(p_num1, p_num2);
+	SwapPointers(&p_num1, &p_num2);
 	printf("p_num1 -> %d\n", *p_num1);
 	printf("p_num2 -> %d\n", *p_num2);
 	puts("");

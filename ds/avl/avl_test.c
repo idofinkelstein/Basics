@@ -17,6 +17,7 @@ static void TestCase1(void);
 static void TestCase2(void);
 static void TestCase3(void);
 static void TestCase4(void);
+static void TestCase5(void);
 
 enum traversal
 {
@@ -31,6 +32,7 @@ int main(void)
 	TestCase2();
 	TestCase3();
 	TestCase4();
+	TestCase5();
 
 	return 0;
 }
@@ -172,6 +174,21 @@ static void TestCase4(void)
 	puts("post order traversl:");
 	ChooseTraversalOrder(avl, POSTORDER);	
 
+
+	AVLDestroy(avl);
+}
+
+static void TestCase5(void)
+{
+	avl_t *avl = AVLCreate(Compare, NULL);
+	int x = 5;
+
+	/* testing empty tree */
+
+	printf("size = %ld\n", AVLSize(avl));
+	AVLForEach(avl, PrintTree, NULL);
+	AVLFind(avl, &x);
+	AVLRemove(avl, &x);
 
 	AVLDestroy(avl);
 }

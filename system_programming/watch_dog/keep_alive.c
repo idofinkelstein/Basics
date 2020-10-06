@@ -24,7 +24,7 @@ typedef struct keep_alive_info
 	sch_t *sched;
 	char **argv;
 	pid_t pid;
-	int creator;
+	int creator; 
 
 }keep_alive_info_t;
 
@@ -152,8 +152,11 @@ int CheckPulse(sch_t *sch, unique_id_t uid, void *param) /* task 2 */
 	{
 		SchStop(thread_info->sched);
 		SchDestroy(thread_info->sched);
-		free(thread_info);
+		printf("sched freed, pid: %d\n", (int)getpid());
 		sem_post(sem);
+		free(thread_info);
+		printf("thread_info freed, pid: %d\n", (int)getpid());
+		printf("partner pid: %d\n", (int)partner_pid);
 		kill(partner_pid, SIGUSR2);		
 		pthread_exit(NULL); 
 	}
@@ -173,7 +176,7 @@ int CheckPulse(sch_t *sch, unique_id_t uid, void *param) /* task 2 */
 		}
 	}
 
-	return 1;
+	return 1; /* repeat task */
 }
 
 void *KeepAlive(void *arg)
@@ -182,8 +185,6 @@ void *KeepAlive(void *arg)
 
 	SchTimerStart(thread_info->sched, 1, SendPulse, thread_info);
 	SchTimerStart(thread_info->sched, 3, CheckPulse, thread_info);
-
-		puts("hi");
 
 	if (thread_info->creator == 1)
 	{
@@ -250,6 +251,7 @@ void Sigusr2Handler(int signal_num, siginfo_t *info, void *context)
 	(void)context;	
 
 	shut_down_g = true;
+	puts("shut down = true");
 }
 
 void DNR()
@@ -278,7 +280,7 @@ int CreateProcess(keep_alive_info_t *thread_info)
     if(0 == child_pid)
     {
 		puts("creating new process");
-        /* checks if argv is equal to user app file - "./app.Debug.out" */
+        /* checks if argv is equal to user app file name - "./app.Debug.out" */
        is_user_app = !strcmp(process_files[0], argv[0]);
 
         /* exec process to the right program - if the process is user app - run 

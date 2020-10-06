@@ -52,7 +52,7 @@ void TestCase1(void)
 	int arr[] = {1, 2, 4, 3, 5, 6, 8, 7, 9, 11, 10, 13, -1};
 	int x = 5;
 
-	tree = BSTtCreate(CompareInt, param);
+	tree = BSTCreate(CompareInt, param);
 
 	printf("size = %ld\n", BSTSize(tree));	
 
@@ -162,7 +162,7 @@ void TestCase2(void)
 	bst_iter_t begin = {NULL};
 	bst_iter_t end = {NULL};
 
-	tree = BSTtCreate(CompareInt, param);
+	tree = BSTCreate(CompareInt, param);
 
 	iter1 = BSTInsert(tree, &arr[3]); /* 3 */
 	iter2 = BSTInsert(tree, &arr[0]); /* 1 */
@@ -204,7 +204,7 @@ void TestCase3(void)
 	bst_iter_t begin = {NULL};
 	bst_iter_t end = {NULL};
 
-	tree = BSTtCreate(CompareInt, param);
+	tree = BSTCreate(CompareInt, param);
 
 	BSTInsert(tree, &arr[3]); /* 3 */
 	BSTInsert(tree, &arr[0]); /* 1 */
@@ -259,7 +259,7 @@ void TestCase4(void)
 	bst_iter_t begin = {NULL};
 	bst_iter_t end = {NULL};
 
-	tree = BSTtCreate(CompareInt, param);
+	tree = BSTCreate(CompareInt, param);
 
 	BSTInsert(tree, &arr[3]); /* 3 */
 	BSTInsert(tree, &arr[1]); /* 2 */
@@ -330,7 +330,7 @@ void TestCase5(void)
 	bst_iter_t util = {NULL};
 	int x = 5;
 
-	tree = BSTtCreate(CompareInt, param);
+	tree = BSTCreate(CompareInt, param);
 
 	printf("size = %ld\n", BSTSize(tree));	
 
