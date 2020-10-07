@@ -65,7 +65,8 @@ int main()
 
 	delete px; px = 0; 
 
-	std::cout << "bye" << std::endl;
+	double *xp = new double[10];
+	delete xp;
 
 	return 0;
 }
