@@ -14,7 +14,7 @@ int main()
 		return 0;
 	}
 
-	f = (void (*)(void))dlsym(handle, "_Z3foov");
+	f = (void (*)(void))dlsym(handle, "foo");
 	if (!f)
 	{
 		puts("error - no symbol found");
