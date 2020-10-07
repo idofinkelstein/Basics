@@ -55,7 +55,7 @@ Vector &Vector::operator=(const Vector& other)
 	this->size = other.size;
 
 	data = static_cast<void**>(malloc(sizeof(void*) * capacity));
-	memcpy(data, other.data, other.capacity * sizeof(void*));
+	memcpy(data, other.data, capacity * sizeof(void*));
 
 	/* just for debug */
 	std::cout << this << std::endl;
