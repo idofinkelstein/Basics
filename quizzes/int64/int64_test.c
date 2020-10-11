@@ -4,12 +4,24 @@
 
 int main()
 {
-	Int64_t y1, y2, x1, x2, res, a, b, c;
-	long Y1 = 4554620;
+	Int64_t y1, y2, x1, x2, res, a, b, c, t;
+	long Y1 = 4554620, k = 45544362000;
 	int shift = 28;
 	long A = 123456789, B = -98765432;
 	
-	
+
+	t = Int64("45544362000");
+	puts("testing shift right");
+
+	printf("t = %08x%08x\n", t.msi, t.lsi);
+	printf("k = %016lx\n", k);
+
+	t = I64Shiftr(t, 7);
+	k >>= 7;
+
+	printf("API:     t >>= %08x%08x\n", t.msi, t.lsi);
+	printf("Machine: k >>= %016lx\n", k);
+	puts("----------------------------------------------------------------");
 
 	c = Int64("-1");
 	y1 = Int64("4554620");
@@ -144,20 +156,26 @@ int main()
 	printf("Machine: x1 + x2 = %016lx\n", -7770000000 + -6660000000);
 	printf("Machine: x1 + x2 = %ld (des)\n", -7770000000 + -6660000000);
 	
+
 /*-------------------------------------------------------------------------------------*/
 
 	x1 = Int64("7000000000");
 	x2 = Int64("5");
+
+	printf("x2.lsi = %d\n", x2.lsi);
 	/* can't handle long inputs until Mul is ready */
 	res = Int64Mul(x1, x2);
-
+	printf("x2.lsi = %d\n", x2.lsi);
 	puts("--------------------------------------------------");
 	printf(" x1 = %ld\n", 7000000000);
 	printf(" x2 = %ld\n", 5l);
+	printf(" x1 = %08x%08x\n", x1.msi, x1.lsi);
+	printf(" x1 = %016lx\n", 7000000000);
+	printf(" x2 = %08x%08x\n", x2.msi, x2.lsi);
+	printf(" x2 = %016lx\n", 5l);
 	printf("API:     x1 * x2 = %08x%08x\n", res.msi, res.lsi);
 	printf("Machine: x1 * x2 = %016lx\n", 7000000000 * 5);
 	printf("Machine: x1 * x2 = %ld (des)\n", 7000000000 * 5);
-
 /*-------------------------------------------------------------------------------------*/
 
 	x1 = Int64("5");
@@ -168,9 +186,44 @@ int main()
 	puts("--------------------------------------------------");
 	printf(" x1 = %ld\n", 5l);
 	printf(" x2 = %ld\n", 7000000000);
+	printf(" x1 = %08x%08x\n", x1.msi, x1.lsi);
+	printf(" x1 = %016lx\n", 5l);
+	printf(" x2 = %08x%08x\n", x2.msi, x2.lsi);
+	printf(" x2 = %016lx\n", 7000000000);
 	printf("API:     x1 * x2 = %08x%08x\n", res.msi, res.lsi);
 	printf("Machine: x1 * x2 = %016lx\n", 7000000000 * 5);
 	printf("Machine: x1 * x2 = %ld (des)\n", 7000000000 * 5);
 
+	/*-------------------------------------------------------------------------------------*/
+
+	x1 = Int64("5435645");
+	x2 = Int64("600000000");
+	/* can't handle long inputs until Mul is ready */
+	res = Int64Mul(x1, x2);
+
+	puts("--------------------------------------------------");
+	printf(" x1 = %ld\n", 5435645l);
+	printf(" x2 = %ld\n", 600000000l);
+	printf(" x1 = %08x%08x\n", x1.msi, x1.lsi);
+	printf(" x2 = %08x%08x\n", x2.msi, x2.lsi);
+	printf("API:     x1 * x2 = %08x%08x\n", res.msi, res.lsi);
+	printf("Machine: x1 * x2 = %016lx\n", 600000000l * 5435645);
+	printf("Machine: x1 * x2 = %ld (des)\n", 600000000l * 5435645);
+
+		/*-------------------------------------------------------------------------------------*/
+
+	x1 = Int64("-5435645");
+	x2 = Int64("600000000");
+	/* can't handle long inputs until Mul is ready */
+	res = Int64Mul(x1, x2);
+
+	puts("--------------------------------------------------");
+	printf(" x1 = %ld\n", -5435645l);
+	printf(" x2 = %ld\n", 600000000l);
+	printf(" x1 = %08x%08x\n", x1.msi, x1.lsi);
+	printf(" x2 = %08x%08x\n", x2.msi, x2.lsi);
+	printf("API:     x1 * x2 = %08x%08x\n", res.msi, res.lsi);
+	printf("Machine: x1 * x2 = %016lx\n", 600000000l * -5435645);
+	printf("Machine: x1 * x2 = %ld (des)\n", 600000000l * -5435645);
 	return 0;
 }

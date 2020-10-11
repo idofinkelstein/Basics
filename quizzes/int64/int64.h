@@ -34,6 +34,7 @@ Int64_t I64CompAdd(Int64_t num1, Int64_t num2);
 
 Int64_t I64Shiftl(Int64_t num, int shift);
 Int64_t I64Shiftl2(Int64_t num, int shift);
+Int64_t I64Shiftr(Int64_t num, int shift);
 
 int I64IsEqual(Int64_t num1, Int64_t num2);
 

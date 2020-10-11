@@ -32,8 +32,9 @@ Int64_t Int64(const char *val)
 		num = Int64Add(Int64Mul(num, base),  digit);
 	}
 
-	if (sign < 0)
+	if (sign < 0)	 
 	{
+		/* -n = ~n + 1 */
 		num = Int64Add(I64Tilde(num), num2);
 	}
 
@@ -55,6 +56,7 @@ Int64_t I64Tilde(Int64_t num)
 	return (res);
 }
 
+/* old version of shift left */
 Int64_t I64Shiftl(Int64_t num, int shift)
 {
 	int bit_state = 0;
@@ -73,20 +75,57 @@ Int64_t I64Shiftl(Int64_t num, int shift)
 	return (num);
 }
 
-Int64_t I64Shiftl2(Int64_t num, int shift)
+Int64_t I64Shiftr(Int64_t num, int shift)
 {
-	unsigned mask = ((~0u << (32 - shift)) & num.lsi) >> (32 - shift);
-	
+	unsigned lsi = num.lsi;
+	unsigned msi = num.msi;
+
+	if(shift == 0)
+	{
+		return (num);
+	}
+
 	if (shift > max_shift)
 	{
-		num.msi = num.lsi << (shift -  32);
-		num.lsi = 0;
+		lsi = msi >> (shift - 32);
+		msi = 0;
 	}
 	else
 	{
-		num.msi = (num.msi << shift) | mask;
-		num.lsi <<= shift;
+		lsi = (lsi >> shift) | (msi << (32 - shift));
+		msi >>= shift;
 	}
+
+	num.lsi = lsi;
+	num.msi = msi;
+
+	return (num);
+}
+
+Int64_t I64Shiftl2(Int64_t num, int shift)
+{
+	unsigned lsi = num.lsi;
+	unsigned msi = num.msi;
+	unsigned mask = ((~0u << (32 - shift)) & lsi) >> (32 - shift);
+	
+	if(shift == 0)
+	{
+		return (num);
+	}
+	
+	if (shift > max_shift)
+	{
+		msi = lsi << (shift -  32);
+		lsi = 0;
+	}
+	else
+	{
+		msi = (msi << shift) | mask;
+		lsi <<= shift;
+	}
+
+	num.lsi = lsi;
+	num.msi = msi;
 
 	return (num);
 }
@@ -126,39 +165,21 @@ Int64_t Int64Add(Int64_t num1, Int64_t num2)
 
 Int64_t Int64Mul(Int64_t num1, Int64_t num2)
 {
-	unsigned i = 0;
-	unsigned j = 0;
-	unsigned k = 0;
-	unsigned max_val = 1u << 31;
 	Int64_t res = {0, 0};
+	int shift = 0;
+	Int64_t sub_res = {0, 0};
+	unsigned shift_bit = 0;
 
-	if ((num1.lsi == 0 && num1.msi == 0) ||
-		(num2.lsi == 0 && num2.msi == 0))
+	while (num2.lsi || num2.msi) /* num2 != 0 */
 	{
-		return (res);
+		shift_bit = num2.lsi & 1;
+		sub_res = I64Shiftl2(num1, shift++);
+		sub_res.lsi *= shift_bit;
+		sub_res.msi *= shift_bit;
+		res = Int64Add(res, sub_res);
+		num2 = I64Shiftr(num2, 1);
 	}
-
-	for (i = 0; i < (unsigned)abs(num2.lsi); ++i)
-	{
-		res = Int64Add(num1, res);
-	}
-
-	if (num2.msi == 0)
-	{
-		return (res);
-	}
-
-	for (k = 0; k < 2; ++k)
-	{
-		for (i = 0; i < max_val; ++i)
-		{
-			for (j = 0; j < (unsigned)abs(num2.msi); ++j)
-			{
-				res = Int64Add(num1, res);
-			}
-		}
-	}
-
+	
 	return (res);
 }
 
