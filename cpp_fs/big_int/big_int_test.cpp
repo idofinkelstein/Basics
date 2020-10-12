@@ -1,6 +1,7 @@
-#include <iostream>
+#include <iostream> /* cout */
 
 #include "bigint.hpp"
+
 using namespace ilrd::rd90;
 
 int main()
@@ -16,12 +17,20 @@ int main()
     std::cout << "testing '=' operator:" << std::endl;
     num1 = num2;
     a = b;
-    std::cout << "num1 = num2 = "<< num1 << " = " << num2 << std::endl;
-    std::cout << "a = b = "<< a << " = " << b << std::endl;
+
+    std::cout << "num1 = num2 = 0x"<<
+                        std::uppercase <<
+                        num1 <<
+                         " = 0x" <<
+                        num2 <<
+                        std::endl;
+
+    std::cout << "a = b = " << std::uppercase << "0x"<< a << " = " << b << std::endl;
+
     std::cout << "--------------------------------------------------------" << std::endl;
 
     std::cout << "testing '+' operator:" << std::endl;
-    std::cout << std::hex  << std::uppercase << "0x" << num3+ num4 << std::endl;
+    std::cout << std::uppercase << "0x" << num3+ num4 << std::endl;
 
     std::cout  << std::hex                      << 
                         std::uppercase           <<
@@ -29,8 +38,28 @@ int main()
                         -1000000 + 2000000 << 
                         std::endl;
 
-    std::cout << std::hex << std::uppercase << "0x" << x + y << std::endl;
-    std::cout << std::hex << std::uppercase << "0x" << X + Y << std::endl; 
+    std::cout << std::uppercase << "x + y = " << "0x" << x + y << std::endl;
+
+    std::cout <<  "X + Y = " << 
+                        std::hex << 
+                        std::uppercase <<
+                        "0x" << 
+                        X + Y << 
+                        std::endl;
+
+    std::cout << "x + x + x + x = " << 
+                        std::uppercase <<
+                        "0x" << 
+                        x + x + x + x <<
+                        std::endl;
+
+    std::cout << "X + X + X + X = " <<
+                        std::hex <<
+                        std::uppercase <<
+                        "0x" <<
+                        X + X + X + X <<
+                        std::endl;
+
     std::cout << "--------------------------------------------------------" << std::endl;
 
     std::cout << "testing '+=' operator:" << std::endl;
@@ -42,10 +71,16 @@ int main()
     std::cout << "b = " << b << std::endl;
     X += X += X += X += X += X += X;
     x += x += x += x += x += x += x;
-    std::cout << "X = " << X << std::endl;
-    std::cout << "x = " << x << std::endl;
+
+    std::cout << "test X += X += X += X += X += X += X; and" 
+                        "x += x += x += x += x += x += x;" <<
+                        std::endl;
+
+    std::cout << "X = 0x" << X << std::endl;
+    std::cout << "x = 0x" << x << std::endl;
     std::cout << "--------------------------------------------------------" << std::endl;
 
+    ;
 
 	return 0;
 

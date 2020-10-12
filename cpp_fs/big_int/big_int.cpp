@@ -1,4 +1,5 @@
-#include <iostream>
+#include <iostream> /* cout */
+#include <iomanip> /* setw, setfill */
 
 #include "bigint.hpp"
 
@@ -22,7 +23,7 @@ Bigint::Bigint(word_t num)
     }
 }
 
-const Bigint Bigint::operator+(const Bigint &num)
+const Bigint Bigint::operator+(const Bigint &num) const
 {
     Bigint res;
     static const int carry_lut[] = {0, 0, 1, 0, 1, 0, 1, 1};
@@ -51,7 +52,11 @@ Bigint &Bigint::operator+=(const Bigint& num)
 
 std::ostream &operator<<(std::ostream &os, const Bigint &bigint)
 {
-    os /*<< "0x" << std::hex*/ << bigint.words[MSI] /* <<  std::hex*/ << bigint.words[LSI];
+    os << std::hex <<
+             std::setw(8) <<
+             std::setfill('0') <<
+             bigint.words[MSI] <<
+             bigint.words[LSI];
 
     return (os);
 }

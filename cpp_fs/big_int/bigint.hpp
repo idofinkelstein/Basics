@@ -54,7 +54,7 @@ public:
     explicit Bigint(word_t num = 0);    // default ctor, with int
     // using generated functions
 
-    const Bigint operator+(const Bigint &num);
+    const Bigint operator+(const Bigint &num) const;
     Bigint& operator+=(const Bigint &num);  
 
     friend std::ostream& operator<<(std::ostream &os, const Bigint &bigint);
