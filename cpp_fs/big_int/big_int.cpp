@@ -46,14 +46,14 @@ Bigint &Bigint::operator+=(const Bigint& num)
 {
     *this = *this + num;
 
-    return *this;
+    return (*this);
 }
 
 std::ostream &operator<<(std::ostream &os, const Bigint &bigint)
 {
     os /*<< "0x" << std::hex*/ << bigint.words[MSI] /* <<  std::hex*/ << bigint.words[LSI];
 
-    return os;
+    return (os);
 }
 
 } // namespace rd90
