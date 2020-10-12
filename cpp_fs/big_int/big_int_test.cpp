@@ -18,14 +18,7 @@ int main()
     a = b;
     std::cout << "num1 = num2 = "<< num1 << " = " << num2 << std::endl;
     std::cout << "a = b = "<< a << " = " << b << std::endl;
-
-    std::cout << "testing '+=' operator:" << std::endl;
-    num2 += num1+= num1;
-    b += a += a;
-    std::cout << "num1 = " << num1 << std::endl;
-    std::cout << "num2 = " << num2 << std::endl;
-    std::cout << "a = " << a << std::endl;
-    std::cout << "b = " << b << std::endl;
+    std::cout << "--------------------------------------------------------" << std::endl;
 
     std::cout << "testing '+' operator:" << std::endl;
     std::cout << std::hex  << std::uppercase << "0x" << num3+ num4 << std::endl;
@@ -37,7 +30,21 @@ int main()
                         std::endl;
 
     std::cout << std::hex << std::uppercase << "0x" << x + y << std::endl;
-    std::cout << std::hex << std::uppercase << "0x" << X + Y << std::endl;
+    std::cout << std::hex << std::uppercase << "0x" << X + Y << std::endl; 
+    std::cout << "--------------------------------------------------------" << std::endl;
+
+    std::cout << "testing '+=' operator:" << std::endl;
+    num2 += num1+= num1;
+    b += a += a;
+    std::cout << "num1 = " << num1 << std::endl;
+    std::cout << "num2 = " << num2 << std::endl;
+    std::cout << "a = " << a << std::endl;
+    std::cout << "b = " << b << std::endl;
+    X += X += X += X += X += X += X;
+    x += x += x += x += x += x += x;
+    std::cout << "X = " << X << std::endl;
+    std::cout << "x = " << x << std::endl;
+    std::cout << "--------------------------------------------------------" << std::endl;
 
 
 	return 0;
