@@ -51,13 +51,14 @@ class Bigint
 {
 public:
     typedef int word_t;
-    explicit Bigint(word_t num = 0);    // default ctor, with int
+    /* non-explicit */ Bigint(word_t num = 0);    // default ctor, with int
     // using generated functions
 
-    const Bigint operator+(const Bigint &num) const;
+    //const Bigint operator+(const Bigint &num) const;
     Bigint& operator+=(const Bigint &num);  
 
     friend std::ostream& operator<<(std::ostream &os, const Bigint &bigint);
+    friend const Bigint operator+(const Bigint &num1, const Bigint &num2); 
 
 private:
     word_t words[2];

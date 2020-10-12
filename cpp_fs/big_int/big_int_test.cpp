@@ -14,6 +14,8 @@ int main()
     long X = -2000000000;
     long Y = -1500000000;
 
+    x += x;
+#if 1
     std::cout << "testing '=' operator:" << std::endl;
     num1 = num2;
     a = b;
@@ -80,8 +82,11 @@ int main()
     std::cout << "x = 0x" << x << std::endl;
     std::cout << "--------------------------------------------------------" << std::endl;
 
-    ;
+    x + 3;
+    3 + x;
+    5 + a + b + 4 + x;
 
+#endif
 	return 0;
 
 
