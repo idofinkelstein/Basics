@@ -31,5 +31,8 @@ int main()
                        "str3 = " << str3 << std::endl <<
                        "str4 = " << str4 << std::endl;
 
+    str1 = str1;
+
+
     return 0;
 }

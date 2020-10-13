@@ -73,6 +73,7 @@ namespace rd90
 {
 
 class String;
+const String operator+(String s1,const String& s2);
 bool operator==(const String& s1, const String& s2); // "hello" == s1 OR s1 == "hello"
 bool operator<(const String& s1, const String& s2); // "hello" == s1 OR 
 bool operator>(const String& s1, const String& s2); // "hello" == s1 OR 
@@ -83,7 +84,7 @@ class String
 public:
     /* non-explicit */String(const char* str = "");
     String(const String& other); //CCTOR
-    String& operator=(const String& other);
+    String& operator=(String other);
     ~String();
 
     String& operator+=(const String& other);  
@@ -96,11 +97,13 @@ public:
     size_t Length() const;
 
 private:
+/*
     friend const String operator+(String s1,const String& s2);
     friend bool operator==(const String& s1, const String& s2); // "hello" == s1 OR 
     friend bool operator<(const String& s1, const String& s2); // "hello" == s1 OR 
     friend bool operator>(const String& s1, const String& s2); // "hello" == s1 OR 
     friend std::ostream& operator<<(std::ostream& os, const String& s);
+*/
     void StringCreate(const char* str);
 
     char *str;

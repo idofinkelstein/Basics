@@ -21,10 +21,14 @@ String::String(const String& other): str(new char[strlen(other.str) + 1])
 }
 /*-----------------------------------------------------------------------------*/
 
-String& String::operator=(const String& other)
+String& String::operator=(String other)
 {
-    delete[] this->str;
-    StringCreate(other.str);
+    char *tempStr = str;
+    str = other.str;
+    other.str = tempStr;
+
+    //delete[] this->str;
+    //StringCreate(other.str);
 
     return (*this);
 }
@@ -86,7 +90,7 @@ const String operator+(String s1,const String& s2)
 
 bool operator==(const String& s1, const String& s2)
 {
-    return (0 == strcmp(s1.str, s2.str));
+    return (0 == strcmp(&s1[0], &s2[0]));
 }
 /*-----------------------------------------------------------------------------*/
 
@@ -94,18 +98,18 @@ bool operator<(const String& s1, const String& s2)
 {
     //s1 < s2 ==> returns 1 if true
 
-     return (0 > strcmp(s1.str, s2.str));
+     return (0 > strcmp(&s1[0], &s2[0]));
 }
 
 bool operator>(const String& s1, const String& s2)
 {
-     return (0 < strcmp(s1.str, s2.str));
+     return (0 < strcmp(&s1[0], &s2[0]));
 }
 /*-----------------------------------------------------------------------------*/
 
 std::ostream& operator<<(std::ostream& os, const String& s)
 {
-    return (os << s.str);
+    return (os << &s[0]);
 }
 /*-----------------------------------------------------------------------------*/
 
