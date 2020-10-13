@@ -7,15 +7,17 @@ namespace ilrd
 namespace rd90
 {
 
-String::String(const char* str)
+String::String(const char* str): str(new char[strlen(str) + 1])
 {
-    StringCreate(str);
+    //StringCreate(str);
+    memcpy(this->str, str, strlen(str) + 1);
 }
 /*-----------------------------------------------------------------------------*/
 
-String::String(const String& other)
+String::String(const String& other): str(new char[strlen(other.str) + 1])
 {
-    StringCreate(other.str);
+    //StringCreate(other.str);
+    memcpy(str, other.str, strlen(other.str) + 1);
 }
 /*-----------------------------------------------------------------------------*/
 
