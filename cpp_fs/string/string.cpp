@@ -7,29 +7,19 @@ namespace ilrd
 namespace rd90
 {
 
-String::String(const char* str): str(new char[strlen(str) + 1])
-{
-    //StringCreate(str);
-    memcpy(this->str, str, strlen(str) + 1);
-}
+String::String(const char* str): str(StringCreate(str)) {}
+/*-----------------------------------------------------------------------------*/
+String::String(const String& other): str(StringCreate(other.str)) {}
 /*-----------------------------------------------------------------------------*/
 
-String::String(const String& other): str(new char[strlen(other.str) + 1])
+String& String::operator=(const String &other)
 {
-    //StringCreate(other.str);
-    memcpy(str, other.str, strlen(other.str) + 1);
-}
-/*-----------------------------------------------------------------------------*/
-
-String& String::operator=(String other)
-{
-    char *tempStr = str;
-    str = other.str;
-    other.str = tempStr;
-
-    //delete[] this->str;
-    //StringCreate(other.str);
-
+    if (this != &other)
+    {
+        char *temp_str = StringCreate(other.str);
+        delete[] this->str;
+        this->str = temp_str;
+    }
     return (*this);
 }
 /*-----------------------------------------------------------------------------*/
@@ -41,11 +31,14 @@ String::~String()
 
 /*-----------------------------------------------------------------------------*/
 
-void String::StringCreate(const char *str)
+char *String::StringCreate(const char *str)
 {
     size_t len = strlen(str);
-    this->str = new char[len + 1];
-    memcpy(this->str, str, len + 1);
+    char *new_str = new char[len + 1];
+
+    memcpy(new_str, str, len + 1);
+
+    return (new_str);
 }
 
 char& String::operator[](size_t i)
@@ -112,6 +105,7 @@ std::ostream& operator<<(std::ostream& os, const String& s)
     return (os << &s[0]);
 }
 /*-----------------------------------------------------------------------------*/
+
 
 size_t String::Length() const
 {

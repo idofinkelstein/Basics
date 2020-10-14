@@ -84,7 +84,7 @@ class String
 public:
     /* non-explicit */String(const char* str = "");
     String(const String& other); //CCTOR
-    String& operator=(String other);
+    String& operator=(const String &other);
     ~String();
 
     String& operator+=(const String& other);  
@@ -104,7 +104,7 @@ private:
     friend bool operator>(const String& s1, const String& s2); // "hello" == s1 OR 
     friend std::ostream& operator<<(std::ostream& os, const String& s);
 */
-    void StringCreate(const char* str);
+    char *StringCreate(const char* str);
 
     char *str;
 };
