@@ -21,8 +21,9 @@ int main()
     str1 = str2 + str3;
 
     str1[4] = c;
+	//str1[20] = c;
     str2 = str2;
-    str2[0] = 'Z';
+    str2[0] = 'z';
     str2[1] = 'Z';
         
     std::cout << "str1 len = " << str1.Length() << std::endl <<

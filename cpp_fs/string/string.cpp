@@ -1,4 +1,5 @@
 #include <string.h>
+#include <assert.h>
 
 #include "string.hpp"
 
@@ -31,43 +32,38 @@ String::~String()
 
 /*-----------------------------------------------------------------------------*/
 
-char *String::StringCreate(const char *str)
+char *String::StringCreate(const char *str1, const char* str2)
 {
-    size_t len = strlen(str);
-    char *new_str = new char[len + 1];
+    size_t len1 = strlen(str1);
+	size_t len2 = strlen(str2);
+	char *new_str = new char[len1 + len2 + 1];
 
-    memcpy(new_str, str, len + 1);
+    memcpy(new_str, str1, len1 + 1);
+	memcpy(new_str + len1, str2, len2 + 1);
 
     return (new_str);
 }
 
 char& String::operator[](size_t i)
 {
-    return (str[i]);
+	// calls const oper[] and casts it to non-const.
+    return (const_cast<char&>( static_cast<const String&>(*this)[i]) );
 }
 /*-----------------------------------------------------------------------------*/
 const char& String::operator[](size_t i) const
 {
+	assert(i < Length());
+
     return (str[i]);
 }
 /*-----------------------------------------------------------------------------*/
 
 String& String::operator+=(const String& other)
 {   
-    //str1 = "hello "
-    //str2 = "world"
-    // str1 += str2 ==> str1 = "hello world"
-
-    String temp(*this);
-    size_t old_len = Length();
-    size_t other_len = other.Length();
-    size_t new_len = old_len + other_len + 1;
-
-    delete[] str;
-
-    str = new char[new_len];
-    memcpy(str, temp.str, old_len + 1);
-    strcat(str, other.str);
+	char *new_str = StringCreate(str, other.str);
+   
+	*this = new_str;
+	delete[] new_str;
 
     return (*this);
 }
@@ -75,8 +71,6 @@ String& String::operator+=(const String& other)
 
 const String operator+(String s1,const String& s2)
 {
-    // s1 = s2 + s3;
-
     return (s1 += s2);
 }
 /*-----------------------------------------------------------------------------*/
