@@ -19,16 +19,24 @@ int main()
 	String s2;
 	StringCCtor(&s2, &s1);
 
+
 	printf("Line %d\n", __LINE__);
 	String s3;
+	String temp;
+#ifdef NO_ELISION
+	StringCtor(&temp, "Shalom", "");
+	StringCCtor(&s3, &temp);
+	StringDtor(&temp);
+#else
 	StringCtor(&s3, "Shalom", "");
+#endif
+
 
 	printf("Line %d\n", __LINE__);
 	String *s4 = malloc(sizeof(String));
 	StringCtor(s4, "", "");
 
 	printf("Line %d\n", __LINE__);
-	String temp;
 	StringCCtor(&temp, &s3);
 	s4 = OperatorAsignment(s4, &temp);
 	StringDtor(&temp);
@@ -42,12 +50,24 @@ int main()
 	char c = *OperatorSubscript(&s3, 3);
 
 	printf("Line %d\n", __LINE__);
+	StringCCtor(&temp, &s3);
 	foo(&s3);
+	StringDtor(&temp);
 
 	printf("Line %d\n", __LINE__);
+	String cpy_tmp;
+#ifdef NO_ELISION
+	StringCtor(&temp, "RD90 are champions", "");
+	StringCCtor(&cpy_tmp, &temp);
+	foo(&cpy_tmp);
+	StringDtor(&temp);
+	StringDtor(&cpy_tmp);
+
+#else
 	StringCtor(&temp, "RD90 are champions", "");
 	foo(&temp);
 	StringDtor(&temp);
+#endif
 
 	printf("Line %d\n", __LINE__);
 	bar("We love C++", &temp);
@@ -68,13 +88,9 @@ int main()
 
 void foo(String *s)
 {
-	String temp;
-	StringCCtor(&temp, s);
-
 	printf("Line %d\n", __LINE__);
 	printf("foo got the arg:\n");
-	printf("%s\n", OperatorSubscript(&temp, 0));
-	StringDtor(&temp);
+	printf("%s\n", OperatorSubscript(s, 0));
 }
 
 void bar(const char* arg, String *tmp_arg)
