@@ -2,7 +2,7 @@
 
 struct X
 {
-	explicit X(); // initialization function without parameters is 
+	//explicit X(); // initialization function without parameters is 
 					   //	named default constructor (declaration)
 	explicit X(int a_, int b_ = 8); // regular (non default) Ctor
 	~X(); // deinitialization function is called destructor (Dtor)
@@ -14,14 +14,20 @@ struct X
 	const int m_b;
 };
 
-X::X():/* m_a(3),*/ m_b(4) //implementation of the default Ctor. (definition)
+struct Y
 {
-	 m_a = 3;
+	X m_x;
+	int m_i;
+};
+
+/*X::X():m_a(3), m_b(4) //implementation of the default Ctor. (definition)
+{
+	 //m_a = 3;
 	 //m_b = 4;
 	std::cout << "this:" << this << " X default Ctor. m_a:" 
 					<< m_a << " m_b:" << m_b << std::endl;	
 }									  
-	
+*/
 X::X(int a_, int b_): m_a(a_), m_b(b_) // implementation of the second
 															// Ctor.
 {
@@ -66,7 +72,17 @@ int main()
 	delete px; px = 0; 
 
 	double *xp = new double[10];
-	delete xp;
+	delete[] xp;
+
+
+	Y y1;
+	y1.m_x.m_a = 250;
+	//y1.m_x.m_b = 750;
+
+	Y y2(y1);
+	Y y3;
+
+	y3 = y1;
 
 	return 0;
 }

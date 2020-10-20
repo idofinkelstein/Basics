@@ -81,8 +81,7 @@ const Bigint operator+(const Bigint &num1, const Bigint &num2)
 }
 
 Bigint &Bigint::operator+=(const Bigint& num)
-{
-    
+{    
     static const int carry_lut[] = {0, 0, 1, 0, 1, 0, 1, 1};
 	int carry = 0;
 	int n1_s_bit, n2_s_bit, r_s_bit;
@@ -110,6 +109,16 @@ std::ostream &operator<<(std::ostream &os, const Bigint &bigint)
              bigint.words[LSI];
 
     return (os);
+}
+
+const Bigint Bigint::operator~() const
+{
+    Bigint temp;    
+
+    temp.words[LSI] = ~words[LSI];
+    temp.words[MSI] = ~words[MSI];
+
+    return (temp);
 }
 
 } // namespace rd90

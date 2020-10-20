@@ -85,6 +85,7 @@ int main()
     x + 3;
     3 + x;
     5 + a + b + 4 + x;
+    x = ~x;
 
 #endif
 	return 0;

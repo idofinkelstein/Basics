@@ -78,7 +78,7 @@ int main()
 	Vector v2(20);
 	Vector v3 = v2;
 
-	v1 = v3;
+	v1 = v3 = v2;
 
 	return 0;
 }

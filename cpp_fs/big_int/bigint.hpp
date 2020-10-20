@@ -55,7 +55,8 @@ public:
     // using generated functions
 
     //const Bigint operator+(const Bigint &num) const;
-    Bigint& operator+=(const Bigint &num);  
+    Bigint& operator+=(const Bigint &num);
+    const Bigint operator~() const;
 
     friend std::ostream& operator<<(std::ostream &os, const Bigint &bigint);
     friend const Bigint operator+(const Bigint &num1, const Bigint &num2); 

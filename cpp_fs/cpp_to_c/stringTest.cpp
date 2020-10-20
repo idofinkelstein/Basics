@@ -13,6 +13,7 @@ int main()
 {
     std::cout << "Line " << __LINE__ << std::endl;
     String s1("Hello");
+	String s()[];
 
     std::cout << "Line " << __LINE__ << std::endl;
     String s2(s1);

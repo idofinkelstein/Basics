@@ -65,7 +65,7 @@ String& String::operator+=(const String& other)
 	*this = new_str;
 	delete[] new_str;
 
-    return (*this);
+    return (*this/* = StringCreate(str, other.str)*/);
 }
 /*-----------------------------------------------------------------------------*/
 
