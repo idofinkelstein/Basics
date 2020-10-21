@@ -49,7 +49,7 @@ void Point::SetY(double y)
 }
 
 void Shape::Draw(){}
-Shape::Shape(const Point& position, double angle, int color) : position(position), angle(angle), color(color) {}
+Shape::Shape(const Point& position, double angle, COLORS color) : position(position), angle(angle), color(color) {}
 
 Shape::~Shape() {}
 
@@ -73,12 +73,8 @@ const Point &Shape::GetPoint() const
 	return (position);
 }
 
-int Shape::GetColor() const
-{
-	return (color);
-}
 
-int Shape::setColor(int color)
+void Shape::SetColor(int color)
 {
 	this->color = color;
 }
@@ -92,8 +88,44 @@ Circle::Circle(const Point& position, double radius) : Shape(position, 0), radiu
 
 void Circle::Draw()
 {
-	DrawCircle(0x010000, GetPoint().GetX(), GetPoint().GetY(), radius);
+	DrawCircle(GetColor(), GetPoint().GetX(), GetPoint().GetY(), radius);
 }
 
+Rectangle::Rectangle(const Point& position, double height, double width): Shape(position), height(height), width(width) {}
+
+void Rectangle::Draw()
+{
+	int x = static_cast<int>(GetPoint().GetX());
+	int y = static_cast<int>(GetPoint().GetY());
+	int xOffSet = width;
+	int yOffSet = height;
+
+	  DrawPolygon(GetColor(),					 4,
+        					x,				    	         y,
+       						x + xOffSet,	             y,
+        					x + xOffSet,			    y + yOffSet,
+       						x, 			    				y + yOffSet);
+}
+/*
+class Triangle : public Shape
+{
+public:
+    explicit Triangle(const Point& position, double height, double base, double dist);
+
+    virtual void Draw();
+
+private:
+    double height;
+    double base;
+    double dist;
+};
+*/
+
+Triangle::Triangle(const Point& position, double height, double base, double dist) : Shape(position), height(height), base(base), dist(dist) {}
+
+void Triangle::Draw()
+{
+
+}
 }// namespace rd90
 }// namespace ilrd

@@ -59,7 +59,7 @@ class Shape
             COLOR_FILL    = 0x8000000
         }; //TBC 
 
-        explicit Shape(const Point& position, double angle);
+        explicit Shape(const Point& position, double angle = 0, COLORS color = COLOR_MAGENTA);
         virtual ~Shape();
 
         virtual void Draw() = 0;
@@ -68,7 +68,7 @@ class Shape
         void Rotate(double angle);
         const Point& GetPoint() const;
 		int GetColor() const;
-		int setColor(int color);
+		void SetColor(int color);
 
     private:
         Point position;
