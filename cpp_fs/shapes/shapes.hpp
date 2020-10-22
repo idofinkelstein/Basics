@@ -62,15 +62,16 @@ class Shape
         explicit Shape(const Point& position, double angle = 0, COLORS color = COLOR_MAGENTA);
         virtual ~Shape();
 
-        virtual void Draw() = 0;
         void Step(const Point& delta);
         void Move(const Point& new_pos);
         void Rotate(double angle);
         const Point& GetPoint() const;
 		int GetColor() const;
 		void SetColor(int color);
+		void Draw(const Point &parentPos = Point(0, 0));
 
     private:
+        virtual void DrawShape(const Point &absPos) = 0;
         Point position;
         double angle;
 		int color;
@@ -83,9 +84,9 @@ class Circle : public Shape
 {
 public:
     explicit Circle(const Point& position, double radius); // : Shape(positon)
-    virtual void Draw();
 
 private:
+    virtual void DrawShape(const Point &absPos);
     double radius;
 };
 
@@ -95,9 +96,9 @@ class Rectangle : public Shape
 {
 public:
     explicit Rectangle(const Point& position, double height, double width);
-    virtual void Draw();
 
 private:
+     virtual void DrawShape(const Point &absPos);
     double height;
     double width;
 };
@@ -110,9 +111,9 @@ class Triangle : public Shape
 public:
     explicit Triangle(const Point& position, double height, double base, double dist);
 
-    virtual void Draw();
 
 private:
+     virtual void DrawShape(const Point &absPos);
     double height;
     double base;
     double dist;
@@ -125,10 +126,10 @@ class Group : public Shape
 public:
     explicit Group(const Point& position); 
 
-    virtual void Draw();
-    void Add(const Shape *shape);
+    void Add(Shape *shape);
 
 private:
+    virtual void DrawShape(const Point &absPos);
     Shape *shapes[50];
     std::size_t size;
 };
