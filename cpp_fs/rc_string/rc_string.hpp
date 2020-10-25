@@ -73,7 +73,6 @@ namespace rd90
 {
 
 class RCString;
-struct Buff;
 
 bool operator==(const RCString& s1, const RCString& s2); 
 bool operator<(const RCString& s1, const RCString& s2); 
@@ -98,13 +97,28 @@ public:
     size_t Length() const;
 
 private:
-    Buff *buff;
+	class StringData;
+    StringData *m_str;
+
 	RCString(const char* str1, const char* str2);
-    Buff *RCStringCreate(const char* str1, const char* str2 = "");
-	void BuffCleanup();
-	void BuffUpdate(const RCString& other);
+	void StringDataCleanup();
+	void StringDataUpdate(const RCString& other);
 };
-                                                    
+
+class RCString::StringData
+{
+public:
+	size_t counter;
+	char str[1];
+
+    static StringData *Create(const char* str1 = "", const char* str2 = "");
+
+private:
+	explicit StringData(const char *lhs, const char *rhs, size_t lhLen, size_t rhLen);
+};
+
+
+                                                 
 } // namespace rd90
 } // namespace ilrd
 
