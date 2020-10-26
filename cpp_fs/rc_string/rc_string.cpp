@@ -19,9 +19,9 @@ RCString::StringData *RCString::StringData::Create(const char *str1, const char*
 {
     size_t len1 = strlen(str1);
 	size_t len2 = strlen(str2) + 1;
+
 	void *buff = operator new(offsetof(StringData, str) + len1 + len2);
    
-
     return  new (buff)   StringData(str1, str2, len1, len2);
 }
        
@@ -112,6 +112,8 @@ RCString::StringData::StringData(const char *lhs, const char *rhs, size_t lhLen,
 	memcpy(&str, lhs, lhLen + 1);
 	memcpy(&str + lhLen, rhs, rhLen);
 }
+
+
 
 } // namespace rd90
 } // namespace ilrd

@@ -82,6 +82,9 @@ std::ostream& operator<<(std::ostream& os, const RCString& s);
 class RCString
 {
 public:
+    class Proxy;
+    friend class Proxy;
+
     /* non-explicit */RCString(const char* str = "");
     RCString(const RCString& other); //CCTOR
     RCString& operator=(const RCString &other);
@@ -89,9 +92,9 @@ public:
 
     RCString& operator+=(const RCString& other);  
 
-    char& operator[](size_t i);
+    Proxy& operator[](size_t i);
 
-	const char& operator[](size_t i) const;
+	const Proxy& operator[](size_t i) const;
 
     friend const RCString operator+(const RCString& s1,const RCString& s2);
     size_t Length() const;
@@ -117,7 +120,21 @@ private:
 	explicit StringData(const char *lhs, const char *rhs, size_t lhLen, size_t rhLen);
 };
 
+class RCString::Proxy 
+{
 
+public:
+    Proxy(RCString& str, int index);
+
+    Proxy& operator=(const Proxy& rhs); // lvalue
+    Proxy& operator=(char c);
+    // uses
+    operator char() const;
+private:
+    RCString& str;
+    int charIndex;
+
+};
                                                  
 } // namespace rd90
 } // namespace ilrd
