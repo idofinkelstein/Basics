@@ -67,14 +67,9 @@ const char& RCString::operator[](size_t i) const
 	return (m_str->str[i]);
 }
 
-char& RCString::operator[](size_t i)
+RCString::Proxy RCString::operator[](size_t i)
 {
-	if (m_str->counter > 1)
-	{
-		--m_str->counter;
-		m_str = StringData::Create(m_str->str);
-	}
-	return (const_cast<char&>( static_cast<const RCString&>(*this)[i]) );
+	return (Proxy(*this, i));
 }
 
 const RCString operator+(const RCString& s1,const RCString& s2)
@@ -106,11 +101,32 @@ bool operator>(const RCString& s1, const RCString& s2)
 	return (0 < strcmp(&s1[0], &s2[0]));
 }
 
-RCString::StringData::StringData(const char *lhs, const char *rhs, size_t lhLen, size_t rhLen) :
+RCString::StringData::StringData(const char *lhs, const char *rhs,
+												    size_t lhLen, size_t rhLen) :
 													counter(1)
 {
 	memcpy(&str, lhs, lhLen + 1);
 	memcpy(&str + lhLen, rhs, rhLen);
+}
+
+RCString::Proxy::Proxy(RCString& str, size_t index) : m_str(&str), m_i(index) {}
+
+RCString::Proxy::operator char() const
+{
+	return m_str->m_str->str[m_i];
+}
+
+char RCString::Proxy::operator=(char c)
+{
+	if (m_str->m_str->counter > 1)
+	{
+		--m_str->m_str->counter;
+		m_str->m_str = StringData::Create(m_str->m_str->str);
+	}
+
+	m_str->m_str->str[m_i] = c;
+
+	return c;
 }
 
 } // namespace rd90

@@ -61,6 +61,8 @@ void foo()
 
 #pragma once
 
+
+
 #include <iostream>     //ostream
 
 /*---------------------------------------------------------------------------*/
@@ -79,12 +81,7 @@ std::ostream& operator<<(std::ostream& os, const RCString& s);
 
 class RCString
 {
-private:
-    class Proxy;
-    friend class Proxy;
-	class StringData;
 public:
-
     /* non-explicit */RCString(const char* str = "");
     RCString(const RCString& other); //CCTOR
     RCString& operator=(const RCString &other);
@@ -92,7 +89,7 @@ public:
 
     RCString& operator+=(const RCString& other);  
 
-    Proxy operator[](size_t i);
+    char& operator[](size_t i);
 
 	const char& operator[](size_t i) const;
 
@@ -100,6 +97,7 @@ public:
     size_t Length() const;
 
 private:
+	class StringData;
     StringData *m_str;
 
 	RCString(const char* str1, const char* str2);
@@ -119,21 +117,7 @@ private:
 	explicit StringData(const char *lhs, const char *rhs, size_t lhLen, size_t rhLen);
 };
 
-class RCString::Proxy 
-{
 
-public:
-    Proxy(RCString& str, size_t index);
-
-    char operator=(const Proxy& rhs); // lvalue
-    char operator=(char c);
-    // uses
-    operator char() const;
-private:
-    RCString* m_str;
-    int m_i;
-
-};
                                                  
 } // namespace rd90
 } // namespace ilrd
