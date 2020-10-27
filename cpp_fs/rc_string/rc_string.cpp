@@ -19,9 +19,9 @@ RCString::StringData *RCString::StringData::Create(const char *str1, const char*
 {
     size_t len1 = strlen(str1);
 	size_t len2 = strlen(str2) + 1;
+
 	void *buff = operator new(offsetof(StringData, str) + len1 + len2);
    
-
     return  new (buff)   StringData(str1, str2, len1, len2);
 }
        
@@ -109,6 +109,7 @@ RCString::StringData::StringData(const char *lhs, const char *rhs,
 	memcpy(&str + lhLen, rhs, rhLen);
 }
 
+<<<<<<< HEAD
 RCString::Proxy::Proxy(RCString& str, size_t index) : m_str(&str), m_i(index) {}
 
 RCString::Proxy::operator char() const
@@ -128,6 +129,9 @@ char RCString::Proxy::operator=(char c)
 
 	return c;
 }
+=======
+
+>>>>>>> 4a9ab5dd4c40f10db7b17f51b296ffc35be6487d
 
 } // namespace rd90
 } // namespace ilrd

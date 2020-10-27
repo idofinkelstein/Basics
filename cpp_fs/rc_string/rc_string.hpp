@@ -84,6 +84,11 @@ private:
     friend class Proxy;
 	class StringData;
 public:
+<<<<<<< HEAD
+=======
+    class Proxy;
+    friend class Proxy;
+>>>>>>> 4a9ab5dd4c40f10db7b17f51b296ffc35be6487d
 
     /* non-explicit */RCString(const char* str = "");
     RCString(const RCString& other); //CCTOR
@@ -92,9 +97,13 @@ public:
 
     RCString& operator+=(const RCString& other);  
 
+<<<<<<< HEAD
     Proxy operator[](size_t i);
+=======
+    Proxy& operator[](size_t i);
+>>>>>>> 4a9ab5dd4c40f10db7b17f51b296ffc35be6487d
 
-	const char& operator[](size_t i) const;
+	const Proxy& operator[](size_t i) const;
 
     friend const RCString operator+(const RCString& s1,const RCString& s2);
     size_t Length() const;
@@ -123,6 +132,7 @@ class RCString::Proxy
 {
 
 public:
+<<<<<<< HEAD
     Proxy(RCString& str, size_t index);
 
     char operator=(const Proxy& rhs); // lvalue
@@ -132,6 +142,17 @@ public:
 private:
     RCString* m_str;
     int m_i;
+=======
+    Proxy(RCString& str, int index);
+
+    Proxy& operator=(const Proxy& rhs); // lvalue
+    Proxy& operator=(char c);
+    // uses
+    operator char() const;
+private:
+    RCString& str;
+    int charIndex;
+>>>>>>> 4a9ab5dd4c40f10db7b17f51b296ffc35be6487d
 
 };
                                                  
