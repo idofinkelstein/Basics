@@ -126,7 +126,6 @@ void RCString::StringData::Detach()
 	}
 }
 
-
 void RCString::Setchar(char c, size_t i)
 {
 	(*m_str)[i] = c;
