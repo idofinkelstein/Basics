@@ -22,7 +22,11 @@ RCString::StringData *RCString::StringData::Create(const char *str1, const char*
 	void *buff = operator new(offsetof(StringData, str) + len1 + len2);
    
 
+<<<<<<< HEAD
     return  new (buff) StringData(str1, str2, len1, len2);
+=======
+    return  new (buff)   StringData(str1, str2, len1, len2);
+>>>>>>> facb48c762dae9653274db9d8c1b12ccaff895ca
 }
        
 void RCString::StringDataCleanup()
@@ -107,6 +111,7 @@ RCString::StringData::StringData(const char *lhs, const char *rhs,
 	memcpy(&str + lhLen, rhs, rhLen);
 }
 
+<<<<<<< HEAD
 int RCString::StringData::IsShared() const
 {
 	return (counter > 1);
@@ -160,6 +165,27 @@ char &RCString::StringData::operator[](size_t i)
 {
 	return str[i];
 }
+=======
+RCString::Proxy::Proxy(RCString& str, size_t index) : m_str(&str), m_i(index) {}
+
+RCString::Proxy::operator char() const
+{
+	return m_str->m_str->str[m_i];
+}
+
+char RCString::Proxy::operator=(char c)
+{
+	if (m_str->m_str->counter > 1)
+	{
+		--m_str->m_str->counter;
+		m_str->m_str = StringData::Create(m_str->m_str->str);
+	}
+
+	m_str->m_str->str[m_i] = c;
+
+	return c;
+}
+>>>>>>> facb48c762dae9653274db9d8c1b12ccaff895ca
 
 } // namespace rd90
 } // namespace ilrd

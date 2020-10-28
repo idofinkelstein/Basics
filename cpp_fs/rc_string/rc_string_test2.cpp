@@ -21,7 +21,11 @@ int main()
     str1 = str2 + str3;//
 
     str1[4] = c;
+<<<<<<< HEAD
 	c = str5[4];
+=======
+	c = str3[1];
+>>>>>>> facb48c762dae9653274db9d8c1b12ccaff895ca
 	//str1[20] = c;
     str2 = str2;
     str2[0] = 'z';//

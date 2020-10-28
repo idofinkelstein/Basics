@@ -61,6 +61,8 @@ void foo()
 
 #pragma once
 
+
+
 #include <iostream>     //ostream
 
 /*---------------------------------------------------------------------------*/
@@ -79,87 +81,43 @@ std::ostream& operator<<(std::ostream& os, const RCString& s);
 
 class RCString
 {
-private:
-    class Proxy;
-<<<<<<< HEAD
-=======
-    friend class Proxy;
->>>>>>> facb48c762dae9653274db9d8c1b12ccaff895ca
-	class StringData;
 public:
-
     /* non-explicit */RCString(const char* str = "");
     RCString(const RCString& other); //CCTOR
     RCString& operator=(const RCString &other);
     ~RCString();
 
     RCString& operator+=(const RCString& other);  
-<<<<<<< HEAD
-    Proxy operator[](size_t i);
-	const char& operator[](size_t i) const;
-    size_t Length() const;
-=======
 
-    Proxy operator[](size_t i);
+    char& operator[](size_t i);
 
 	const char& operator[](size_t i) const;
->>>>>>> facb48c762dae9653274db9d8c1b12ccaff895ca
 
     friend const RCString operator+(const RCString& s1,const RCString& s2);
+    size_t Length() const;
 
 private:
+	class StringData;
     StringData *m_str;
 
 	RCString(const char* str1, const char* str2);
 	void StringDataCleanup();
 	void StringDataUpdate(const RCString& other);
-    void Setchar(char c, size_t i);
 };
 
 class RCString::StringData
 {
 public:
+	size_t counter;
+	char str[1];
 
     static StringData *Create(const char* str1 = "", const char* str2 = "");
-    int IsShared() const;
-    void Join();
-    void Detach();
-
-    const char &operator[](size_t i) const;
-    char &operator[](size_t i);
 
 private:
 	explicit StringData(const char *lhs, const char *rhs, size_t lhLen, size_t rhLen);
-	size_t counter;
-	char str[1];
 };
 
-class RCString::Proxy 
-{
 
-public:
-    Proxy(RCString& str, size_t index);
-<<<<<<< HEAD
-
-    char operator=(const Proxy& rhs); 
-    char operator=(char c);
-
-    operator char() const;
-=======
-
-    char operator=(const Proxy& rhs); // lvalue
-    char operator=(char c);
-    // uses
-    operator char() const;
-private:
-    RCString* m_str;
-    int m_i;
->>>>>>> facb48c762dae9653274db9d8c1b12ccaff895ca
-
-private:
-    RCString* m_str;
-    int m_i;
-};
                                                  
 } // namespace rd90
 } // namespace ilrd
