@@ -61,6 +61,8 @@ void foo()
 
 #pragma once
 
+
+
 #include <iostream>     //ostream
 
 /*---------------------------------------------------------------------------*/
@@ -81,8 +83,9 @@ class RCString
 {
 private:
     class Proxy;
-	class StringData;
+
 public:
+    //friend class Proxy;
 
     /* non-explicit */RCString(const char* str = "");
     RCString(const RCString& other); //CCTOR
@@ -90,53 +93,54 @@ public:
     ~RCString();
 
     RCString& operator+=(const RCString& other);  
-    Proxy operator[](size_t i);
+
+    Proxy& operator[](size_t i);
+
 	const char& operator[](size_t i) const;
-    size_t Length() const;
 
     friend const RCString operator+(const RCString& s1,const RCString& s2);
+    size_t Length() const;
 
 private:
+	class StringData;
     StringData *m_str;
 
 	RCString(const char* str1, const char* str2);
 	void StringDataCleanup();
 	void StringDataUpdate(const RCString& other);
-    void Setchar(char c, size_t i);
 };
 
 class RCString::StringData
 {
 public:
+	size_t counter;
+	char str[1];
 
     static StringData *Create(const char* str1 = "", const char* str2 = "");
-    int IsShared() const;
-    void Join();
-    void Detach();
-
-    const char &operator[](size_t i) const;
-    char &operator[](size_t i);
 
 private:
 	explicit StringData(const char *lhs, const char *rhs, size_t lhLen, size_t rhLen);
-	size_t counter;
-	char str[1];
 };
 
 class RCString::Proxy 
 {
 
 public:
-    Proxy(RCString& str, size_t index);
 
-    char operator=(const Proxy& rhs); 
+    Proxy(RCString& str, int index = 0);
+
+    // using generated cctor
+
     char operator=(char c);
+    //char operator=(const Proxy& other); // lvalue
 
     operator char() const;
-
 private:
+
+    //RCString& m_str;
     RCString* m_str;
-    int m_i;
+    int m_ndex;
+
 };
                                                  
 } // namespace rd90

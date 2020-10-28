@@ -21,7 +21,6 @@ int main()
     str1 = str2 + str3;//
 
     str1[4] = c;
-	c = str5[4];
 	//str1[20] = c;
     str2 = str2;
     str2[0] = 'z';//
@@ -39,7 +38,6 @@ int main()
                        "str5 = " << str5 << std::endl;
     str1 = str1;
 
-	std::cout << " c = " << c << std::endl;
 
     if (str2 > str5)
     {
