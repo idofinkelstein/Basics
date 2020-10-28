@@ -197,9 +197,15 @@ void FiFi(Centipede *c)
 
 int main(int argc, char const *argv[])
 {
-    Centipede c, temp;
+    Centipede c, c2, temp, arr3[4];
     Animal tmp;
     Animal *array[3];
+    Animal arr2[3];
+    Centipede Ctmp;
+    Squirl Stmp, *arr4;
+    Animal Atmp;
+
+    int i = 0;
 
     CentipedeCtor(&c);
     Foo(&c.animal);
@@ -211,8 +217,71 @@ int main(int argc, char const *argv[])
     FiFi(&c);
 
     array[0] = malloc(sizeof(Centipede));
+    CentipedeCtor((Centipede*)array[0]);
     array[1] = malloc(sizeof(Squirl));
+    SquirlCtor((Squirl*)array[1]);
     array[2] = malloc(sizeof(Centipede));
+    CentipedeCtor((Centipede*)array[2]);
+
+	for(i = 0; i < 3; ++i) 
+    {
+        array[i]->Vptr[Display](array[i]);
+    }
+
+    CentipedeDtorV((Centipede*)array[2]);
+    SquirlDisplayV((Squirl*)array[1]);
+    CentipedeDtorV((Centipede*)array[0]);
+
+    for(i = 0; i < 3; ++i)
+    {
+        free(array[i]);
+    }
+
+    CentipedeCtor(&Ctmp);
+    AnimalCCtor(&arr2[0], &Ctmp.animal);
+    CentipedeDtorV(&Ctmp);
+
+    SquirlCtor(&Stmp);
+    AnimalCCtor(&arr2[1], &Stmp.animal);
+    SquirlDtorV(&Stmp);
+    
+    AnimalCtor(&Atmp);
+    AnimalCCtor(&arr2[2], &Atmp);
+    AnimalDtorV(&Atmp);
+
+    for(i = 0; i < 3; ++i) 
+    {
+        arr2[i].Vptr[Display](&arr2[i]);
+    }
+
+    AnimalPrintCount();
+    CentipedeCtor(&c2);
+    AnimalPrintCount();
+
+    CentipedeCtor(&arr3[0]);
+    CentipedeCtor(&arr3[1]);
+    CentipedeCtor(&arr3[2]);
+    CentipedeCtor(&arr3[3]);
+
+    arr4 = malloc(sizeof(Squirl) * 4);
+    SquirlCtor(&arr4[0]);
+    SquirlCtor(&arr4[1]);
+    SquirlCtor(&arr4[2]);
+    SquirlCtor(&arr4[3]);
+
+    SquirlDtorV(&arr4[3]);
+    SquirlDtorV(&arr4[2]);
+    SquirlDtorV(&arr4[1]);
+    SquirlDtorV(&arr4[0]);
+
+    free(arr4);
+
+    AnimalDtorV(&arr2[2]);
+    AnimalDtorV(&arr2[1]);
+    AnimalDtorV(&arr2[0]);
+
+    CentipedeDtorV(&c2);
+    CentipedeDtorV(&c);
 
 
     return 0;
