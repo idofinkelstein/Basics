@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 int Animal_s_count = 0;
 
@@ -53,20 +54,20 @@ void SquirlCCtor(Squirl * const this, const Squirl *other);
 void SquirlDtorV(Squirl * const this);
 void SquirlDisplayV(Squirl * const this);
 
-FUNCPTR AnimalVMT[2] = 
+static FUNCPTR AnimalVMT[2] = 
 {
     (void(*)(void*))AnimalDtorV,
     (void(*)(void*))AnimalDisplayV
 };
 
-FUNCPTR CentipedeVMT[3] = 
+static FUNCPTR CentipedeVMT[3] = 
 {
     (void(*)(void*))CentipedeDtorV,
     (void(*)(void*))CentipedeDisplayV,
     (void(*)(void*))CentipedeBuyShuesV
 };
 
-FUNCPTR SquirlVMT[2] = 
+static FUNCPTR SquirlVMT[2] = 
 {
     (void(*)(void*))SquirlDtorV,
     (void(*)(void*))SquirlDisplayV
@@ -196,9 +197,23 @@ void FiFi(Centipede *c)
 
 int main(int argc, char const *argv[])
 {
-    Centipede c;
+    Centipede c, temp;
+    Animal tmp;
+    Animal *array[3];
+
     CentipedeCtor(&c);
     Foo(&c.animal);
+
+    AFoo(3, &temp.animal);
+    AnimalDisplayV(&temp.animal);
+    CentipedeDtorV(&temp);
+
+    FiFi(&c);
+
+    array[0] = malloc(sizeof(Centipede));
+    array[1] = malloc(sizeof(Squirl));
+    array[2] = malloc(sizeof(Centipede));
+
 
     return 0;
 }

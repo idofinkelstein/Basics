@@ -81,10 +81,6 @@ class RCString
 {
 private:
     class Proxy;
-<<<<<<< HEAD
-=======
-    friend class Proxy;
->>>>>>> facb48c762dae9653274db9d8c1b12ccaff895ca
 	class StringData;
 public:
 
@@ -94,16 +90,9 @@ public:
     ~RCString();
 
     RCString& operator+=(const RCString& other);  
-<<<<<<< HEAD
     Proxy operator[](size_t i);
 	const char& operator[](size_t i) const;
     size_t Length() const;
-=======
-
-    Proxy operator[](size_t i);
-
-	const char& operator[](size_t i) const;
->>>>>>> facb48c762dae9653274db9d8c1b12ccaff895ca
 
     friend const RCString operator+(const RCString& s1,const RCString& s2);
 
@@ -139,22 +128,11 @@ class RCString::Proxy
 
 public:
     Proxy(RCString& str, size_t index);
-<<<<<<< HEAD
 
     char operator=(const Proxy& rhs); 
     char operator=(char c);
 
     operator char() const;
-=======
-
-    char operator=(const Proxy& rhs); // lvalue
-    char operator=(char c);
-    // uses
-    operator char() const;
-private:
-    RCString* m_str;
-    int m_i;
->>>>>>> facb48c762dae9653274db9d8c1b12ccaff895ca
 
 private:
     RCString* m_str;
