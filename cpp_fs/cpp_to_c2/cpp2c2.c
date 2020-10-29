@@ -113,7 +113,7 @@ void CentipedeCtor(Centipede * const this)
 {
     AnimalCtor(&this->animal);
     this->m_numLegs = 46;
-    printf("s_count: %d\n", Animal_s_count);
+    printf("Centipede::Ctor()\n");
     this->animal.Vptr = CentipedeVMT;
 }
 void CentipedeCCtor(Centipede * const this, const Centipede *other)
