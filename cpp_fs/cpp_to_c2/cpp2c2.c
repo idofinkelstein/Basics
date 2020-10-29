@@ -125,8 +125,9 @@ void CentipedeCCtor(Centipede * const this, const Centipede *other)
 }
 void CentipedeDtorV(Centipede * const this)
 {
-    AnimalDtorV(&this->animal);
     printf("Centipede::Dtor()\n");
+    this->animal.Vptr = AnimalVMT;
+    AnimalDtorV(&this->animal);
 }
 
 void CentipedeDisplayV(Centipede * const this)
@@ -157,8 +158,9 @@ void SquirlCCtor(Squirl * const this, const Squirl *other)
 
 void SquirlDtorV(Squirl * const this)
 {
-    AnimalDtorV(&this->animal);
     printf("Squirl::Dtor()\n");
+    this->animal.Vptr = AnimalVMT;
+    AnimalDtorV(&this->animal);
 }
 void SquirlDisplayV(Squirl * const this)
 {
@@ -183,7 +185,7 @@ void AFoo(int i, Animal *res)
     printf("Foo(int i)\n");
     CentipedeDisplayV(&temp);
 
-    AnimalCCtor(&temp.animal, res);
+    AnimalCCtor(res, &temp.animal);
     CentipedeDtorV(&temp);
 }
 
@@ -229,7 +231,7 @@ int main(int argc, char const *argv[])
     }
 
     CentipedeDtorV((Centipede*)array[2]);
-    SquirlDisplayV((Squirl*)array[1]);
+    SquirlDtorV((Squirl*)array[1]);
     CentipedeDtorV((Centipede*)array[0]);
 
     for(i = 0; i < 3; ++i)
