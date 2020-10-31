@@ -5,10 +5,10 @@
 ROOT_DIR = ../..
 
 #PROJ_SRCS = $(wildcard *.c)
-PROJ_SRCS = d_vector.cpp d_vector_test.cpp
+PROJ_SRCS = d_vector.cpp d_vector_test.cpp rc_string.cpp
 
 # list of directories containing header files
-PROJ_INC_DIR =
+PROJ_INC_DIR = $(ROOT_DIR)/cpp_fs/rc_string
 
 # the executable file
 PROJ_OUT = dVector.out
@@ -31,6 +31,6 @@ PROJ_LIBS =
 PROJ_LDFLAGS =
 
 # list of projects (makefiles) this project depends on
-PROJ_DEPENDS  =
+PROJ_DEPENDS  = $(ROOT_DIR)/cpp_fs/rc_string/Makefile
 
 include $(ROOT_DIR)/make/Project.mak
