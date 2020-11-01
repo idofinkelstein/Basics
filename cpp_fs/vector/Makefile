@@ -5,7 +5,7 @@
 ROOT_DIR = ../..
 
 #PROJ_SRCS = $(wildcard *.c)
-PROJ_SRCS = d_vector.cpp d_vector_test.cpp rc_string.cpp
+PROJ_SRCS = d_vector.cpp d_vector_test2.cpp rc_string.cpp
 
 # list of directories containing header files
 PROJ_INC_DIR = $(ROOT_DIR)/cpp_fs/rc_string

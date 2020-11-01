@@ -19,12 +19,12 @@ Main operations on vector:
 #include <cstring>
 #include <cstddef> //size_t
 #include <cassert>
+#include <new>
 
 namespace ilrd
 {
 namespace rd90
 {
-
 
 enum factor
 {
@@ -46,13 +46,15 @@ public:
     inline size_t Capacity() const;
     T& operator[](size_t index);
     const T& operator[](size_t index) const;
-    void Resize(size_t new_size, T t = T());
+    void Resize(size_t new_size, const T& t = T());
     void Reserve(size_t new_capacity);
 
 private:
     DVector(const DVector& other);
     DVector& operator=(const DVector& other);
 	void ChangeCapacity(size_t size);
+	void Init(size_t start_index, size_t end_index, const T& t);
+	void Init(size_t start_index, size_t end_index);
 
     size_t m_capacity;
     size_t m_size;
@@ -63,12 +65,21 @@ private:
 template <typename T>
 DVector<T>::DVector(size_t init_size) : m_capacity(init_size * RESIZE_FACTOR + 1),
                                         m_size(init_size),
-                                        m_data(new T[m_capacity]) {}
+                                        m_data(static_cast<T*>(operator new (sizeof(T) * 
+															   m_capacity)))
+{
+	Init(0, m_size);
+}
 
 template <typename T>
 DVector<T>::~DVector()
 {
-    delete[] m_data;     
+	for (size_t i = 0; i < Size(); ++i)
+	{
+		m_data[i].~T();
+	}
+
+    operator delete (m_data);     
 }
 
 template <typename T>
@@ -80,7 +91,7 @@ void DVector<T>::PushBack(const T& data)
     }
 
     ++m_size;
-    this->m_data[m_size - 1] = data;
+	new (&m_data[m_size - 1]) T(data);
 }
 
 template <typename T>
@@ -88,6 +99,7 @@ template <typename T>
 {
 	if (0 != m_size)
 	{
+		m_data[m_size - 1].~T();
 		--m_size;
 	}
 	else
@@ -131,7 +143,7 @@ const T& DVector<T>::operator[](size_t index) const
 template <typename T>
 void DVector<T>::Reserve(size_t new_capacity)
 {
-	if (new_capacity > this->Capacity)
+	if (new_capacity > Capacity())
 	{
 		ChangeCapacity(new_capacity);
 	}
@@ -140,21 +152,23 @@ void DVector<T>::Reserve(size_t new_capacity)
 template <typename T>
 void DVector<T>::ChangeCapacity(size_t size)
 {
-	T *tmp_data = new T[size];
+	T *tmp_data = static_cast<T*>(operator new (sizeof(T) * size));
 
 	for(size_t i = 0; i < m_size; ++i)
 	{
-		tmp_data[i] =  this->m_data[i];
+		new (&tmp_data[i]) T(m_data[i]);
+
+		m_data[i].~T();
 	}
 
-    delete[] this->m_data;
+	operator delete (this->m_data);
     this->m_data = tmp_data;
 
 	m_capacity = size;
 }
 
 template <typename T>
-void DVector<T>::Resize(size_t new_size, T t)
+void DVector<T>::Resize(size_t new_size, const T& t)
 {
 	size_t start = 0, end = 0;
 
@@ -175,10 +189,26 @@ void DVector<T>::Resize(size_t new_size, T t)
 		end = Capacity();
 	}
 
-	for (size_t i = start; i < end; ++i)
+	Init(start, end, t);
+}
+
+template <typename T>
+void DVector<T>::Init(size_t start_index, size_t end_index, const T& t)
+{
+	for (size_t i = start_index; i < end_index; ++i)
 	{
-		m_data[i] = t;
+		new (&m_data[i]) T(t);
 	}
 }
+
+template <typename T>
+void DVector<T>::Init(size_t start_index, size_t end_index)
+{
+	for (size_t i = start_index; i < end_index; ++i)
+	{
+		new (&m_data[i]) T();
+	}
+}
+
 } // namespace rd90
 } // namespace ilrd

@@ -77,7 +77,7 @@ const RCString operator+(const RCString& s1,const RCString& s2)
 
 std::ostream& operator<<(std::ostream& os, const RCString& s)
 {
-    return (os << &s[0]);
+    return (os << s[0]);
 }
 
 size_t RCString::Length() const
@@ -160,6 +160,11 @@ const char &RCString::StringData::operator[](size_t i) const
 char &RCString::StringData::operator[](size_t i)
 {
 	return str[i];
+}
+
+char RCString::Proxy::operator=(const Proxy& other)
+{
+    return (*this = static_cast<char>(other));
 }
 
 } // namespace rd90
