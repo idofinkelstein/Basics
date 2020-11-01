@@ -77,7 +77,7 @@ const RCString operator+(const RCString& s1,const RCString& s2)
 
 std::ostream& operator<<(std::ostream& os, const RCString& s)
 {
-    return (os << s[0]);
+    return (os << &s[0]);
 }
 
 size_t RCString::Length() const
