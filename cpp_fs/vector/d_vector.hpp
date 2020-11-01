@@ -38,7 +38,6 @@ class DVector
 {
 public:
     explicit DVector(size_t init_size = 0);
-
     ~DVector();
     void PushBack(const T& m_data);
     void PopBack();
@@ -53,8 +52,7 @@ private:
     DVector(const DVector& other);
     DVector& operator=(const DVector& other);
 	void ChangeCapacity(size_t size);
-	void Init(size_t start_index, size_t end_index, const T& t);
-	void Init(size_t start_index, size_t end_index);
+	void Init(size_t start_index, size_t end_index, const T& t = T());
 
     size_t m_capacity;
     size_t m_size;
@@ -198,15 +196,6 @@ void DVector<T>::Init(size_t start_index, size_t end_index, const T& t)
 	for (size_t i = start_index; i < end_index; ++i)
 	{
 		new (&m_data[i]) T(t);
-	}
-}
-
-template <typename T>
-void DVector<T>::Init(size_t start_index, size_t end_index)
-{
-	for (size_t i = start_index; i < end_index; ++i)
-	{
-		new (&m_data[i]) T();
 	}
 }
 
