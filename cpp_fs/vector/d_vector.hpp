@@ -37,7 +37,8 @@ template <typename T>
 class DVector
 {
 public:
-    explicit DVector(size_t init_size = 0);
+	explicit DVector();
+    explicit DVector(size_t init_size, const T& t = T());
     ~DVector();
     void PushBack(const T& m_data);
     void PopBack();
@@ -61,12 +62,21 @@ private:
 
 
 template <typename T>
-DVector<T>::DVector(size_t init_size) : m_capacity(init_size * RESIZE_FACTOR + 1),
+DVector<T>::DVector() : m_capacity(1),
+                        m_size(0),
+                        m_data(static_cast<T*>(operator new (sizeof(T) * 
+															 m_capacity)))
+{
+	Init(0, m_size);
+}
+
+template <typename T>
+DVector<T>::DVector(size_t init_size, const T& t) : m_capacity(init_size * RESIZE_FACTOR + 1),
                                         m_size(init_size),
                                         m_data(static_cast<T*>(operator new (sizeof(T) * 
 															   m_capacity)))
 {
-	Init(0, m_size);
+	Init(0, m_size, t);
 }
 
 template <typename T>
