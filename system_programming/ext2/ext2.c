@@ -21,8 +21,9 @@ static void read_inode(int fd,
 					   const struct ext2_group_desc *group,
  					   struct ext2_inode *inode);
 
-static void read_dir(int fd, const struct ext2_inode *inode, const struct ext2_group_desc *group);
-static void read_file(int fd, const struct ext2_inode *inode, const struct ext2_group_desc *group);
+static void read_dir(int fd, const struct ext2_inode *inode);
+static void read_file(int fd, const struct ext2_inode *inode);
+void PrintInodeData(struct ext2_inode *inode);
 
 
 
@@ -31,7 +32,7 @@ int main()
 	struct ext2_super_block *sb;
 	int ram_fd = 0;
 	char sb_buff[1024];
-	int status = 0, i = 0;
+	int status = 0;
 	unsigned int group_count;
 	unsigned block_size;
 	unsigned int descr_list_size;
@@ -73,7 +74,7 @@ int main()
 	printf("bg inode table = %d\n", group_des.bg_inode_table); 
 
 	read_inode(ram_fd, 2, &group_des, &root);
-	read_inode(ram_fd, 14, &group_des, &header);
+	read_inode(ram_fd, 110, &group_des, &header);
 
 	printf("root.i_size = %d\n",root.i_size);
 	printf("root.i_blocks = %d\n", root.i_blocks);
@@ -89,19 +90,13 @@ int main()
 	       root.i_size,
 	       root.i_blocks);
 
-	for(i=0; i<EXT2_N_BLOCKS; i++)
-		if (i < EXT2_NDIR_BLOCKS)         /* direct blocks */
-			printf("Block %2u : %u\n", i, root.i_block[i]);
-		else if (i == EXT2_IND_BLOCK)     /* single indirect block */
-			printf("Single   : %u\n", root.i_block[i]);
-		else if (i == EXT2_DIND_BLOCK)    /* double indirect block */
-			printf("Double   : %u\n", root.i_block[i]);
-		else if (i == EXT2_TIND_BLOCK)    /* triple indirect block */
-			printf("Triple   : %u\n", root.i_block[i]);
+	PrintInodeData(&root);
+	PrintInodeData(&header);
 
+	
 
-	read_dir(ram_fd, &root, &group_des);
-	read_file(ram_fd, &header, &group_des);
+	read_dir(ram_fd, &root);
+	read_file(ram_fd, &header);
 	return 0;
 }
 
@@ -116,7 +111,7 @@ static void read_inode(fd, inode_no, group, inode)
 	read(fd, inode, sizeof(struct ext2_inode));
 }
 
-static void read_dir(int fd, const struct ext2_inode *inode, const struct ext2_group_desc *group)
+static void read_dir(int fd, const struct ext2_inode *inode)
 {
 	void *block;
 	int i = 0;
@@ -140,7 +135,7 @@ static void read_dir(int fd, const struct ext2_inode *inode, const struct ext2_g
 			entry = (struct ext2_dir_entry_2 *) block;  /* first entry in the directory */
 					/* Notice that the list may be terminated with a NULL
 					entry (entry->inode == NULL)*/
-			while((size < inode->i_size) && entry->inode)
+			while(entry->inode && (size < inode->i_size) )
 			{
 				char file_name[EXT2_NAME_LEN+1];
 				memcpy(file_name, entry->name, entry->name_len);
@@ -157,35 +152,42 @@ static void read_dir(int fd, const struct ext2_inode *inode, const struct ext2_g
 	}
 }
 
-static void read_file(int fd, const struct ext2_inode *inode, const struct ext2_group_desc *group)
+static void read_file(int fd, const struct ext2_inode *inode)
 {
 	void *block;
 	int i = 0;
 
 	
-	
-		
-
 		if ((block = malloc(BLOCK_SIZE)) == NULL) { /* allocate memory for the data block */
 			fprintf(stderr, "Memory error\n");
 			close(fd);
 			exit(1);
 		}
 
-		for (i = 0; i < 4; ++i)
+		for (i = 0; i < 13; ++i)
 		{
 			lseek(fd, BLOCK_OFFSET(inode->i_block[i]), SEEK_SET);
 			read(fd, block, BLOCK_SIZE);                /* read block from disk*/
-
-			
-			
-				
-			printf("%s\n", (char*)block);
-			
-			
+							
+			printf("%s\n", (char*)block);						
 		}
 		
 
 		free(block);
 	
+}
+
+void PrintInodeData(struct ext2_inode *inode)
+{
+	int i = 0;
+
+	for(i=0; i<EXT2_N_BLOCKS; i++)
+		if (i < EXT2_NDIR_BLOCKS)         /* direct blocks */
+			printf("Block %2u : %u\n", i, (*inode).i_block[i]);
+		else if (i == EXT2_IND_BLOCK)     /* single indirect block */
+			printf("Single   : %u\n",(*inode).i_block[i]);
+		else if (i == EXT2_DIND_BLOCK)    /* double indirect block */
+			printf("Double   : %u\n",(*inode).i_block[i]);
+		else if (i == EXT2_TIND_BLOCK)    /* triple indirect block */
+			printf("Triple   : %u\n",(*inode).i_block[i]);
 }
