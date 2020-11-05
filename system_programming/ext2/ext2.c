@@ -169,6 +169,12 @@ static void read_file(int fd, const struct ext2_inode *inode)
 			lseek(fd, BLOCK_OFFSET(inode->i_block[i]), SEEK_SET);
 			read(fd, block, BLOCK_SIZE);                /* read block from disk*/
 							
+			if (i == 12)
+			{
+				
+
+			}
+
 			printf("%s\n", (char*)block);						
 		}
 		
