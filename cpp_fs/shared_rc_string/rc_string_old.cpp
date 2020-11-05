@@ -105,12 +105,6 @@ void RCString::StringData::Detach()
 
 void RCString::Setchar(char c, size_t i)
 {
-	if (m_str.UseCount() > 1)
-	{
-		// this is the problem
-		m_str = SharedPtr<StringData>(StringData::Create(&(*m_str)[0]));
-	}
-
 	(*m_str)[i] = c;
 }
 
@@ -123,6 +117,12 @@ RCString::Proxy::operator char() const
 
 char RCString::Proxy::operator=(char c)
 {
+	if (m_str->m_str.UseCount() > 1)
+	{
+		// this is the problem
+		m_str->m_str->RCString::StringData::Create(*(m_str->m_str));
+	}
+
 	m_str->Setchar(c, m_i);
 
 	return c;
