@@ -135,7 +135,7 @@ static void read_dir(int fd, const struct ext2_inode *inode)
 			entry = (struct ext2_dir_entry_2 *) block;  /* first entry in the directory */
 					/* Notice that the list may be terminated with a NULL
 					entry (entry->inode == NULL)*/
-			while(entry->inode && (size < inode->i_size) )
+			while((size < inode->i_size) && entry->inode)
 			{
 				char file_name[EXT2_NAME_LEN+1];
 				memcpy(file_name, entry->name, entry->name_len);
@@ -168,14 +168,9 @@ static void read_file(int fd, const struct ext2_inode *inode)
 		{
 			lseek(fd, BLOCK_OFFSET(inode->i_block[i]), SEEK_SET);
 			read(fd, block, BLOCK_SIZE);                /* read block from disk*/
-							
-			if (i == 12)
-			{
-				
+		
+			write(1, block, BLOCK_SIZE);
 
-			}
-
-			printf("%s\n", (char*)block);						
 		}
 		
 
