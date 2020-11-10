@@ -19,7 +19,7 @@
 int main(int argc, char *argv[]) 
 {
     int sockfd; 
-    char buffer[MAXLINE]; 
+    char *buffer; 
     char *ping = "ping";
     char *pong = "pong"; 
     struct sockaddr_in server_addr, client_addr;
@@ -28,6 +28,13 @@ int main(int argc, char *argv[])
 
     if (argc > 1)
     {
+        buffer = (char*)malloc(MAXLINE);
+        if (NULL == buffer)
+        {
+            exit(EXIT_FAILURE);
+        }
+
+
         /* Creating socket file descriptor */
         if (-1 == (sockfd = socket(AF_INET, SOCK_DGRAM, 0))) /* UDP protocol */
         { 
@@ -39,9 +46,9 @@ int main(int argc, char *argv[])
         memset(&client_addr, 0, sizeof(client_addr));
 
         /* Filling server information */
-        server_addr.sin_family = AF_INET; 
-        server_addr.sin_port = htons(PORT); 
-        server_addr.sin_addr.s_addr = INADDR_ANY;
+        server_addr.sin_family = AF_INET;  /* ipv4 */
+        server_addr.sin_port = htons(PORT); /* port number */
+        server_addr.sin_addr.s_addr = INADDR_ANY; /* ip address */
 
         /* enters client application */
         if (0 == strcmp(argv[1], "client"))
@@ -93,5 +100,6 @@ int main(int argc, char *argv[])
         printf("change arguments and start again\n");
     }
 
+    free(buffer);
     return (0);
 }
