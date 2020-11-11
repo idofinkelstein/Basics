@@ -32,6 +32,8 @@ void Widget::operator=(Widget other)
     char *str = m_str;
     m_str = other.m_str;
     other.m_str = str;
+
+	// pointers swap
 }
 
 void Widget::operator=(Widget(*other)())

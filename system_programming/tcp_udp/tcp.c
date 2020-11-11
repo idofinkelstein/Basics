@@ -17,6 +17,7 @@
 #define PORT 9000
 #define BUFF_SIZE 1024
 
+
 int main(int argc, char const *argv[])
 {
     int sockfd, new_fd; 
@@ -37,7 +38,7 @@ int main(int argc, char const *argv[])
     }
 
 
-    memset(&hints, 0, sizeof hints);
+    memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE;
