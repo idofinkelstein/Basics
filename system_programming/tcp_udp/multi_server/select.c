@@ -24,7 +24,6 @@ struct data
 {
     int sockfd;
     fd_oper_t action;
-
 };
 
 struct select_reactor
@@ -32,15 +31,15 @@ struct select_reactor
     int max_fd;
     avl_t *dict;
     fd_set master;
-
 };
 
 
 static struct timeval InitTimeVal(long seconds, long microseconds);
-void InitAddrInfo(struct addrinfo* hints, int socktype);
+static void InitAddrInfo(struct addrinfo* hints, int socktype);
 static void ReactorAddHandler(select_reactor_t *reactor_handle,
 											  int sockfd, 
 											  fd_oper_t action_func);
+
 static void ReactorRemoveHandler(select_reactor_t *reactor_handle, data_t *data);
 static void ReactorInit(select_reactor_t *reactor_handle);
 static data_t *InitData(int sockfd, fd_oper_t action_func);
@@ -59,18 +58,13 @@ struct sockaddr_storage their_addr;
 
 int main()
 {
-    int i, udp_sockfd, tcp_sockfd, new_fd, stdin_fd = 0; 
-    char *tcp_buff, *udp_buff; 
-    char *ping = "ping\n";
-    char *pong = "hi janna!!!\n";     
+    int i, udp_sockfd, tcp_sockfd, stdin_fd = 0; 
     struct addrinfo udp_hints, tcp_hints;
     struct addrinfo *udp_servinfo, *tcp_servinfo;
 	struct timeval time = {0, 0};
     int status, socket_opt = 1;
-    unsigned int len = strlen(pong);
 	select_reactor_t reactorBlockHandler;
-    socklen_t addr_size;
-    fd_set work, master;
+    fd_set work;
 
     InitAddrInfo(&tcp_hints, SOCK_STREAM);
     InitAddrInfo(&udp_hints, SOCK_DGRAM);
@@ -261,17 +255,18 @@ static void TCPHandler(data_t *data, select_reactor_t *reactor_handle)
     const char *pong = "pong";
 
     n = recv(data->sockfd, (char *)buffer, MAX_LINE,  0); 
-    if(n == -1)
+    if (n == -1)
     {
         ErrorHandler(data, reactor_handle, "recv failed\n"); 
     } 
-    else if(n != 0)
+    else if (n != 0)
     {
         buffer[n] = '\0'; 
         printf("%s\n", buffer); 
         sleep(1);
         n = send(data->sockfd, pong, strlen(pong), 0);
-        if(n == -1)
+
+        if (n == -1)
         {
             ErrorHandler(data, reactor_handle, "sendto failed\n");
         }
