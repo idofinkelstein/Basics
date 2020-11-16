@@ -78,7 +78,7 @@ T* Singleton<T>::Instance()
 
             atexit(Cleanup);
         }
-        /* spin lock */
+        /* spin lock - until instancePtr will be constructed */
         else while (__atomic_load_n(&instancePtr, __ATOMIC_SEQ_CST) == 0);       
     }
 
