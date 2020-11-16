@@ -28,7 +28,7 @@ PROJ_ADD_OBJS =
 PROJ_LIBS =
 
 # linker flags
-PROJ_LDFLAGS =
+PROJ_LDFLAGS = -pthread
 
 # list of projects (makefiles) this project depends on
 PROJ_DEPENDS  =
