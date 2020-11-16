@@ -1,5 +1,5 @@
 #include <cstdlib>
-//#include <atomic>
+#include <atomic>
 
 template<typename T>
 class Singleton
@@ -11,7 +11,7 @@ public:
     T* operator->();
     static void Cleanup();
 
-    static Singleton* Instance();
+    static T* Instance();
 private:
     static T* instancePtr;
 };
@@ -21,8 +21,9 @@ template<typename T>
 T* Singleton<T>::instancePtr = 0;
 
 template<typename T>
-Singleton<T>::Singleton(/* args */)
+Singleton<T>::Singleton()
 {
+    Instance();
 }
 
 template<typename T>
@@ -45,7 +46,7 @@ void Singleton<T>::Cleanup()
 
 
 template<typename T>
-Singleton<T>* Singleton<T>::Instance()
+T* Singleton<T>::Instance()
 {
     if (instancePtr == 0)
     {
@@ -53,11 +54,11 @@ Singleton<T>* Singleton<T>::Instance()
 
         if (!__atomic_test_and_set(&initStarted, __ATOMIC_ACQUIRE))
         {
-            __atomic_store(&instancePtr, new T, __ATOMIC_SEQ_CST);
+            __atomic_store_n(&instancePtr, new T, __ATOMIC_SEQ_CST);
 
             atexit(Cleanup);
         }
-        else while (__atomic_load(&instancePtr, __ATOMIC_SEQ_CST) == 0)
+        else while (__atomic_load_n(&instancePtr, __ATOMIC_SEQ_CST) == 0)
         {
             /* code */
         }
