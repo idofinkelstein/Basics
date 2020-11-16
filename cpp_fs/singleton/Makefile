@@ -16,7 +16,7 @@ PROJ_OUT = singleton.out
 # list of compiler flags (prepended with "-" sign)
 #PROJ_CFLAGS = -Wunused-but-set-variable
 PROJ_CFLAGS =
-PROJ_CPPFLAGS =
+PROJ_CPPFLAGS = #-std=c++11
 
 #PROJ_MACROS = _BSD_SOURCE
 PROJ_MACROS =
