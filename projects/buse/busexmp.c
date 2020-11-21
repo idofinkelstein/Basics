@@ -26,7 +26,7 @@
 #include "buse.h"
 
 /* BUSE callbacks */
-static void *data;
+static void *data; /* represent the device */
 
 static int xmp_read(void *buf, u_int32_t len, u_int64_t offset, void *userdata)
 {

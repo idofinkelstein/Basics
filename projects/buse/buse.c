@@ -138,7 +138,7 @@ static int serve_nbd(int sk, const struct buse_operations *aop, void *userdata)
   reply.magic = htonl(NBD_REPLY_MAGIC);
   reply.error = htonl(0);
 
-  while ((bytes_read = read(sk, &request, sizeof(request))) > 0)
+  while ((bytes_read = read(sk, &request, sizeof(request))) > 0) /* reads request message */
   {
     assert(bytes_read == sizeof(request));
     memcpy(reply.handle, request.handle, sizeof(reply.handle));
@@ -155,6 +155,8 @@ static int serve_nbd(int sk, const struct buse_operations *aop, void *userdata)
        * oversized requests into multiple pieces. This applies to reads
        * and writes.
        */
+
+
     case NBD_CMD_READ:
       if (BUSE_DEBUG) fprintf(stderr, "Request for read of size %d\n", len);
       /* Fill with zero in case actual read is not implemented */
@@ -173,6 +175,8 @@ static int serve_nbd(int sk, const struct buse_operations *aop, void *userdata)
 
       free(chunk);
       break;
+
+/*------------------------------------------------------------------------------------------*/
     case NBD_CMD_WRITE:
       if (BUSE_DEBUG) fprintf(stderr, "Request for write of size %d\n", len);
 
@@ -190,6 +194,15 @@ static int serve_nbd(int sk, const struct buse_operations *aop, void *userdata)
       free(chunk);
       write_all(sk, (char*)&reply, sizeof(struct nbd_reply));
       break;
+
+/*------------------------------------------------------------------------------------------*/
+
+
+
+
+
+
+
     case NBD_CMD_DISC:
       if (BUSE_DEBUG) fprintf(stderr, "Got NBD_CMD_DISC\n");
       /* Handle a disconnect request. */
@@ -232,89 +245,93 @@ static int serve_nbd(int sk, const struct buse_operations *aop, void *userdata)
 
 int buse_main(const char* dev_file, const struct buse_operations *aop, void *userdata)
 {
-  int sp[2];
-  int nbd, sk, err, flags;
+	int sp[2];
+	int nbd, sk, err, flags;
 
-  err = socketpair(AF_UNIX, SOCK_STREAM, 0, sp);
-  assert(!err);
+	err = socketpair(AF_UNIX, SOCK_STREAM, 0, sp);
+	assert(!err);
 
-  nbd = open(dev_file, O_RDWR);
-  if (nbd == -1) {
-    fprintf(stderr, 
-        "Failed to open `%s': %s\n"
-        "Is kernel module `nbd' loaded and you have permissions "
-        "to access the device?\n", dev_file, strerror(errno));
-    return 1;
-  }
+	/* achieving file descriptor for /dev/nbd0 */
+	nbd = open(dev_file, O_RDWR);
+	if (nbd == -1) {
+	fprintf(stderr, 
+		"Failed to open `%s': %s\n"
+		"Is kernel module `nbd' loaded and you have permissions "
+		"to access the device?\n", dev_file, strerror(errno));
+	return 1;
+	}
 
-  if (aop->blksize) {
-    err = ioctl(nbd, NBD_SET_BLKSIZE, aop->blksize);
-    assert(err != -1);
-  }
-  if (aop->size) {
-    err = ioctl(nbd, NBD_SET_SIZE, aop->size);
-    assert(err != -1);
-  }
-  if (aop->size_blocks) {
-    err = ioctl(nbd, NBD_SET_SIZE_BLOCKS, aop->size_blocks);
-    assert(err != -1);
-  }
+	if (aop->blksize) {
+	err = ioctl(nbd, NBD_SET_BLKSIZE, aop->blksize);
+	assert(err != -1);
+	}
+	if (aop->size) {
+	err = ioctl(nbd, NBD_SET_SIZE, aop->size);
+	assert(err != -1);
+	}
+	if (aop->size_blocks) {
+	err = ioctl(nbd, NBD_SET_SIZE_BLOCKS, aop->size_blocks);
+	assert(err != -1);
+	}
 
-  err = ioctl(nbd, NBD_CLEAR_SOCK);
-  assert(err != -1);
+	err = ioctl(nbd, NBD_CLEAR_SOCK);
+	assert(err != -1);
 
-  pid_t pid = fork();
-  if (pid == 0) {
-    /* Block all signals to not get interrupted in ioctl(NBD_DO_IT), as
-     * it seems there is no good way to handle such interruption.*/
-    sigset_t sigset;
-    if (sigfillset(&sigset) != 0 ||
-        sigprocmask(SIG_SETMASK, &sigset, NULL) != 0) 
-    {
-      warn("failed to block signals in child");
-      exit(EXIT_FAILURE);
-    }
+	pid_t pid = fork();
+	if (pid == 0) /* in the child process */
+	{
+		/* Block all signals to not get interrupted in ioctl(NBD_DO_IT), as
+		 * it seems there is no good way to handle such interruption.*/
+		sigset_t sigset;
+		if (sigfillset(&sigset) != 0 ||
+		    sigprocmask(SIG_SETMASK, &sigset, NULL) != 0) 
+		{
+		  warn("failed to block signals in child");
+		  exit(EXIT_FAILURE);
+		}
 
-    /* The child needs to continue setting things up. */
-    close(sp[0]);
-    sk = sp[1];
+		/* The child needs to continue setting things up. */
+		close(sp[0]);
+		sk = sp[1];
 
-    if(ioctl(nbd, NBD_SET_SOCK, sk) == -1){
-      fprintf(stderr, "ioctl(nbd, NBD_SET_SOCK, sk) failed.[%s]\n", strerror(errno));
-      exit(EXIT_FAILURE);
-    }
-    else{
-#if defined NBD_SET_FLAGS
-      flags = 0;
-#if defined NBD_FLAG_SEND_TRIM
-      flags |= NBD_FLAG_SEND_TRIM;
-#endif
-#if defined NBD_FLAG_SEND_FLUSH
-      flags |= NBD_FLAG_SEND_FLUSH;
-#endif
-      if (flags != 0 && ioctl(nbd, NBD_SET_FLAGS, flags) == -1){
-        fprintf(stderr, "ioctl(nbd, NBD_SET_FLAGS, %d) failed.[%s]\n", flags, strerror(errno));
-        exit(EXIT_FAILURE);
-      }
-#endif
-      err = ioctl(nbd, NBD_DO_IT);
-      if (BUSE_DEBUG) fprintf(stderr, "nbd device terminated with code %d\n", err);
-      if (err == -1) {
-        warn("NBD_DO_IT terminated with error");
-        exit(EXIT_FAILURE);
-      }
-    }
+		if(ioctl(nbd, NBD_SET_SOCK, sk) == -1){
+		  fprintf(stderr, "ioctl(nbd, NBD_SET_SOCK, sk) failed.[%s]\n", strerror(errno));
+		  exit(EXIT_FAILURE);
+		}
+		else{
+	#if defined NBD_SET_FLAGS
+		  flags = 0;
+	#if defined NBD_FLAG_SEND_TRIM
+		  flags |= NBD_FLAG_SEND_TRIM;
+	#endif
+	#if defined NBD_FLAG_SEND_FLUSH
+		  flags |= NBD_FLAG_SEND_FLUSH;
+	#endif
+		  if (flags != 0 && ioctl(nbd, NBD_SET_FLAGS, flags) == -1){
+		    fprintf(stderr, "ioctl(nbd, NBD_SET_FLAGS, %d) failed.[%s]\n", flags, strerror(errno));
+		    exit(EXIT_FAILURE);
+		  }
+	#endif
+			/* turning into an nbd request handler */
+		  err = ioctl(nbd, NBD_DO_IT);
 
-    if (
-      ioctl(nbd, NBD_CLEAR_QUE) == -1 ||
-      ioctl(nbd, NBD_CLEAR_SOCK) == -1
-    ) {
-      warn("failed to perform nbd cleanup actions");
-      exit(EXIT_FAILURE);
-    }
+		  if (BUSE_DEBUG) fprintf(stderr, "nbd device terminated with code %d\n", err);
+		  if (err == -1) {
+		    warn("NBD_DO_IT terminated with error");
+		    exit(EXIT_FAILURE);
+		  }
+		}
 
-    exit(0);
-  }
+		if (
+		  ioctl(nbd, NBD_CLEAR_QUE) == -1 ||
+		  ioctl(nbd, NBD_CLEAR_SOCK) == -1
+		) {
+		  warn("failed to perform nbd cleanup actions");
+		  exit(EXIT_FAILURE);
+		}
+
+		exit(0);
+	}
 
   /* Parent handles termination signals by terminating nbd device. */
   assert(nbd_dev_to_disconnect == -1);
