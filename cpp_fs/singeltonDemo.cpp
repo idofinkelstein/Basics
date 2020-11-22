@@ -44,6 +44,7 @@ Gadget::Gadget(/* args */)
 Gadget::~Gadget()
 {
 }
+
 template<typename T>
 T& GetInstance()
 {
