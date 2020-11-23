@@ -7,8 +7,11 @@ namespace ilrd
 namespace rd90
 {
 
+template<typename>
+class Function;
+
 template<typename ARG, typename RET>
-class Function
+class Function<RET(ARG)>
 {
 public:
 
@@ -57,15 +60,15 @@ private:
 /*----------------------class Function: definition---------------------------*/
 template <typename ARG, typename RET>
 template <typename S>
-Function<ARG, RET>::Function(RET(S::*fptr)(ARG), S *t)
+Function<RET(ARG)>::Function(RET(S::*fptr)(ARG), S *t)
 : m_ptr(new MemberFunctionProxy<S>(fptr, t)) {}
 
 template <typename ARG, typename RET>
-Function<ARG, RET>::Function(RET(fptr)(ARG))
+Function<RET(ARG)>::Function(RET(fptr)(ARG))
 : m_ptr(new FreeFunctionProxy(fptr)) {}
 
 template <typename ARG, typename RET>
-RET Function<ARG, RET>::operator()(ARG val)
+RET Function<RET(ARG)>::operator()(ARG val)
 {
     return (*m_ptr)(val);
 }
@@ -73,24 +76,24 @@ RET Function<ARG, RET>::operator()(ARG val)
 /*-------------------class MemberFunctionProxy: definition------------------------------*/
 template <typename ARG, typename RET>
 template <typename S>
-Function<ARG, RET>::MemberFunctionProxy<S>::MemberFunctionProxy(RET(S::*fptr)(ARG), S *t)
+Function<RET(ARG)>::MemberFunctionProxy<S>::MemberFunctionProxy(RET(S::*fptr)(ARG), S *t)
 : m_func(fptr), 
   m_obj(t) {}
 
 template <typename ARG, typename RET>
 template<typename S>
-RET Function<ARG, RET>::MemberFunctionProxy<S>::operator()(ARG num)
+RET Function<RET(ARG)>::MemberFunctionProxy<S>::operator()(ARG num)
 {
     return (m_obj->*m_func)(num);  
 }
 
 /*-------------------class FreeFunctionProxy: definition------------------------------*/
 template<typename ARG, typename RET>
-Function<ARG, RET>::FreeFunctionProxy::FreeFunctionProxy(RET(fptr)(ARG)) : m_func(fptr)
+Function<RET(ARG)>::FreeFunctionProxy::FreeFunctionProxy(RET(fptr)(ARG)) : m_func(fptr)
 {}
 
 template<typename ARG, typename RET>
-RET Function<ARG, RET>::FreeFunctionProxy::operator()(ARG val)
+RET Function<RET(ARG)>::FreeFunctionProxy::operator()(ARG val)
 {
     return m_func(val);
 }
