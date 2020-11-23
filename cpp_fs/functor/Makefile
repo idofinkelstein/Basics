@@ -2,16 +2,16 @@
 # make clean/all CONFIG=Debug/Release ARCH=linux64/raspi ECHO=0/1
 
 # the parrent dir of "arch" dir
-ROOT_DIR = ../../..
+ROOT_DIR = ../..
 
 #PROJ_SRCS = $(wildcard *.c)
-PROJ_SRCS = aaa.c bbb.cpp
+PROJ_SRCS =  rd90.cpp
 
 # list of directories containing header files
 PROJ_INC_DIR =
 
 # the executable file
-PROJ_OUT = app.out
+PROJ_OUT = functionClassExmp.out
 
 # list of compiler flags (prepended with "-" sign)
 #PROJ_CFLAGS = -Wunused-but-set-variable

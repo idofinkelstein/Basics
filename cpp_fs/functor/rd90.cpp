@@ -9,7 +9,7 @@ using namespace ilrd::rd90;
 
 //------------------- utility function
 
-void for_each(int* vector, size_t size, Function<int> action)
+void for_each(int* vector, size_t size,  Function action)
 {
     for (int i=0; i < size; ++i)
     {
@@ -25,12 +25,12 @@ class Widget
 public:
     void Action1(/* Widget* const this, */ int data)
     {
-        printf("DDD");
+        std::cout << data << std::endl;
     }
 
     void Action2(/* Widget* const this, */ int data)
     {
-        printf("Ddd");
+        std::cout << data << std::endl;
     }
 };
 
@@ -39,7 +39,7 @@ class Gadget
 public:
     void Action(/* Gadget* const this, */ int data)
     {
-
+        std::cout << data << std::endl;
     }
 };
 
@@ -52,9 +52,9 @@ int main()
     Gadget g1;
 
 
-    for_each(arr, 10, Function<Widget>(&Widget::Action1, &w1));
-    for_each(arr, 10, Function<Widget>(&Widget::Action2, &w1));
-    for_each(arr, 10, Function<Gadget>(&Gadget::Action, &g1));
+    for_each(arr, 10, Function(&Widget::Action1, &w1));
+    for_each(arr, 10, Function(&Widget::Action2, &w1));
+    for_each(arr, 10, Function(&Gadget::Action, &g1));
 
 
     return 0;
