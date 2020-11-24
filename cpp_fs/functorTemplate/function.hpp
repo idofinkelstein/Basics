@@ -10,6 +10,12 @@ namespace rd90
 template<typename>
 class Function;
 
+template<typename ARG, typename RET, typename S>
+Function<RET(ARG)> Bind(RET(S::*func)(ARG arg));
+
+template<typename ARG, typename RET>
+Function<RET(ARG)> Bind(RET(*func)(ARG arg));
+
 template<typename ARG, typename RET>
 class Function<RET(ARG)>
 {
@@ -96,6 +102,18 @@ template<typename ARG, typename RET>
 RET Function<RET(ARG)>::FreeFunctionProxy::operator()(ARG val)
 {
     return m_func(val);
+}
+
+template<typename ARG, typename RET>
+Function<RET(ARG)> Bind(RET(*func)(ARG arg))
+{
+    return (Function<RET(ARG)>(func));
+}
+
+template<typename ARG, typename RET, typename S>
+Function<RET(ARG)> Bind(RET(S::*func)(ARG arg))
+{
+    return (Function<RET(ARG)>(func));
 }
 
 } // namespace rd90
