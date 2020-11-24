@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 void *align(size_t what, size_t to);
 size_t CreateByteMask(size_t num_of_bytes);
@@ -16,11 +17,12 @@ void *Memcpy(void *dest, const void *src, size_t n)
     size_t bytes_to_shift = 0;
 
     printf("tail = %ld\n", tail);
-    while (n-- && tail--)
+    while (n && tail--)
     {
         *(char*)dest = *(char*)src;
         src = (char*)src + 1;
         dest = (char*)dest + 1;
+		n--;
     }
 
     src_offset = ((size_t)src & addr_mask) ? word - ((size_t)src & addr_mask) : 0;
@@ -34,7 +36,14 @@ void *Memcpy(void *dest, const void *src, size_t n)
         *(size_t*)dest = (word_mask & *(size_t*)work_src) >> bytes_to_shift * word;
         work_src = (size_t*)work_src + 1;
         word_mask = ~word_mask;
-        *(size_t*)dest = (word_mask & *(size_t*)work_src) << word * (word - bytes_to_shift);
+		if (bytes_to_shift)
+		{
+	        *(size_t*)dest = (word_mask & *(size_t*)work_src) << word * (word - bytes_to_shift);
+		}
+		else
+		{
+			*(size_t*)dest = (word_mask & *(size_t*)work_src);
+		}
         dest = (size_t*)dest + 1;
         word_mask = ~word_mask;
         n -= word;
@@ -59,28 +68,26 @@ void *align(size_t what, size_t to)
 
 size_t CreateByteMask(size_t num_of_bytes)
 {
-    if(!num_of_bytes)
-    {
-        return ~0;
-    }
-
     return ((1ul << num_of_bytes) - 1);
 }
 
 int main()
 {
-    int src[200] = {0};
-    int dest[200] = {0};
+    int *src = malloc(1000);
+    int *dest = malloc(1000);
     int i = 0;
+
+	dest = (int*)((char*)dest + 3);
+	src = (int*)((char*)src + 5);
 
     for (i = 0; i < 200; ++i)
     {
         src[i] = i;
     }
 
-    Memcpy(dest, src, 800);
+    Memcpy(dest, src, 900);
 
-    for (i = 0; i < 150; ++i)
+    for (i = 0; i < 200; ++i)
     {
         printf("%d\n", dest[i]);
     }
