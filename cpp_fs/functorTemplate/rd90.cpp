@@ -59,12 +59,15 @@ int main()
     int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     Widget w1;
     Gadget g1;
-    Function<int(int)> f1(Foo);
+    Function<int(int)> f1(Foo), f2;
 
     for_each(arr, 10, Function<int(int)>(&Widget::Action1, &w1));
     for_each(arr, 10, Function<int(int)>(&Widget::Action2, &w1));
     for_each(arr, 10, Function<int(int)>(&Gadget::Action, &g1));
             
     f1(10);
+    f2 = Bind(Foo);
+
+    f2(20);
     return 0;
 }

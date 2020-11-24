@@ -21,6 +21,8 @@ class Function<RET(ARG)>
 {
 public:
 
+    explicit Function() {}
+
     // Free function ctor
     explicit Function(RET(fptr)(ARG));
 
