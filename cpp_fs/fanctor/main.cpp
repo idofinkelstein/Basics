@@ -10,8 +10,8 @@ UnaryFunction for_each(InputIt first, InputIt last, UnaryFunction f)
 {
     for (; first != last; ++first)
     {
-         printf("fe: %p\n", __builtin_frame_address(0));
-        f(*first);
+        printf("fe: %p\n", __builtin_frame_address(0));
+        f(*first); 
     }
 
     return f;

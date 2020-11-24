@@ -25,6 +25,7 @@ int main()
 
     std::function< int(std::string, const Gadget &)> f1 = Foo;
     auto f2 = std::bind(&Foo, std::placeholders::_1, "aaa");
+    f2(2);
 
 
 

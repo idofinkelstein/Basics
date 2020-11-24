@@ -37,6 +37,7 @@ template <typename T>
 class DVector
 {
 public:
+	class Iterator;
 	explicit DVector();
     explicit DVector(size_t init_size, const T& t = T());
     ~DVector();
@@ -48,6 +49,30 @@ public:
     const T& operator[](size_t index) const;
     void Resize(size_t new_size, const T& t = T());
     void Reserve(size_t new_capacity);
+	Iterator Begin();
+	Iterator End();
+
+	class Iterator
+	{
+		typedef std::input_iterator_tag iterator_category;
+        typedef  T value_type;
+        typedef size_t difference_type;
+        typedef T* pointer;
+        typedef T& reference;
+	public:
+		explicit Iterator();
+		
+		bool operator!=(const T& other) const;
+		Iterator& operator=(const Iterator& other);
+		T& operator*();
+		T* operator->();
+		const Iterator& operator++(int val); // postfix
+		const Iterator& operator++(); // prefix
+	private:
+		T* m_member;
+	};
+
+
 
 private:
     DVector(const DVector& other);
@@ -208,6 +233,21 @@ void DVector<T>::Init(size_t start_index, size_t end_index, const T& t)
 		new (&m_data[i]) T(t);
 	}
 }
+
+template<class T> 
+DVector<T>::Iterator Begin()
+{
+	return 
+}
+
+template<class T> 
+DVector<T>::Iterator End()
+{
+
+}
+
+template <typename T>
+void DVector<T>::Iterator::Iterator() : m_member(NULL) {}
 
 } // namespace rd90
 } // namespace ilrd
