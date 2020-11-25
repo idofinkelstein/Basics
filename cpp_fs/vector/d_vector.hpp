@@ -49,30 +49,30 @@ public:
     const T& operator[](size_t index) const;
     void Resize(size_t new_size, const T& t = T());
     void Reserve(size_t new_capacity);
-	Iterator Begin();
-	Iterator End();
+
+	
 
 	class Iterator
 	{
+	public:
 		typedef std::input_iterator_tag iterator_category;
         typedef  T value_type;
         typedef size_t difference_type;
         typedef T* pointer;
         typedef T& reference;
-	public:
-		explicit Iterator();
+		explicit Iterator(T* obj = NULL);
 		
-		bool operator!=(const T& other) const;
+		bool operator!=(const DVector<T>::Iterator& other) const;
 		Iterator& operator=(const Iterator& other);
 		T& operator*();
-		T* operator->();
 		const Iterator& operator++(int val); // postfix
 		const Iterator& operator++(); // prefix
 	private:
 		T* m_member;
 	};
 
-
+	Iterator Begin();
+	Iterator End();
 
 private:
     DVector(const DVector& other);
@@ -235,19 +235,40 @@ void DVector<T>::Init(size_t start_index, size_t end_index, const T& t)
 }
 
 template<class T> 
-DVector<T>::Iterator Begin()
+typename DVector<T>::Iterator DVector<T>::Begin()
 {
-	return 
+	return Iterator(m_data);
 }
 
 template<class T> 
-DVector<T>::Iterator End()
+typename DVector<T>::Iterator DVector<T>::End()
 {
-
+	return Iterator(&m_data[m_size - 1]);
 }
 
+/*-------------------------Iterator definition-------------------------------*/
+
 template <typename T>
-void DVector<T>::Iterator::Iterator() : m_member(NULL) {}
+DVector<T>::Iterator::Iterator(T *obj) : m_member(obj) {}
+
+template<class T> 
+bool DVector<T>::Iterator::operator!=(const DVector<T>::Iterator &other) const
+{
+	return (m_member != other.m_member);
+}
+
+template<class T> 
+T &DVector<T>::Iterator::operator*()
+{
+	return (*m_member);
+}
+
+template<class T> const 
+typename DVector<T>::Iterator &DVector<T>::Iterator::operator++()
+{
+	++m_member;
+	return (*this);
+}
 
 } // namespace rd90
 } // namespace ilrd

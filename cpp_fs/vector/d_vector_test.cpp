@@ -22,6 +22,7 @@ int main()
 void TestStringMembers(void)
 {
 	DVector<RCString>v(1);
+	DVector<RCString>v2(300);
 	std::cout << "capacity = " << v.Capacity() << std::endl;
 	for(size_t i = 0; i < 100; ++i)
 	v.PushBack("hello");
@@ -42,6 +43,12 @@ void TestStringMembers(void)
 
 	for(size_t i = 0; i < v.Size(); ++i)
 	std::cout << v[i] << i << std::endl;
+
+	std::copy(v.Begin(), v.End(), v2.Begin());
+
+	for(size_t i = 0; i < v2.Size(); ++i)
+	std::cout << v2[i] << i << std::endl;
+
 
 }
 
