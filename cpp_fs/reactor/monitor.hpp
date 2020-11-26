@@ -25,6 +25,8 @@ private:
     fd_set m_master;
     fd_set m_work;
     int m_max_fd;
+
+    int UpdateMax();
 };
 
 

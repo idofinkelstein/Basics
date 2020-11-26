@@ -23,6 +23,7 @@ void Select::Add(int fd)
 void Select::Remove(int fd)
 {
     FD_CLR(fd, &m_master);
+    m_max_fd = UpdateMax();
 }
 
 int Select::WaitForEvent()
@@ -38,6 +39,16 @@ int Select::GetNextFd()
 
 }
 
+int Select::UpdateMax()
+{
+    for (int i = m_max_fd; i >= 0; --i)
+    {
+        if (FD_ISSET(i, &m_master))
+        {
+            return (i);
+        }
+    }
+}
 
 
 
