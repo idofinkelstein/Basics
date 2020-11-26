@@ -24,7 +24,7 @@ private:
 };
 
 template<typename MONITOR_TYPE> 
-Reactor<MONITOR_TYPE>::Reactor()
+Reactor<MONITOR_TYPE>::Reactor() : m_monitor(new MONITOR_TYPE)
 {
 }
 

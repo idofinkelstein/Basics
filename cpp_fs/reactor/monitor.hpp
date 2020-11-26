@@ -14,7 +14,7 @@ namespace rd90
 class Select
 {
 public:
-    Select(/* args */);
+    Select();
     ~Select();
 
     void Add(int fd);
@@ -23,6 +23,7 @@ public:
     int GetNextFd();
 private:
     fd_set m_master;
+    fd_set m_work;
     int m_max_fd;
 };
 
