@@ -15,7 +15,7 @@ class Select
 {
 public:
     Select();
-    ~Select();
+    ~Select() = default;
 
     void Add(int fd);
     void Remove(int fd);

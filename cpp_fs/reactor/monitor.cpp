@@ -10,9 +10,6 @@ Select::Select() : m_max_fd(0)
     FD_ZERO(&m_master);
 }
 
-Select::~Select()
-{
-}
 
 void Select::Add(int fd)
 {
