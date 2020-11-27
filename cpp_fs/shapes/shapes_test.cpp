@@ -11,7 +11,7 @@ using namespace ilrd::rd90;
 
 static Point p1(100,100), p2(500, 500), delta(4, 4),grpStep(4,0);
 static Shape *circle1 = new Circle(p1, 10);
-static Shape *rec = new Rectangle(p1, 50, 100);
+static Shape *rec = new Rectangle(p1, 300, 300);
 static Shape *tri1 = new Triangle(p2, 50, 100, 50);
 static Shape *tri2 = new Triangle(p2 + Point(0 ,+25), -50, 100, 50);
 static Circle circle2(p2, 40);
@@ -43,6 +43,7 @@ static int TimerFunction()
 	circle1->Step(delta);
 	grp1->Step(grpStep);	
 	grp2->Step(grpStep);	
+	rec->Rotate(3.14/50);
 
 	if(circle1->GetPoint().GetX() > 900 || circle1->GetPoint().GetX() < 100)
 	{

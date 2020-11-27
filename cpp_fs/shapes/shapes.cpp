@@ -47,6 +47,20 @@ void Point::SetY(double y)
 	m_y = y;
 }
 
+void Point::Revolve(double angle, const Point &pivot)
+{
+	double sinVal = sin(angle);
+    double cosVal = cos(angle);
+
+    // translate point back to origin: 
+    double xOffset = m_x - pivot.m_x;
+    double yOffset = m_y - pivot.m_y;
+
+     //rotate point & translate point back: 
+    m_x = pivot.m_x + xOffset * cosVal - yOffset * sinVal;
+    m_y = pivot.m_y + xOffset * sinVal + yOffset * cosVal;
+}
+
 Shape::Shape(const Point& position, double angle, COLORS color) : position(position), angle(angle), color(color) {}
 
 Shape::~Shape() {}
@@ -59,6 +73,11 @@ void Shape::Step(const Point& delta)
 int Shape::GetColor() const
 {
 	return (color);
+}
+
+double Shape::GetAngle()
+{
+	return angle;
 }
 
 void Shape::Move(const Point& new_pos)
@@ -84,21 +103,18 @@ void Shape::Draw(const Point &parentPos)
 	DrawShape(absPos);
 }
 
-/*
+
 void Shape::Rotate(double angle)
 {
-	 double sinVal = sin(angle);
-    double cosVal = cos(angle);
+	Point p = GetPoint();
 
-    // translate point back to origin: 
-    double xOffset = GetPoint().GetX() - pivot->m_x;
-    double yOffset = p->m_y - pivot->m_y;
+	std::cout << p.GetX() << std::endl;
+	p.Revolve(angle, Point(0, 0));
 
-     //rotate point & translate point back: 
-    p->m_x = pivot->m_x + xOffset * cosVal - yOffset * sinVal;
-    p->m_y = pivot->m_y + xOffset * sinVal + yOffset * cosVal;
+	std::cout << p.GetX() << std::endl;
+	Move(p);
 }
-*/
+
 Circle::Circle(const Point& position, double radius) : Shape(position, 0), radius(radius) {}
 
 void Circle::DrawShape(const Point &absPos)
@@ -110,9 +126,19 @@ Rectangle::Rectangle(const Point& position, double height, double width): Shape(
 
 void Rectangle::DrawShape(const Point &absPos)
 {
+	double sinVal = sin(GetAngle());
+    double cosVal = cos(GetAngle());
+
+
 	//Point absPos = parentPos + GetPoint();
 	int x = static_cast<int>(absPos.GetX());
 	int y = static_cast<int>(absPos.GetY());
+
+	double deltaX = x;
+    double deltaY = y;
+
+	x = x + deltaX * cosVal - deltaY * sinVal;
+    y = y + deltaX * sinVal + deltaY * cosVal;
 	int xOffSet = width;
 	int yOffSet = height;
 
@@ -140,20 +166,6 @@ void Triangle::DrawShape(const Point &absPos)
        						x + Dist, 			    				y + Height);
 }
 
-/*
-class Group : public Shape
-{
-public:
-    explicit Group(const Point& position); 
-
-    virtual void Draw();
-    void Add(const Shape *shape);
-
-private:
-    Shape *shapes[50];
-    std::size_t size;
-};
-*/
 
 Group::Group(const Point& position) : Shape(position), size(0) {}
 

@@ -27,7 +27,7 @@ public:
     
     Point& operator+=(const Point& other);
     const Point operator+(const Point& other) const; 
-    //... Revolve(double angle, const point& ) const // .revolve p3 = 
+    void Revolve(double angle, const Point& );
     // colission() const
 
     double GetX() const;
