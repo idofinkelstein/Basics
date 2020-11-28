@@ -32,36 +32,36 @@ public:
 
     RET operator()(ARG);
 
-class I_Function
-{
-public:    
-    virtual RET operator()(ARG) = 0;
-    virtual ~I_Function() = default;
-};
-
-// Handles calls of member function on an object    
-template <typename S>
-class MemberFunctionProxy : public I_Function
-{
-public:
-    RET operator()(ARG);
-    MemberFunctionProxy(RET(S::*fptr)(ARG), S *t);
 private:
-    RET(S::*m_func)(ARG);
-    S *m_obj;
-};    
+	class I_Function
+	{
+	public:    
+		virtual RET operator()(ARG) = 0;
+		virtual ~I_Function() = default;
+	};
 
-// Handled calls to free function
-class FreeFunctionProxy : public I_Function
-{
-public:
-    RET operator()(ARG);
-    FreeFunctionProxy(RET(fptr)(ARG));
-private:
-    RET(*m_func)(ARG);
-};    
+	// Handles calls of member function on an object    
+	template <typename S>
+	class MemberFunctionProxy : public I_Function
+	{
+	public:
+		RET operator()(ARG);
+		MemberFunctionProxy(RET(S::*fptr)(ARG), S *t);
+	private:
+		RET(S::*m_func)(ARG);
+		S *m_obj;
+	};    
 
-private:
+	// Handled calls to free function
+	class FreeFunctionProxy : public I_Function
+	{
+	public:
+		RET operator()(ARG);
+		FreeFunctionProxy(RET(fptr)(ARG));
+	private:
+		RET(*m_func)(ARG);
+	};    
+
     std::shared_ptr<I_Function> m_ptr;  
 };
 
