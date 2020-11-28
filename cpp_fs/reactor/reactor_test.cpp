@@ -1,5 +1,6 @@
 #include <stdio.h> 		/* perror, printf */
 #include <cstdlib> 		/* malloc, free */
+#include <cstring>
 #include <sys/ioctl.h>  /* ioctl */
 #include <unistd.h> 	/* read */
 
@@ -30,7 +31,6 @@ void ReadSTDIN(int fd)
 {
     char *buff = NULL;
     size_t buff_size = 0;
-
     int read_bytes = 0;
 
     if (-1 == ioctl(fd, FIONREAD, &buff_size))
@@ -39,7 +39,7 @@ void ReadSTDIN(int fd)
         return;
     }
 
-	buff = new char[buff_size + 1];
+	buff = new char[buff_size];
 
     read_bytes = read(fd, buff, buff_size);
     if (-1 == read_bytes)
@@ -50,10 +50,17 @@ void ReadSTDIN(int fd)
         return;
     }
 
-    buff[read_bytes] = '\0';
+    buff[read_bytes - 1] = '\0';
 
     printf("Message received on STDIN!\n message: %s\n", buff);
  
+	if (!strcmp(buff, "exit"))
+	{
+		delete[] buff;
+		exit(0);
+	}
+
 	delete[] buff; 
+
 
 }
