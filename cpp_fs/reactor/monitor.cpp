@@ -29,11 +29,22 @@ int Select::WaitForEvent()
     int num_of_fds;
 
     num_of_fds = select(m_max_fd + 1, &m_work, NULL, NULL, NULL);
+
+	return (num_of_fds);
 }
 
 int Select::GetNextFd()
 {
 
+	for (int i = 0; i <= m_max_fd; ++i)
+	{
+		if (FD_ISSET(i, &m_work))
+        {
+            return (i);
+        }
+	}
+
+	return 0;
 }
 
 int Select::UpdateMax()
@@ -45,6 +56,8 @@ int Select::UpdateMax()
             return (i);
         }
     }
+
+	return 0;
 }
 
 
