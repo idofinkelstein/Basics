@@ -5,7 +5,7 @@
 ROOT_DIR = ../..
 
 #PROJ_SRCS = $(wildcard *.c)
-PROJ_SRCS = monitor.cpp reactor_test.cpp
+PROJ_SRCS = monitor.cpp reactor_test.cpp tcp.cpp
 
 # list of directories containing header files
 PROJ_INC_DIR = $(ROOT_DIR)/cpp_fs/functorTemplate

@@ -40,11 +40,12 @@ int Select::GetNextFd()
 	{
 		if (FD_ISSET(i, &m_work))
         {
+            FD_CLR(i, &m_work);
             return (i);
         }
 	}
 
-	return 0;
+	return -1;
 }
 
 int Select::UpdateMax()

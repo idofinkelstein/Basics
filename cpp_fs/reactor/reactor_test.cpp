@@ -5,22 +5,22 @@
 #include <unistd.h> 	/* read */
 
 #include "reactor.hpp"
+#include "tcp.hpp"
 
 using namespace ilrd::rd90;
 
 void ReadSTDIN(int fd);
 
-class STDIN
-{
-	
-};
 
 int main()
 {
     Reactor<Select> reactor(new Select);
+    TCPServer server(&reactor, "9000");
+
 
 	reactor.Add(0, Bind(ReadSTDIN));
 
+    server.Start();
 	reactor.Run();
 
     return 0;
