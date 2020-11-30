@@ -11,7 +11,17 @@ namespace ilrd
 namespace rd90
 {
 
-class Select
+class IMonitor
+{
+public:
+    virtual void Add(int fd) = 0;
+    virtual void Remove(int fd) = 0;
+    virtual int WaitForEvent() = 0;
+    virtual int GetNextFd() = 0;
+    virtual ~IMonitor() = default;
+};
+
+class Select : public IMonitor
 {
 public:
     Select();
@@ -27,6 +37,20 @@ private:
     int m_max_fd;
 
     int UpdateMax();
+};
+
+class Epol : public IMonitor
+{
+public:
+    Epol();
+    ~Epol() = default;
+
+    void Add(int fd);
+    void Remove(int fd);
+    int WaitForEvent();
+    int GetNextFd();
+private:
+    
 };
 
 

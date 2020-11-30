@@ -31,13 +31,16 @@ private:
 
 template<typename MONITOR_TYPE> 
 Reactor<MONITOR_TYPE>::Reactor(MONITOR_TYPE *monitor) : m_monitor(monitor)
-{}
+{
+	// 
+	(void)static_cast<IMonitor*>(monitor);
+}
 
 template <typename MONITOR_TYPE>
 void Reactor<MONITOR_TYPE>::Add(int fd, Function<void(int)> action)
 {
 	dict[fd] = action;
-	m_monitor->Add(fd);
+	m_monitor->MONITOR_TYPE::Add(fd);
 }
 
 template <typename MONITOR_TYPE>

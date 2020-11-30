@@ -61,6 +61,34 @@ int Select::UpdateMax()
 	return 0;
 }
 
+/*-------------------------------------------------------------------------*/
+
+Epol::Epol()
+{
+
+}
+
+void Epol::Add(int fd)
+{
+
+}
+
+void Epol::Remove(int fd)
+{
+
+}
+
+int Epol::WaitForEvent()
+{
+
+}
+
+int Epol::GetNextFd()
+{
+    
+}
+
+
 
 
 

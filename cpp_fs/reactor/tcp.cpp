@@ -20,8 +20,6 @@ TCPServer::TCPServer(Reactor<Select> *reactor, const char *port)
 {
     struct addrinfo hints;
     struct addrinfo *servinfo;
-    
-    socklen_t addr_size;
     int status;
 
     memset(&hints, 0, sizeof(hints));
@@ -56,8 +54,11 @@ void TCPServer::AcceptHandler(int tcpFd)
     int new_fd;
     struct sockaddr_storage their_addr;
     socklen_t addr_size = sizeof(struct sockaddr_storage);
+    (void)tcpFd;
 
-    if (-1 == (new_fd = accept(m_tcpFd, (struct sockaddr *)&their_addr, &addr_size)))
+    if (-1 == (new_fd = accept(m_tcpFd, 
+                               reinterpret_cast<struct sockaddr *>(&their_addr),
+                               &addr_size)))
     {
         throw("accept");
     }
