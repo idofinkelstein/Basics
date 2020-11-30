@@ -1,3 +1,4 @@
+#include <cstring>
 #include <sys/types.h> 
 #include <sys/socket.h> 
 #include <arpa/inet.h> 
@@ -23,29 +24,30 @@ TCPServer::TCPServer(Reactor<Select> *reactor, const char *port)
     socklen_t addr_size;
     int status;
 
-    if ((status = getaddrinfo("127.0.0.1", port, &hints, &servinfo)) != 0)
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
+
+    if ((status = getaddrinfo("127.0.0.1" , port, &hints, &servinfo)) != 0)
     {
-        fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
-        exit(1);
+        throw("getaddrinfo");
     }
 
     /* Creating socket file descriptor */
     if (-1 == (m_tcpFd = socket(servinfo->ai_family, servinfo->ai_socktype, 0))) /* TCP protocol */
     { 
-        perror("socket creation failed"); 
-        exit(EXIT_FAILURE); 
+        throw("socket");
     }
 
     if (-1 == bind(m_tcpFd, servinfo->ai_addr, servinfo->ai_addrlen))
     {
-        perror("bind");
-        exit(EXIT_FAILURE);
+        throw("bind");
     }
 
     if (-1 == listen(m_tcpFd, 5))
     {
-        perror("listen"); 
-        exit(EXIT_FAILURE);
+        throw("listen");
     }
 }
 
@@ -57,50 +59,40 @@ void TCPServer::AcceptHandler(int tcpFd)
 
     if (-1 == (new_fd = accept(m_tcpFd, (struct sockaddr *)&their_addr, &addr_size)))
     {
-        perror("accept"); 
-        exit(EXIT_FAILURE);
+        throw("accept");
     }
-    m_reactor->Add(new_fd,Bind(ReadHadler, this));
+    m_reactor->Add(new_fd,Bind(&TCPServer::ReadHadler, this));
     
 }
 
 void TCPServer::ReadHadler(int readFd)
 {
-    char *pong = "pong";
+    char pong[] = "pong";
     char len = 5;  
     char *buff;
-    size_t buff_size, bytes_read;
+    long buff_size, bytes_read;
     /* get size in buffer to allocate */
     if (-1 == ioctl(readFd, FIONREAD, &buff_size))
     {
-        perror("tcp ioctl");
-        return;
+        throw("ioctl");
     }
 
     buff = new char[buff_size];
-
+    
     bytes_read = recv(readFd, buff, buff_size, 0);
+    
     if(-1 == bytes_read)
     {
-        perror("recv");
-        delete[] buff;
-        close(m_tcpFd);
-        close(readFd);
-        exit(EXIT_FAILURE);
+        throw("recv");
     }
     else if (bytes_read > 0)
     {
         write(1, buff, buff_size);
         
-
         bytes_read = send(readFd, pong, len, 0);
         if (-1 == bytes_read)
         {
-            perror("tcp send");
-            delete[] buff;
-            close(m_tcpFd);
-            close(readFd);
-            exit(EXIT_FAILURE);
+            throw("send");
         }
     }
 
@@ -109,7 +101,7 @@ void TCPServer::ReadHadler(int readFd)
 
 void TCPServer::Start()
 {
-    m_reactor->Add(m_tcpFd, Bind(AcceptHandler, this));
+    m_reactor->Add(m_tcpFd, Bind(&TCPServer::AcceptHandler, this));
 }
 
 

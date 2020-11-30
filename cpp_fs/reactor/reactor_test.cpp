@@ -15,7 +15,7 @@ void ReadSTDIN(int fd);
 int main()
 {
     Reactor<Select> reactor(new Select);
-    TCPServer server(&reactor, "9000");
+    TCPServer server(&reactor, "9001");
 
 
 	reactor.Add(0, Bind(ReadSTDIN));
@@ -35,8 +35,7 @@ void ReadSTDIN(int fd)
 
     if (-1 == ioctl(fd, FIONREAD, &buff_size))
     {
-        perror("udp ictl");
-        return;
+        throw("ioctl");
     }
 
 	buff = new char[buff_size];
@@ -44,10 +43,7 @@ void ReadSTDIN(int fd)
     read_bytes = read(fd, buff, buff_size);
     if (-1 == read_bytes)
     {
-        perror("stdin read");
-
-        delete[] buff;
-        return;
+        throw("read");
     }
 
     buff[read_bytes - 1] = '\0';
@@ -56,8 +52,7 @@ void ReadSTDIN(int fd)
  
 	if (!strcmp(buff, "exit"))
 	{
-		delete[] buff;
-		exit(0);
+		throw("strcmp");
 	}
 
 	delete[] buff; 
