@@ -11,7 +11,7 @@ template<typename>
 class Function;
 
 template<typename ARG, typename RET, typename S>
-Function<RET(ARG)> Bind(RET(S::*func)(ARG arg));
+Function<RET(ARG)> Bind(RET(S::*func)(ARG arg), S *object);
 
 template<typename ARG, typename RET>
 Function<RET(ARG)> Bind(RET(*func)(ARG arg));
@@ -113,9 +113,9 @@ Function<RET(ARG)> Bind(RET(*func)(ARG arg))
 }
 
 template<typename ARG, typename RET, typename S>
-Function<RET(ARG)> Bind(RET(S::*func)(ARG arg))
+Function<RET(ARG)> Bind(RET(S::*func)(ARG arg), S *object)
 {
-    return (Function<RET(ARG)>(func));
+    return (Function<RET(ARG)>(func,object));
 }
 
 } // namespace rd90

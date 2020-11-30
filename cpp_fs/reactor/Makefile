@@ -8,7 +8,7 @@ ROOT_DIR = ../..
 PROJ_SRCS = monitor.cpp reactor_test.cpp tcp.cpp
 
 # list of directories containing header files
-PROJ_INC_DIR = $(ROOT_DIR)/cpp_fs/functorTemplate
+PROJ_INC_DIR = $(ROOT_DIR)/cpp_fs/function
 
 # the executable file
 PROJ_OUT = reactor_test.out
@@ -31,6 +31,6 @@ PROJ_LIBS =
 PROJ_LDFLAGS =
 
 # list of projects (makefiles) this project depends on
-PROJ_DEPENDS  = $(ROOT_DIR)/cpp_fs/functorTemplate/Makefile
+PROJ_DEPENDS  = $(ROOT_DIR)/cpp_fs/function/Makefile
 
 include $(ROOT_DIR)/make/Project.mak

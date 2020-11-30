@@ -44,7 +44,7 @@ int main(int argc, char const *argv[])
     hints.ai_flags = AI_PASSIVE;
 
 
-    if ((status = getaddrinfo("10.1.0.33", "9000", &hints, &servinfo)) != 0)
+    if ((status = getaddrinfo("127.0.0.1", "9001", &hints, &servinfo)) != 0)
     {
         fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
         exit(1);
