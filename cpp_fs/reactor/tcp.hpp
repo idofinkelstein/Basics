@@ -7,13 +7,14 @@ namespace ilrd
 namespace rd90
 {
 
+
 class TCPServer
 {
 public:
-    explicit TCPServer(Reactor<Select> *reactor, const char *port);
+    explicit TCPServer(Reactor<Epoll> *reactor, const char *port);
     void Start();
 private:
-    Reactor<Select> *m_reactor;
+    Reactor<Epoll> *m_reactor;
     int m_tcpFd;
 
     void AcceptHandler(int);

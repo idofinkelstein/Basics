@@ -15,7 +15,7 @@ namespace ilrd
 namespace rd90
 {
 
-TCPServer::TCPServer(Reactor<Select> *reactor, const char *port)
+TCPServer::TCPServer(Reactor<Epoll> *reactor, const char *port)
 : m_reactor(reactor)
 {
     struct addrinfo hints;
@@ -77,9 +77,7 @@ void TCPServer::ReadHadler(int readFd)
     {
         throw("ioctl");
     }
-
-    buff = new char[buff_size];
-    
+    buff = new char[100];
     bytes_read = recv(readFd, buff, buff_size, 0);
     
     if(-1 == bytes_read)

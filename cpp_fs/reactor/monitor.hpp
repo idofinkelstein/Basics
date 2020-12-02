@@ -39,17 +39,22 @@ private:
     int UpdateMax();
 };
 
-class Epol : public IMonitor
+class Epoll : public IMonitor
 {
 public:
-    Epol();
-    ~Epol() = default;
+    Epoll(int max_events);
+    ~Epoll();
 
     void Add(int fd);
     void Remove(int fd);
     int WaitForEvent();
     int GetNextFd();
 private:
+    int m_max_events;
+    int m_fd;
+    int m_curr_event;
+    // TODO: vector instead of array
+    struct epoll_event *m_events;
     
 };
 

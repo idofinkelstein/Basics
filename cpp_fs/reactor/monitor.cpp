@@ -1,3 +1,5 @@
+#include <sys/epoll.h>
+
 #include "monitor.hpp"
 
 namespace ilrd
@@ -63,29 +65,59 @@ int Select::UpdateMax()
 
 /*-------------------------------------------------------------------------*/
 
-Epol::Epol()
+Epoll::Epoll(int max_events)
+: m_max_events(max_events),
+  m_curr_event(0),
+  m_events (new struct epoll_event[max_events])
 {
-
+    if (-1 == (m_fd = epoll_create1(0)))
+    {
+        throw("epoll_create");
+    }
 }
 
-void Epol::Add(int fd)
+Epoll::~Epoll()
 {
+    close(m_events->data.fd);
 
+    delete [] m_events;
 }
 
-void Epol::Remove(int fd)
-{
 
+void Epoll::Add(int fd)
+{
+    // EPOLLIN - The associated file is available for read
+    m_events->events = EPOLLIN;
+    m_events->data.fd = fd;
+
+    if (-1 == epoll_ctl(m_fd, EPOLL_CTL_ADD, fd, m_events))
+    {
+        throw ("epoll_ctl: Add");
+    }
 }
 
-int Epol::WaitForEvent()
+void Epoll::Remove(int fd)
 {
-
+    if (-1 == epoll_ctl(m_fd, EPOLL_CTL_DEL, fd, m_events))
+    {
+        throw("epoll_ctl: Remove");
+    }
 }
 
-int Epol::GetNextFd()
+int Epoll::WaitForEvent()
+{
+    m_curr_event = 0;
+    // returns num of available fd's
+    return (epoll_wait(m_fd, m_events, m_max_events, -1));
+}
+
+int Epoll::GetNextFd()
 {
     
+    
+   return (m_events[m_curr_event++].data.fd);
+
+
 }
 
 
@@ -95,3 +127,6 @@ int Epol::GetNextFd()
 
 } // rd90
 } // ilrd
+
+
+// sudo sh -c "echo 4 > /sys/block/nbd0/queue/max_sectors_kb" 

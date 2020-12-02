@@ -44,7 +44,7 @@ int main(int argc, char const *argv[])
     hints.ai_flags = AI_PASSIVE;
 
 
-    if ((status = getaddrinfo("127.0.0.1", "9001", &hints, &servinfo)) != 0)
+    if ((status = getaddrinfo("127.0.0.1", "9998", &hints, &servinfo)) != 0)
     {
         fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
         exit(1);
@@ -134,7 +134,6 @@ int main(int argc, char const *argv[])
                 close(sockfd);
                 exit(EXIT_FAILURE);
             }
-
             if(-1 == recv(sockfd, buffer,len, 0))
             {
                 perror("recv");

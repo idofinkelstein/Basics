@@ -14,8 +14,12 @@ void ReadSTDIN(int fd);
 
 int main()
 {
+#if 0
     Reactor<Select> reactor(new Select);
-    TCPServer server(&reactor, "9001");
+#else
+    Reactor<Epoll> reactor(new Epoll(5));
+#endif
+    TCPServer server(&reactor, "9998");
 
 
 	reactor.Add(0, Bind(ReadSTDIN));
