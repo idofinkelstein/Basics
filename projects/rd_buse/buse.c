@@ -20,7 +20,7 @@
 
 /* Utility functions declaration */
 u_int64_t Ntohll(u_int64_t a);
-static int ReadAll(int fd, char* buf, size_t count);
+int ReadAll(int fd, char* buf, size_t count);
 static int WriteAll(int fd, char* buf, size_t count);
 
 typedef struct 
@@ -59,10 +59,18 @@ int BioDevOpen(const char* dev_file, uint64_t size)
 		return (DEV_OPN_FAILURE);
 	}
 	
+		
 	if (-1 == (err = ioctl(nbd, NBD_CLEAR_SOCK)))
 	{
 		return (DEV_OPN_FAILURE);
 	}
+
+	if(ioctl(nbd, NBD_SET_SOCK, sp[1]) == -1 ||
+		   ioctl(nbd, NBD_CLEAR_QUE) 	== -1)
+	{
+		return (DEV_OPN_FAILURE);
+	}
+
 
 	pid_t pid = fork();
 	if (-1 == pid)
@@ -75,13 +83,9 @@ int BioDevOpen(const char* dev_file, uint64_t size)
 		close(sp[0]);
 		sk = sp[1];
 		puts("before do it");
-		if(ioctl(nbd, NBD_SET_SOCK, sk) == -1 ||
-		   ioctl(nbd, NBD_DO_IT) 		== -1 ||
-		   ioctl(nbd, NBD_CLEAR_QUE) 	== -1 ||
-		   ioctl(nbd, NBD_CLEAR_SOCK) 	== -1)
-		{
-			return (DEV_OPN_FAILURE);
-		}
+		
+		ioctl(nbd, NBD_DO_IT);
+
 		puts("after do it");
 		exit(EXIT_SUCCESS);
 	}
@@ -94,6 +98,8 @@ int BioDevOpen(const char* dev_file, uint64_t size)
             return (DEV_OPN_FAILURE);
         }
 	}
+
+	close(sp[1]);
 
 	return (sp[0]);
 }
@@ -108,10 +114,11 @@ BioRequest* BioRequestRead(int bioDesc)
 	/* reads request message */
 	ReadAll(bioDesc, (char*)&request, sizeof(struct nbd_request));
 	
-	data_len = ntohl(request.len);
+	/* handles only read and write request */
+	data_len = (request.type == NBD_CMD_READ || request.type == NBD_CMD_WRITE) * ntohl(request.len);
 		
 	 /* alloc new nbd_message */
-    message = (nbd_message *)malloc(offsetof(nbd_message, buffer) + data_len);
+    message = (nbd_message *)malloc(offsetof(nbd_message, buffer) + ntohl(request.len));
     
     if (NULL == message)
     {
@@ -133,6 +140,11 @@ BioRequest* BioRequestRead(int bioDesc)
     memcpy(&message->reply, &reply, sizeof(struct nbd_reply));
     /* init socket in message */
     message->nbd_socket = bioDesc;
+
+	if(request.type == NBD_CMD_WRITE)
+    {
+        write(bioDesc, &message->buffer, data_len);
+    }
 
                           
     return ((BioRequest*)message);
@@ -184,7 +196,7 @@ u_int64_t Ntohll(u_int64_t a)
 #define htonll Ntohll
 
 /* reads from fd to buf */
-static int ReadAll(int fd, char* buf, size_t count)
+int ReadAll(int fd, char* buf, size_t count)
 {
   int bytes_read;
 

@@ -19,8 +19,6 @@ int BioDevOpen(const char* dev_file, uint64_t size);
 BioRequest* BioRequestRead(int bioDesc);
 void BioRequestDone(BioRequest* req, int error);
 
-int ReadAll(int fd, char* buf, size_t count);
-
 //void BioDevDisconnect();
 
 #ifdef __cplusplus

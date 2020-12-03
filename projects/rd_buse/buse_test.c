@@ -16,6 +16,9 @@ static void UserRead(void *buf, u_int32_t len, u_int64_t offset);
 static void UserWrite(const void *buf, u_int32_t len, u_int64_t offset);
 static unsigned long long StrToUllWithPrefix(const char *str, char **end);
 
+
+
+
 struct arguments 
 {
 	unsigned long long size;
@@ -90,6 +93,8 @@ int main(int argc, char *argv[])
 				break;
 
 			case (NBD_CMD_WRITE):
+
+				ReadAll(nbd_socket, bioRequest->dataBuf, bioRequest->dataLen);
 
 				UserWrite(bioRequest->dataBuf, bioRequest->dataLen, bioRequest->offset);
 				break;
