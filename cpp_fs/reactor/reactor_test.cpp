@@ -1,4 +1,4 @@
-#include <stdio.h> 		/* perror, printf */
+#include <cstdio> 		/* perror, printf */
 #include <cstdlib> 		/* malloc, free */
 #include <cstring>
 #include <sys/ioctl.h>  /* ioctl */

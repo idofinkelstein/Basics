@@ -47,9 +47,9 @@ class RequestDispatcher
 {
 public:
     // if also registers handler of bio_fd, needs to pass as a paremeter
-    explicit RequestDispatcher(Reactor<Epoll>& react, int bio_fd); 
+    explicit RequestDispatcher(Reactor<Epoll> &react, int bio_fd); 
 
-    int RegisterIoT(const std::string& ip_addr); // will also register handler 
+    void RegisterIoT(const std::string& ip_addr); // will also register handler 
                                                   // in reactor?
     // void RegisterHandler(int bio_fd);   // if handlers' registration is explicit
 
@@ -58,8 +58,8 @@ public:
     ~RequestDispatcher() = default;
 
 private:
-    int RequestHandler(int bio_fd);
-    int ReplyHandler(int iot_fd);
+    void RequestHandler(int bio_fd);
+    void ReplyHandler(int iot_fd);
     int InitIPSocket(const std::string& ip_addr);
 
     std::vector<int>m_iotFds;

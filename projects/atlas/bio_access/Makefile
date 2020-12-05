@@ -5,18 +5,18 @@
 ROOT_DIR = ../../..
 
 #PROJ_SRCS = $(wildcard *.c)
-PROJ_SRCS = request_dispatcher_test.cpp request_dispatcher.cpp bio_access.c monitor.cpp
+PROJ_SRCS = bio_access.c bio_access_test.c
 
 # list of directories containing header files
-PROJ_INC_DIR = $(ROOT_DIR)/cpp_fs/reactor  $(ROOT_DIR)/cpp_fs/function $(ROOT_DIR)/projects/atlas/bio_access
+PROJ_INC_DIR =
 
 # the executable file
-PROJ_OUT = dispatcher.out
+PROJ_OUT = bio.out
 
 # list of compiler flags (prepended with "-" sign)
 #PROJ_CFLAGS = -Wunused-but-set-variable
-PROJ_CFLAGS =
-PROJ_CPPFLAGS = -std=c++11
+PROJ_CFLAGS = -std=c99
+PROJ_CPPFLAGS =
 
 #PROJ_MACROS = _BSD_SOURCE
 PROJ_MACROS =
@@ -31,6 +31,6 @@ PROJ_LIBS =
 PROJ_LDFLAGS =
 
 # list of projects (makefiles) this project depends on
-PROJ_DEPENDS  =  $(ROOT_DIR)/cpp_fs/reactor/Makefile $(ROOT_DIR)/projects/atlas/bio_access/Makefile
+PROJ_DEPENDS  =
 
 include $(ROOT_DIR)/make/Project.mak

@@ -1,5 +1,5 @@
 #include <stdio.h>
-
+/* multiplyes without * */ 
 int MulR(int a, int b)
 {
 	if (b == 0)
@@ -15,6 +15,7 @@ int MulR(int a, int b)
 	return MulR(a, b+1) + -a;
 }
 
+/* adds 1 bitwise style */
 int Add1(int a)
 {
 	unsigned mask = 1;
@@ -28,6 +29,7 @@ int Add1(int a)
 	return a ^ mask;
 }
 
+/* adds 1 bitwise style recursively */
 int _Add1(int a, int mask)
 {
 	if (!(a & mask))
@@ -38,6 +40,7 @@ int _Add1(int a, int mask)
 	return mask ^ _Add1(a, mask << 1);
 }
 
+/* _Add1's wrapper */
 int Add1R(int a)
 {
 	return _Add1(a, 1);

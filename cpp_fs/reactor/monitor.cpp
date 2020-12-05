@@ -112,17 +112,9 @@ int Epoll::WaitForEvent()
 }
 
 int Epoll::GetNextFd()
-{
-    
-    
+{      
    return (m_events[m_curr_event++].data.fd);
-
-
 }
-
-
-
-
 
 
 } // rd90

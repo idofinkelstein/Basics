@@ -10,89 +10,156 @@
 
 #include "bio_access.h"
 
-#include <argp.h>
-#include <err.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/wait.h>
-#include <netinet/in.h>
-#include <assert.h>
-#include <unistd.h>
+#define DEV_OPN_FAILURE -1
 
-#include "bio_access.h"
+/* BUSE callbacks */
+static void *data; /* represent the device */
 
-#ifndef BUSE_DEBUG
-  #define BUSE_DEBUG (0)
-#endif
+static error_t ParseOpt(int key, char *arg, struct argp_state *state);
+static void UserRead(void *buf, u_int32_t len, u_int64_t offset);
+static void UserWrite(const void *buf, u_int32_t len, u_int64_t offset);
+static unsigned long long StrToUllWithPrefix(const char *str, char **end);
 
-/* function declarations */
-static void *data;
-int ReadAll(int fd, char* buf, size_t count);
+/*----------------------------------------------------------------------------*/
 
-static int HandleRead(void *buf, u_int32_t len, u_int64_t offset)
+
+struct arguments 
 {
-  fprintf(stderr, "R - %lu, %u\n", offset, len);
-    
-  memcpy(buf, (char *)data + offset, len);
+	unsigned long long size;
+	char 			   *device;
+	int 			   verbose;
+};
+/*----------------------------------------------------------------------------*/
 
-  return (0);
-}
-
-static int HandleWrite(const void *buf, u_int32_t len, u_int64_t offset)
-{
-  fprintf(stderr, "W - %lu, %u\n", offset, len);
-    
-  memcpy((char *)data + offset, buf, len);
-
-  return (0);
-}
 
 /* argument parsing using argp */
+
 static struct argp_option options[] = 
 {
   {"verbose", 'v', 0, 0, "Produce verbose output", 0},
   {0},
 };
+/*----------------------------------------------------------------------------*/
 
-struct arguments {
-  unsigned long long size;
-  char *device;
-  int verbose;
+static struct argp argp = 
+{
+  .options = options,
+  .parser = ParseOpt,
+  .args_doc = "SIZE DEVICE",
+  .doc = "BUSE virtual block device that stores its content in memory.\n"
+         "`SIZE` accepts suffixes K, M, G. `DEVICE` is path to block device,"
+		 " for example \"/dev/nbd0\".",
 };
 
-static unsigned long long strtoull_with_prefix(const char * str, char * * end) 
+/*----------------------------------------------------------------------------*/
+int main(int argc, char *argv[]) 
 {
-  unsigned long long v = strtoull(str, end, 0);
-  
-  switch (**end) 
-  {
-    case 'K':
-      v *= 1024;
-      *end += 1;
-      break;
+	int nbd_socket = 0;
+    int error = 0;
+    BioRequest *bioRequest = NULL;
 
-    case 'M':
-      v *= 1024 * 1024;
-      *end += 1;
-      break;
+	struct arguments arguments = 
+	{
+		.verbose = 0,
+	};
 
-    case 'G':
-      v *= 1024 * 1024 * 1024;
-      *end += 1;
-      break;
-  }
+	argp_parse(&argp, argc, argv, 0, 0, &arguments);
+	printf("size = %lld\n", arguments.size);
+	data = malloc(arguments.size);
+	if (NULL == data)
+	{
+		perror("malloc failed");
+		return (EXIT_FAILURE);
+	}
 
-  return (v);
+	nbd_socket = BioDevOpen(arguments.device, arguments.size);
+	if (DEV_OPN_FAILURE == nbd_socket)
+	{
+		perror("BioDevOpen failed");
+		puts(arguments.device);
+		free(data);
+		return (EXIT_FAILURE);
+	}
+
+	while (1)
+	{
+		
+		bioRequest = BioRequestRead(nbd_socket);
+		if (NULL == bioRequest)
+		{
+			free(data);
+			return (EXIT_FAILURE);
+		}
+
+		switch (bioRequest->reqType)
+		{
+			case (NBD_CMD_READ):
+
+				UserRead(bioRequest->dataBuf, bioRequest->dataLen, bioRequest->offset);
+				break;
+
+			case (NBD_CMD_WRITE):
+
+				UserWrite(bioRequest->dataBuf, bioRequest->dataLen, bioRequest->offset);
+				break;
+
+			default:
+				break;
+		}
+
+	BioRequestDone(bioRequest, error);
+	}
+
+
+	return 0;
 }
 
+static void UserRead(void *buf, u_int32_t len, u_int64_t offset)
+{
+	fprintf(stderr, "R - %lu, %u\n", offset, len);
+
+	memcpy(buf, (char *)data + offset, len);
+}
+/*----------------------------------------------------------------------------*/
+static void UserWrite(const void *buf, u_int32_t len, u_int64_t offset)
+{
+	fprintf(stderr, "W - %lu, %u\n", offset, len);
+
+	memcpy((char *)data + offset, buf, len);
+}
+
+/*----------------------------------------------------------------------------*/
+
+
+static unsigned long long StrToUllWithPrefix(const char *str, char **end) 
+{
+	unsigned long long v = strtoull(str, end, 0);
+
+	switch (**end) 
+	{
+		case 'K':
+			v *= 1024;
+			*end += 1;
+			break;
+		case 'M':
+			v *= 1024 * 1024;
+			*end += 1;
+			break;
+		case 'G':
+			v *= 1024 * 1024 * 1024;
+			*end += 1;
+			break;
+	}
+	return v;
+}
+/*----------------------------------------------------------------------------*/
 /* Parse a single option. */
-static error_t ParseOpt(int key, char *arg, struct argp_state *state)
+static error_t ParseOpt(int key, char *arg, struct argp_state *state) 
 {
   struct arguments *arguments = state->input;
-  char *endptr;
+  char * endptr;
 
-  switch (key)
+  switch (key) 
   {
 
     case 'v':
@@ -104,14 +171,12 @@ static error_t ParseOpt(int key, char *arg, struct argp_state *state)
       {
 
         case 0:
-          arguments->size = strtoull_with_prefix(arg, &endptr);
-
+          arguments->size = StrToUllWithPrefix(arg, &endptr);
           if (*endptr != '\0') 
           {
             /* failed to parse integer */
             errx(EXIT_FAILURE, "SIZE must be an integer");
           }
-
           break;
 
         case 1:
@@ -120,9 +185,8 @@ static error_t ParseOpt(int key, char *arg, struct argp_state *state)
 
         default:
           /* Too many arguments. */
-          return (ARGP_ERR_UNKNOWN);
+          return ARGP_ERR_UNKNOWN;
       }
-
       break;
 
     case ARGP_KEY_END:
@@ -131,82 +195,15 @@ static error_t ParseOpt(int key, char *arg, struct argp_state *state)
         warnx("not enough arguments");
         argp_usage(state);
       }
-
       break;
 
     default:
-      return ARGP_ERR_UNKNOWN;
+		return ARGP_ERR_UNKNOWN;
   }
 
-  return (0);
+  return 0;
 }
 
-static struct argp argp = 
-{
-  .options = options,
-  .parser = ParseOpt,
-  .args_doc = "SIZE DEVICE",
-  .doc = "BUSE virtual block device that stores its content in memory.\n"
-         "`SIZE` accepts suffixes K, M, G. `DEVICE` is path to block device, for example \"/dev/nbd0\".",
-};
 
 
-int main(int argc, char *argv[]) 
-{
-  BioRequest* next_request = NULL;
-	uint32_t error = 0;
 
-  struct arguments arguments = 
-  {
-    .verbose = 0,
-  };
-
-  argp_parse(&argp, argc, argv, 0, 0, &arguments);
-
-  data = malloc(arguments.size);
-
-  if (data == NULL) 
-  {
-    err(EXIT_FAILURE, "failed to alloc space for data");
-  }
-
-  //int nbd_socket = buse_main(arguments.device, &aop, (void *)&arguments.verbose);
-  int nbd_socket = BioDevOpen(arguments.device, arguments.size);
-
-  while (1)
-  {
-    /* serve NBD socket */
-     next_request = BioRequestRead(nbd_socket);
-		if (NULL == next_request)
-		{
-			fprintf(stderr, "request read failed\n");
-			close(nbd_socket);
-      
-			return(EXIT_FAILURE);
-		}
-		
-		switch(next_request->reqType)
-		{
-
-		case NBD_CMD_READ:
-					
-			error = HandleRead(next_request->dataBuf, 
-							next_request->dataLen, 
-							next_request->offset);
-			break;
-
-		case NBD_CMD_WRITE:
-	
-			ReadAll(nbd_socket, next_request->dataBuf, next_request->dataLen);
-
-			error = HandleWrite(next_request->dataBuf, 
-							 next_request->dataLen, 
-							 next_request->offset);
-			break;
-		}
-
-		BioRequestDone(next_request, error);
-  }
-
-  return (0);
-}
