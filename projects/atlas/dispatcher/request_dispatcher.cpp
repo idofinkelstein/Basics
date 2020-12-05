@@ -60,6 +60,7 @@ void RequestDispatcher::RequestHandler(int bio_fd)
 
 	if (-1 == write(m_iotFds[0], reinterpret_cast<char *>(&requestToIoT), sizeof(AtlasHeader)))
 	{
+		puts("RequestHandler: write header");
 		throw("write to IoT failed");
 	}
 
@@ -67,7 +68,8 @@ void RequestDispatcher::RequestHandler(int bio_fd)
 	{
 		if (-1 == (write(m_iotFds[0], requestFromNBD->dataBuf, requestFromNBD->dataLen)))
 		{
-			 throw("write to IoT failed");
+			puts("RequestHandler: write data");
+			throw("write to IoT failed");
 		}
 	}
 }

@@ -1,4 +1,5 @@
 #include <sys/epoll.h>
+#include <cstdio> // debugging perposes
 
 #include "monitor.hpp"
 
@@ -72,6 +73,7 @@ Epoll::Epoll(int max_events)
 {
     if (-1 == (m_fd = epoll_create1(0)))
     {
+		puts("Epoll epoll_create");
         throw("epoll_create");
     }
 }
@@ -92,6 +94,7 @@ void Epoll::Add(int fd)
 
     if (-1 == epoll_ctl(m_fd, EPOLL_CTL_ADD, fd, m_events))
     {
+		puts("Epoll::Add epoll_ctl");
         throw ("epoll_ctl: Add");
     }
 }
@@ -100,6 +103,7 @@ void Epoll::Remove(int fd)
 {
     if (-1 == epoll_ctl(m_fd, EPOLL_CTL_DEL, fd, m_events))
     {
+		puts("Epoll::Remove epoll_ctl");
         throw("epoll_ctl: Remove");
     }
 }
