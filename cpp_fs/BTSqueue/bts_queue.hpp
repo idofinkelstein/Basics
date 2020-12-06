@@ -13,25 +13,24 @@ template<typename T>
 class BTSQueue
 {
 public:
-    BTSQueue(/* args */);
+    explicit BTSQueue();
     ~BTSQueue();
     BTSQueue(const BTSQueue &other) = delete;
-    operator=(const BTSQueue &other) = delete;
+    void operator=(const BTSQueue &other) = delete;
 
-    T &Dequeue();
+    void Dequeue(T &element);
     void Enqueue(const T &element);
     size_t Size();
-    int IsEmpty();
+    bool IsEmpty();
 
 private:
     std::priority_queue<T> m_queue;
     std::mutex m_mtx;
     std::condition_variable m_conVar;
-    std::unique_lock<T> m_uLock;
 };
 
 template<typename T>
-BTSQueue<T>::BTSQueue(/* args */)
+BTSQueue<T>::BTSQueue()
 {
 }
 
@@ -40,9 +39,41 @@ BTSQueue<T>::~BTSQueue()
 {
 }
 
-template<class T> T &BTSQueue<T>::Dequeue()
+template<typename T> 
+void BTSQueue<T>::Dequeue(T &element)
 {
+    std::unique_lock<std::mutex> mlock(m_mtx);
+    while (m_queue.empty())
+    {
+      m_conVar.wait(mlock);
+    }
+    element = m_queue.top();
+    m_queue.pop();
+}
 
+template<typename T>
+void BTSQueue<T>::Enqueue(const T &element)
+{
+    std::unique_lock<std::mutex> mlock(m_mtx);
+    m_queue.push(element);
+    mlock.unlock();
+    m_conVar.notify_one();
+}
+
+template<typename T> 
+size_t BTSQueue<T>::Size()
+{
+    std::unique_lock<std::mutex> mlock(m_mtx);
+
+    return m_queue.size();
+}
+
+template<typename T>
+bool BTSQueue<T>::IsEmpty()
+{
+    std::unique_lock<std::mutex> mlock(m_mtx);
+
+    return m_queue.empty();
 }
 
 
