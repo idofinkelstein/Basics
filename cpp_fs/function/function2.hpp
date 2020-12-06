@@ -13,32 +13,32 @@ template<typename>
 class Function;
 
 template<typename ARG, typename RET, typename S>
-Function<RET(void)> Bind(RET(S::*func)(ARG arg), S *object, const ARG& arg);
+Function<RET(ARG)> Bind(RET(S::*func)(ARG arg), S *object);
 
 template<typename ARG, typename RET>
-Function<RET(void)> Bind(RET(*func)(ARG arg), const ARG& arg);
+Function<RET(ARG)> Bind(RET(*func)(ARG arg));
 
 template<typename ARG, typename RET>
-class Function<RET(void)>
+class Function<RET(ARG)>
 {
 public:
 
     explicit Function() {}
 
     // Free function ctor
-    explicit Function(RET(fptr)(ARG), const ARG &arg);
+    explicit Function(RET(fptr)(ARG));
 
     // Member function ctor
     template <typename S>
-    Function(RET(S::*fptr)(ARG a), S *t, const ARG &arg);
+    Function(RET(S::*fptr)(ARG a), S *t);
 
-    RET operator()();
+    RET operator()(ARG);
 
 private:
 	class I_Function
 	{
 	public:    
-		virtual RET operator()() = 0;
+		virtual RET operator()(ARG) = 0;
 		virtual ~I_Function() = default;
 	};
 
@@ -47,23 +47,21 @@ private:
 	class MemberFunctionProxy : public I_Function
 	{
 	public:
-		RET operator()();
-		MemberFunctionProxy(RET(S::*fptr)(ARG), S *t, const ARG& arg);
+		RET operator()(ARG);
+		MemberFunctionProxy(RET(S::*fptr)(ARG), S *t);
 	private:
 		RET(S::*m_func)(ARG);
 		S *m_obj;
-		ARG m_arg;
 	};    
 
 	// Handled calls to free function
 	class FreeFunctionProxy : public I_Function
 	{
 	public:
-		RET operator()();
-		FreeFunctionProxy(RET(fptr)(ARG), const ARG& arg);
+		RET operator()(ARG);
+		FreeFunctionProxy(RET(fptr)(ARG));
 	private:
 		RET(*m_func)(ARG);
-		ARG m_arg;
 	};    
 
     std::shared_ptr<I_Function> m_ptr;  
@@ -72,57 +70,54 @@ private:
 /*----------------------class Function: definition---------------------------*/
 template <typename ARG, typename RET>
 template <typename S>
-Function<RET(void)>::Function(RET(S::*fptr)(ARG), S *t)
+Function<RET(ARG)>::Function(RET(S::*fptr)(ARG), S *t)
 : m_ptr(new MemberFunctionProxy<S>(fptr, t)) {}
 
 template <typename ARG, typename RET>
-Function<RET(void)>::Function(RET(fptr)(ARG))
+Function<RET(ARG)>::Function(RET(fptr)(ARG))
 : m_ptr(new FreeFunctionProxy(fptr)) {}
 
 template <typename ARG, typename RET>
-RET Function<RET(void)>::operator()()
+RET Function<RET(ARG)>::operator()(ARG val)
 {
-    return (*m_ptr)();
+    return (*m_ptr)(val);
 }
 
 /*-------------------class MemberFunctionProxy: definition------------------------------*/
 template <typename ARG, typename RET>
 template <typename S>
-Function<RET(void)>::MemberFunctionProxy<S>::MemberFunctionProxy(RET(S::*fptr)(ARG), S *t, const ARG& arg)
+Function<RET(ARG)>::MemberFunctionProxy<S>::MemberFunctionProxy(RET(S::*fptr)(ARG), S *t)
 : m_func(fptr), 
-  m_obj(t),
-  m_arg(arg) {}
+  m_obj(t) {}
 
 template <typename ARG, typename RET>
 template<typename S>
-RET Function<RET(void)>::MemberFunctionProxy<S>::operator()()
+RET Function<RET(ARG)>::MemberFunctionProxy<S>::operator()(ARG num)
 {
-    return (m_obj->*m_func)(m_arg);  
+    return (m_obj->*m_func)(num);  
 }
 
 /*-------------------class FreeFunctionProxy: definition------------------------------*/
 template<typename ARG, typename RET>
-Function<RET(void)>::FreeFunctionProxy::FreeFunctionProxy(RET(fptr)(ARG), const ARG& arg)
-: m_func(fptr),
-  m_arg(arg)
+Function<RET(ARG)>::FreeFunctionProxy::FreeFunctionProxy(RET(fptr)(ARG)) : m_func(fptr)
 {}
 
 template<typename ARG, typename RET>
-RET Function<RET(void)>::FreeFunctionProxy::operator()()
+RET Function<RET(ARG)>::FreeFunctionProxy::operator()(ARG val)
 {
-    return m_func(m_arg);
+    return m_func(val);
 }
 
 template<typename ARG, typename RET>
-Function<RET(void)> Bind(RET(*func)(ARG arg), ARG arg)
+Function<RET(ARG)> Bind(RET(*func)(ARG arg))
 {
-    return (Function<RET(void)>(func, arg));
+    return (Function<RET(ARG)>(func));
 }
 
 template<typename ARG, typename RET, typename S>
-Function<RET(void)> Bind(RET(S::*func)(ARG arg), S *object, ARG arg)
+Function<RET(ARG)> Bind(RET(S::*func)(ARG arg), S *object)
 {
-    return (Function<RET(void)>(func,object, arg));
+    return (Function<RET(ARG)>(func,object));
 }
 
 } // namespace rd90
