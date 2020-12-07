@@ -10,6 +10,7 @@
 #include <vector>
 //#include <future>
 #include <thread>
+#include <memory>
 #include "bts_queue.hpp"
 #include "function.hpp"
 
@@ -63,12 +64,13 @@ private:
 		Priority m_pri;
 	};
 
+	//מטמפלטים את התור למצביע חכם של משימות
 	void ThreadFunc(int debugging);
 
 	size_t m_nOfThreads;
 	size_t m_activeThreads;
 	std::vector<std::thread> m_pool;
-	BTSQueue<Task> m_tasks;
+	BTSQueue< std::shared_ptr<Task> > m_tasks;
 };
 /*****************************************************************************/
 

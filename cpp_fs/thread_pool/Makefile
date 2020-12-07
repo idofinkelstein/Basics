@@ -5,7 +5,7 @@
 ROOT_DIR = ../..
 
 #PROJ_SRCS = $(wildcard *.c)
-PROJ_SRCS =  threadpool_test.cpp
+PROJ_SRCS =  threadpool_test.cpp threadpool.cpp
 
 # list of directories containing header files
 PROJ_INC_DIR = $(ROOT_DIR)/cpp_fs/BTSqueue/ $(ROOT_DIR)/cpp_fs/function

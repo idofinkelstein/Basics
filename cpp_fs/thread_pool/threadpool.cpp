@@ -7,11 +7,13 @@ namespace rd90
 {
 
 
-ThreadPool::ThreadPool(size_t nofThreads) : m_nOfThreads(nofThreads)
+ThreadPool::ThreadPool(size_t nofThreads)
+: m_nOfThreads(nofThreads), 
+  m_activeThreads(m_nOfThreads)
 {
-	for(int i = 0; i < m_nOfThreads; ++i)
+	for(size_t i = 0; i < m_nOfThreads; ++i)
     {
-        m_pool.push_back(std::thread(ThreadFunc, i));
+        m_pool.push_back(std::thread(&ThreadPool::ThreadFunc, this, i));
     }
 }
 
@@ -23,7 +25,7 @@ ThreadPool::~ThreadPool()
 	// when queue is empty, signal to threads to break out of their loop
 	// join all threads
 
-    for(int i = 0; i < m_nOfThreads; ++i)
+    for(size_t i = 0; i < m_nOfThreads; ++i)
     {
         m_pool[i].join();
     }
@@ -33,12 +35,12 @@ ThreadPool::~ThreadPool()
 
 void ThreadPool::ThreadFunc(int debugging)
 {
-    Task currTask;
+    std::shared_ptr<Task> currTask;
 
 	while (1)
 	{      
 		m_tasks.Dequeue(currTask);
-		currTask.RunFunc();
+		currTask->RunFunc();    
 	}
 }
 
@@ -51,7 +53,9 @@ void ThreadPool::SetActiveThreads(size_t nof_threads)
 
 void ThreadPool::Async(Function<int(void)> func, Priority pri)
 {
-    m_tasks.Enqueue(Task(func, pri));
+    std::shared_ptr<Task> taskptr(new Task(func, pri));
+
+    m_tasks.Enqueue(taskptr);
 }
 
 

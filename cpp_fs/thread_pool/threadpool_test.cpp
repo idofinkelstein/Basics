@@ -20,7 +20,7 @@ int Foo(int a)
 using namespace ilrd::rd90;
 int main()
 {
-    ThreadPool tp(8);
+    ThreadPool tp(size_t(8));
     
     tp.Async(Bind(Foo, 5), ThreadPool::HIGH);
     // urgent private logic

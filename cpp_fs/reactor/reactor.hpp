@@ -21,7 +21,7 @@ public:
     Reactor(const Reactor &other) = delete;
     Reactor operator=(const Reactor& other) = delete;
 
-	void Add(int fd, Function<void(void)> action);
+	void Add(int fd, const Function<void(void)> &action);
 	void Remove(int fd);
 	void Run();
 private:
@@ -37,7 +37,7 @@ Reactor<MONITOR_TYPE>::Reactor(MONITOR_TYPE *monitor) : m_monitor(monitor)
 }
 
 template <typename MONITOR_TYPE>
-void Reactor<MONITOR_TYPE>::Add(int fd, Function<void(void)> action)
+void Reactor<MONITOR_TYPE>::Add(int fd, const Function<void(void)> &action)
 {
 	dict[fd] = action;
 	m_monitor->MONITOR_TYPE::Add(fd);
