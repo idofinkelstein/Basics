@@ -55,6 +55,8 @@ int main()
     Widget w1;
     Gadget g1;
     Function<int(void)> f1, f2;
+    Function<int(void)> f3(Foo, 50);
+    Function<int(void)> f4(&Widget::Action2, &w1,  50);
 
     for_each(Bind(&Widget::Action1, &w1, 10));
     for_each(Function<int(void)>(&Widget::Action2, &w1, 10));
@@ -62,7 +64,8 @@ int main()
             
     f1 = Bind(Foo, 20);
     f2 = Bind(Foo, 20);
-
+    f3();
     f2();
+    f4();
     return 0;
 }
