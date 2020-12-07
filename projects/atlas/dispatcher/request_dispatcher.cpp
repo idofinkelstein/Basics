@@ -36,14 +36,14 @@ static void InitHints(struct addrinfo* hints, int family, int socktype, int flag
 
 RequestDispatcher::RequestDispatcher(Reactor<Epoll>& react, int bio_fd) : m_react(react)
 {
-    m_react.Add(bio_fd, Bind(&RequestDispatcher::RequestHandler, this));
+    m_react.Add(bio_fd, Bind(&RequestDispatcher::RequestHandler, this, bio_fd));
 }
 
 void RequestDispatcher::RegisterIoT(const std::string& ip_addr)
 {
     int socket = InitIPSocket(ip_addr);
 
-    m_react.Add(socket, Bind(&RequestDispatcher::ReplyHandler, this));
+    m_react.Add(socket, Bind(&RequestDispatcher::ReplyHandler, this, socket));
     m_iotFds.push_back(socket);
 }
 

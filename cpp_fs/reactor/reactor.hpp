@@ -21,12 +21,12 @@ public:
     Reactor(const Reactor &other) = delete;
     Reactor operator=(const Reactor& other) = delete;
 
-	void Add(int fd, Function<void(int)> action);
+	void Add(int fd, Function<void(void)> action);
 	void Remove(int fd);
 	void Run();
 private:
     std::shared_ptr<MONITOR_TYPE> m_monitor;
-    std::map<int, Function<void(int)> > dict;
+    std::map<int, Function<void(void)> > dict;
 };
 
 template<typename MONITOR_TYPE> 
@@ -37,7 +37,7 @@ Reactor<MONITOR_TYPE>::Reactor(MONITOR_TYPE *monitor) : m_monitor(monitor)
 }
 
 template <typename MONITOR_TYPE>
-void Reactor<MONITOR_TYPE>::Add(int fd, Function<void(int)> action)
+void Reactor<MONITOR_TYPE>::Add(int fd, Function<void(void)> action)
 {
 	dict[fd] = action;
 	m_monitor->MONITOR_TYPE::Add(fd);
@@ -46,7 +46,8 @@ void Reactor<MONITOR_TYPE>::Add(int fd, Function<void(int)> action)
 template <typename MONITOR_TYPE>
 void Reactor<MONITOR_TYPE>::Remove(int fd)
 {
-
+	m_monitor->Remove(fd);
+    dict.erase(fd);
 }
 
 template <typename MONITOR_TYPE>
@@ -62,7 +63,7 @@ void Reactor<MONITOR_TYPE>::Run()
 		for (int i = 0; i < num_of_events; ++i)
 		{
 			event = m_monitor->GetNextFd();
-			dict[event](event);
+			dict[event]();
 		}
 	}
 

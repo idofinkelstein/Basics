@@ -22,7 +22,7 @@ int main()
     TCPServer server(&reactor, "9998");
 
 
-	reactor.Add(0, Bind(ReadSTDIN));
+	reactor.Add(0, Bind(ReadSTDIN, 0));
 
     server.Start();
 	reactor.Run();

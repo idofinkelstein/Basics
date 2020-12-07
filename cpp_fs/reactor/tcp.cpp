@@ -62,7 +62,7 @@ void TCPServer::AcceptHandler(int tcpFd)
     {
         throw("accept");
     }
-    m_reactor->Add(new_fd,Bind(&TCPServer::ReadHadler, this));
+    m_reactor->Add(new_fd,Bind(&TCPServer::ReadHadler, this, new_fd));
     
 }
 
@@ -100,7 +100,7 @@ void TCPServer::ReadHadler(int readFd)
 
 void TCPServer::Start()
 {
-    m_reactor->Add(m_tcpFd, Bind(&TCPServer::AcceptHandler, this));
+    m_reactor->Add(m_tcpFd, Bind(&TCPServer::AcceptHandler, this, m_tcpFd));
 }
 
 
