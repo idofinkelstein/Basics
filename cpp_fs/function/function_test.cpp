@@ -9,13 +9,9 @@ using namespace ilrd::rd90;
 
 //------------------- utility function
 
-void for_each(int* vector, size_t size,  Function<int(void)>  )
+void for_each(Function<int(void)> action )
 {
-    for (size_t i = 0; i < size; ++i)
-    {
-       action(vector[i]);
-    }
-
+    action();
 }
 
 int Foo(int val)
@@ -56,18 +52,17 @@ public:
 
 int main()
 {
-    int arr[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     Widget w1;
     Gadget g1;
-    Function<int(int)> f1(Foo), f2;
+    Function<int(void)> f1, f2;
 
-    for_each(arr, 10, Bind(&Widget::Action1, &w1, 10));
-    for_each(arr, 10, Function<int(void)>(&Widget::Action2, &w1, 10));
-    for_each(arr, 10, Function<int(void)>(&Gadget::Action, &g1, 10));
+    for_each(Bind(&Widget::Action1, &w1, 10));
+    for_each(Function<int(void)>(&Widget::Action2, &w1, 10));
+    for_each(Function<int(void)>(&Gadget::Action, &g1, 10));
             
-    f1(10);
-    f2 = Bind(Foo);
+    f1 = Bind(Foo, 20);
+    f2 = Bind(Foo, 20);
 
-    f2(20);
+    f2();
     return 0;
 }
