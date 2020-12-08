@@ -3,9 +3,8 @@
 * Developer: 						Ido Finkelstein       *      *
 * Project Launch: 					Dec 03, 2020          *      ****
 * Project completion				Dec 07, 2020          *      *
-* Reviewer:                         Janna torbilo        ***  *  *
+* Reviewer:                         unknown        		 ***  *  *
 ******************************************************************************/
-/**********************   PREPROCESSOR DIRECTIVES   **************************/
 #pragma once
 #include <vector>
 //#include <future>
@@ -13,6 +12,7 @@
 #include <memory>
 #include "bts_queue.hpp"
 #include "function.hpp"
+#include "semaphore.hpp"
 
 /*
 int main ()
@@ -35,7 +35,11 @@ namespace rd90
 
 class ThreadPool
 {
+private:
+	// forward declaration
+	class Task;
 public:
+	class Future;
 	enum Priority
 	{
 		LOW = 0,
@@ -45,32 +49,52 @@ public:
 	explicit ThreadPool(size_t nofThreads = 1);
 	~ThreadPool();
 
-	void SetActiveThreads(size_t nofThreads);
-
+	// adds or removes available threads by delta
+	void Tune(int delta);
 	ThreadPool(const ThreadPool& other) = delete;
 	ThreadPool& operator=(const ThreadPool& other) = delete;
+	Future Async(Function<int(void)> func, Priority pri);
 
-	void Async(Function<int(void)> func, Priority pri);
+	class Future
+	{
+	public:
+		explicit Future(std::shared_ptr<Task> task);
+		void operator=(const Future &) = delete;
+		void Wait();
+	private:
+		std::shared_ptr<Task> m_task;
+	};
 
 private:
 	class Task
 	{
 	public:
 		explicit Task(Function<int(void)> func, Priority pri);
-		explicit Task(){}
+		explicit Task() : m_sem(0){}
 		int RunFunc();
+		friend class Future;
+
+		class Compare
+		{
+		public:
+			bool operator()(const std::shared_ptr<Task> &lhs, const std::shared_ptr<Task> &rhs);
+		};
+
 	private:
 		Function<int(void)> m_func;
 		Priority m_pri;
+		int m_retVal;
+		Semaphore m_sem;
 	};
 
-	//מטמפלטים את התור למצביע חכם של משימות
 	void ThreadFunc(int debugging);
+	int WaitTask(int);
 
-	size_t m_nOfThreads;
-	size_t m_activeThreads;
+	int m_maxThreads;
+	int m_activeThreads;
+	Semaphore m_sem;
 	std::vector<std::thread> m_pool;
-	BTSQueue< std::shared_ptr<Task> > m_tasks;
+	BTSQueue< std::shared_ptr<Task>, Task::Compare > m_tasks;
 };
 /*****************************************************************************/
 

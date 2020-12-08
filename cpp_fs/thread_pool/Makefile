@@ -5,10 +5,10 @@
 ROOT_DIR = ../..
 
 #PROJ_SRCS = $(wildcard *.c)
-PROJ_SRCS =  threadpool_test.cpp threadpool.cpp
+PROJ_SRCS =  threadpool_test.cpp threadpool.cpp semaphore.cpp
 
 # list of directories containing header files
-PROJ_INC_DIR = $(ROOT_DIR)/cpp_fs/BTSqueue/ $(ROOT_DIR)/cpp_fs/function
+PROJ_INC_DIR = $(ROOT_DIR)/cpp_fs/BTSqueue/ $(ROOT_DIR)/cpp_fs/function $(ROOT_DIR)/cpp_fs/semaphore/
 
 # the executable file
 PROJ_OUT = tp.out
@@ -31,6 +31,6 @@ PROJ_LIBS =
 PROJ_LDFLAGS = -pthread
 
 # list of projects (makefiles) this project depends on
-PROJ_DEPENDS  = $(ROOT_DIR)/cpp_fs/BTSqueue/Makefile
+PROJ_DEPENDS  = $(ROOT_DIR)/cpp_fs/BTSqueue/Makefile $(ROOT_DIR)/cpp_fs/semaphore/Makefile
 
 include $(ROOT_DIR)/make/Project.mak

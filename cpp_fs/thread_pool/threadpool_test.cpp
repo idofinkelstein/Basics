@@ -1,11 +1,11 @@
 /******************************************************************************
 * Project name:					 	threadpool           ***     *******
-* Developer: 						Inbal Elmalech        *      *
-* Project Lauch: 					Dec 03, 2020          *      ****
+* Developer: 						Ido Finkelstein       *      *
+* Project Launch: 					Dec 03, 2020          *      ****
 * Project completion				Dec 07, 2020          *      *
-* Reviewer:                                              ***  *  *******
+* Reviewer:                         unknown        		 ***  *  *
 ******************************************************************************/
-/**********************   PREPROCESSOR DIRECTIVES   **************************/
+
 
 #include "threadpool.hpp"
 
@@ -18,13 +18,16 @@ int Foo(int a)
 
 
 using namespace ilrd::rd90;
+
 int main()
 {
     ThreadPool tp(size_t(8));
     
-    tp.Async(Bind(Foo, 5), ThreadPool::HIGH);
-    // urgent private logic
-    tp.SetActiveThreads(4);
+    ThreadPool::Future f1 = tp.Async(Bind(Foo, 5), ThreadPool::HIGH);
+
+    //f1.wait();
+    
+    tp.Tune(4);
 
     return (0);
 }
