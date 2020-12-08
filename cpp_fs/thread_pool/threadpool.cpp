@@ -115,6 +115,12 @@ int ThreadPool::WaitTask(int arg)
     return 0;
 }
 
+int ThreadPool::Future::Wait()
+{
+    m_task->m_sem.Wait();
+    return (m_task->m_retVal);
+}
+
 ThreadPool::Future::Future(std::shared_ptr<ThreadPool::Task> task) : m_task(task) {}
 
 } // namespace rd90

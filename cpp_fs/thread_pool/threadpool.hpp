@@ -14,19 +14,6 @@
 #include "function.hpp"
 #include "semaphore.hpp"
 
-/*
-int main ()
-{
-	Threadpool t_pool(4);
-	std::future<> task1 = Async(Function<int(void)> , low);
-	std::future<> task2 = Async(Function<int(void)> , mid);
-	std::future<> task3 = Async(Function<int(void)> , high);
-	std::future<> task4 = Async(Function<int(void)> , low);
-
-	return (0);
-}
-*/
-
 namespace ilrd
 {
 namespace rd90
@@ -60,7 +47,7 @@ public:
 	public:
 		explicit Future(std::shared_ptr<Task> task);
 		void operator=(const Future &) = delete;
-		void Wait();
+		int Wait();
 	private:
 		std::shared_ptr<Task> m_task;
 	};
