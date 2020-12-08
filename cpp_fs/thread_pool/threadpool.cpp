@@ -46,7 +46,7 @@ void ThreadPool::ThreadFunc(int debugging)
 	while (1)
 	{      
 		m_tasks.Dequeue(currTask);
-		int retVal = currTask->RunFunc();    
+		currTask->Set(currTask->RunFunc());    
 	}
 }
 
@@ -96,9 +96,13 @@ int ThreadPool::Task::RunFunc()
     return m_func();
 }
 
+void ThreadPool::Task::Set(int retVal)
+{
+    m_retVal = retVal;
+}
+
 bool ThreadPool::Task::Compare::operator()(const std::shared_ptr<Task> &lhs, const std::shared_ptr<Task> &rhs)
 {
-    puts("hi");
     return (lhs->m_pri < rhs->m_pri);
 }
 

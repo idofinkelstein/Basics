@@ -72,6 +72,7 @@ private:
 		explicit Task(Function<int(void)> func, Priority pri);
 		explicit Task() : m_sem(0){}
 		int RunFunc();
+		void Set(int retVal);
 		friend class Future;
 
 		class Compare
