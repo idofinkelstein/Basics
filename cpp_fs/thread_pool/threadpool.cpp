@@ -19,6 +19,7 @@ namespace rd90
 ThreadPool::ThreadPool(size_t nofThreads)
 : m_maxThreads(nofThreads), 
   m_activeThreads(m_maxThreads),
+  m_noMore(false),
   m_sem(0, nofThreads)
 {
 	for(int i = 0; i < m_maxThreads; ++i)
@@ -31,9 +32,13 @@ ThreadPool::ThreadPool(size_t nofThreads)
 
 ThreadPool::~ThreadPool()
 {	    
+    m_noMore = true;
+
+    Tune(m_maxThreads);
+
     for(int i = 0; i < m_maxThreads; ++i)
     {
-        Async(Bind(&ThreadPool::BadApple, this, 5), ThreadPool::SUPER_LOW);
+        AsyncProxy(Bind(&ThreadPool::BadApple, this, 5), ThreadPool::SUPER_LOW);
     }
     
     for(int i = 0; i < m_maxThreads; ++i)
@@ -86,10 +91,22 @@ void ThreadPool::Tune(int delta)
             Async(Bind(&ThreadPool::WaitTask, this, 5), ThreadPool::SUPER_HIGH);
         }
     }
+
+    m_activeThreads = Min(m_maxThreads, Max(nofThreads, 0));
 }
 /*---------------------------------------------------------------------------*/
 
 ThreadPool::Future ThreadPool::Async(Function<int(void)> func, Priority pri)
+{
+    if (m_noMore == true)
+    {
+        throw -1;
+    }
+
+    return AsyncProxy(func, pri);
+}
+/*---------------------------------------------------------------------------*/
+ThreadPool::Future ThreadPool::AsyncProxy(Function<int(void)> func, Priority pri)
 {
     std::shared_ptr<Task> taskptr(new Task(func, pri));
 
@@ -97,7 +114,6 @@ ThreadPool::Future ThreadPool::Async(Function<int(void)> func, Priority pri)
 
     return Future(taskptr);
 }
-/*---------------------------------------------------------------------------*/
 
 
 int ThreadPool::WaitTask(int arg)

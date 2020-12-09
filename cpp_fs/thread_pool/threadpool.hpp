@@ -46,6 +46,7 @@ public:
 	// adds or removes available threads by delta
 	void Tune(int delta);
 	Future Async(Function<int(void)> func, Priority pri);
+	Future AsyncProxy(Function<int(void)> func, Priority pri);
 
 	// Deleted functions
 	ThreadPool(const ThreadPool& other) = delete;
@@ -92,11 +93,24 @@ private:
 
 	int 											 m_maxThreads;
 	int 											 m_activeThreads;
+	bool											 m_noMore;
 	Semaphore 										 m_sem;
 	std::vector<std::thread> 						 m_pool;
 	BTSQueue< std::shared_ptr<Task>, Task::Compare > m_tasks;
 };
 /*****************************************************************************/
+
+/*-------------------------Utility functions---------------------------------*/
+inline int Max(int a, int b)
+{
+	return (a > b ? a : b);
+}
+
+inline int Min(int a, int b)
+{
+	return (a < b ? a : b);
+}
+
 
 } // namespace rd90
 } // namespace ilrd
