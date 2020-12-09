@@ -6,10 +6,12 @@
 * Reviewer:                         unknown        		 ***  *  *
 ******************************************************************************/
 #pragma once
+
 #include <vector>
 //#include <future>
 #include <thread>
 #include <memory>
+
 #include "bts_queue.hpp"
 #include "function.hpp"
 #include "semaphore.hpp"
@@ -38,9 +40,11 @@ public:
 
 	// adds or removes available threads by delta
 	void Tune(int delta);
+	Future Async(Function<int(void)> func, Priority pri);
+
+	// Deleted functions
 	ThreadPool(const ThreadPool& other) = delete;
 	ThreadPool& operator=(const ThreadPool& other) = delete;
-	Future Async(Function<int(void)> func, Priority pri);
 
 	class Future
 	{
@@ -58,7 +62,7 @@ private:
 	public:
 		explicit Task(Function<int(void)> func, Priority pri);
 		explicit Task() : m_sem(0){}
-		int RunFunc();
+		int RunTask();
 		void Set(int retVal);
 		friend class Future;
 

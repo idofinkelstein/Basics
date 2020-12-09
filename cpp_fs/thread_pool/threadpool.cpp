@@ -46,7 +46,7 @@ void ThreadPool::ThreadFunc(int debugging)
 	while (1)
 	{      
 		m_tasks.Dequeue(currTask);
-		currTask->Set(currTask->RunFunc());    
+		currTask->Set(currTask->RunTask());    
 	}
 }
 
@@ -74,6 +74,7 @@ void ThreadPool::Tune(int delta)
     }
 }
 
+/*---------------------------------------------------------------------------*/
 
 
 ThreadPool::Future ThreadPool::Async(Function<int(void)> func, Priority pri)
@@ -85,26 +86,31 @@ ThreadPool::Future ThreadPool::Async(Function<int(void)> func, Priority pri)
     return Future(taskptr);
 }
 
+/*---------------------------------------------------------------------------*/
 
 ThreadPool::Task::Task(Function<int(void)> func, Priority pri)
 : m_func(func), 
   m_pri(pri),
   m_sem(0) {}
+/*---------------------------------------------------------------------------*/
 
-int ThreadPool::Task::RunFunc()
+int ThreadPool::Task::RunTask()
 {
     return m_func();
 }
+/*---------------------------------------------------------------------------*/
 
 void ThreadPool::Task::Set(int retVal)
 {
     m_retVal = retVal;
 }
+/*---------------------------------------------------------------------------*/
 
 bool ThreadPool::Task::Compare::operator()(const std::shared_ptr<Task> &lhs, const std::shared_ptr<Task> &rhs)
 {
     return (lhs->m_pri < rhs->m_pri);
 }
+/*---------------------------------------------------------------------------*/
 
 int ThreadPool::WaitTask(int arg)
 {
@@ -114,12 +120,14 @@ int ThreadPool::WaitTask(int arg)
 
     return 0;
 }
+/*---------------------------------------------------------------------------*/
 
 int ThreadPool::Future::Wait()
 {
     m_task->m_sem.Wait();
     return (m_task->m_retVal);
 }
+/*---------------------------------------------------------------------------*/
 
 ThreadPool::Future::Future(std::shared_ptr<ThreadPool::Task> task) : m_task(task) {}
 
