@@ -135,7 +135,7 @@ int ThreadPool::BadApple(int)
 ThreadPool::Task::Task(Function<int(void)> func, Priority pri)
 : m_func(func), 
   m_pri(pri),
-  m_sem(1, 1) {} // binary semaphore starts from 0
+  m_sem(0, 1) {} // binary semaphore starts from 0
 /*---------------------------------------------------------------------------*/
 
 int ThreadPool::Task::RunTask()
