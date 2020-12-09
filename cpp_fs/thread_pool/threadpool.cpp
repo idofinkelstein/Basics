@@ -14,12 +14,12 @@ namespace ilrd
 namespace rd90
 {
 
-
+/*-------------------------class ThreadPool: Definition--------------------------*/
 
 ThreadPool::ThreadPool(size_t nofThreads)
 : m_maxThreads(nofThreads), 
   m_activeThreads(m_maxThreads),
-  m_sem(nofThreads)
+  m_sem(0, nofThreads)
 {
 	for(int i = 0; i < m_maxThreads; ++i)
     {
@@ -30,7 +30,12 @@ ThreadPool::ThreadPool(size_t nofThreads)
 /*---------------------------------------------------------------------------*/
 
 ThreadPool::~ThreadPool()
-{	
+{	    
+    for(int i = 0; i < m_maxThreads; ++i)
+    {
+        Async(Bind(&ThreadPool::BadApple, this, 5), ThreadPool::SUPER_LOW);
+    }
+    
     for(int i = 0; i < m_maxThreads; ++i)
     {
         m_pool[i].join();
@@ -43,11 +48,18 @@ void ThreadPool::ThreadFunc(int debugging)
 {
     std::shared_ptr<Task> currTask;
 
-	while (1)
-	{      
-		m_tasks.Dequeue(currTask);
-		currTask->Set(currTask->RunTask());    
-	}
+    try
+    {
+        while (true)
+        {      
+            m_tasks.Dequeue(currTask);
+            currTask->Set(currTask->RunTask());    
+        }  
+    }
+    catch(...)
+    {
+        std::cout << "ThreadPool terminated" << std::endl;
+    }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -61,21 +73,21 @@ void ThreadPool::Tune(int delta)
     {
         while(delta--)
         {
+            puts("hi delta > 0");
             m_sem.Post();
         }
     }
-    else if (delta < 0 && nofThreads > 0)
+    else if (delta < 0 && nofThreads >= 0)
     {
         delta = -delta;
         while(delta--)
         {
-            Async(Bind(&ThreadPool::WaitTask, this, 5), ThreadPool::HIGH);
+            puts("hi delta < 0");
+            Async(Bind(&ThreadPool::WaitTask, this, 5), ThreadPool::SUPER_HIGH);
         }
     }
 }
-
 /*---------------------------------------------------------------------------*/
-
 
 ThreadPool::Future ThreadPool::Async(Function<int(void)> func, Priority pri)
 {
@@ -85,32 +97,8 @@ ThreadPool::Future ThreadPool::Async(Function<int(void)> func, Priority pri)
 
     return Future(taskptr);
 }
-
 /*---------------------------------------------------------------------------*/
 
-ThreadPool::Task::Task(Function<int(void)> func, Priority pri)
-: m_func(func), 
-  m_pri(pri),
-  m_sem(0) {}
-/*---------------------------------------------------------------------------*/
-
-int ThreadPool::Task::RunTask()
-{
-    return m_func();
-}
-/*---------------------------------------------------------------------------*/
-
-void ThreadPool::Task::Set(int retVal)
-{
-    m_retVal = retVal;
-}
-/*---------------------------------------------------------------------------*/
-
-bool ThreadPool::Task::Compare::operator()(const std::shared_ptr<Task> &lhs, const std::shared_ptr<Task> &rhs)
-{
-    return (lhs->m_pri < rhs->m_pri);
-}
-/*---------------------------------------------------------------------------*/
 
 int ThreadPool::WaitTask(int arg)
 {
@@ -122,6 +110,31 @@ int ThreadPool::WaitTask(int arg)
 }
 /*---------------------------------------------------------------------------*/
 
+int ThreadPool::BadApple(int)
+{
+    throw -1;
+}
+
+/*-------------------------class Task: Definition--------------------------*/
+ThreadPool::Task::Task(Function<int(void)> func, Priority pri)
+: m_func(func), 
+  m_pri(pri),
+  m_sem(1, 1) {} // binary semaphore starts from 0
+/*---------------------------------------------------------------------------*/
+
+int ThreadPool::Task::RunTask()
+{
+    return m_func();
+}
+/*---------------------------------------------------------------------------*/
+
+void ThreadPool::Task::Set(int retVal)
+{
+    m_retVal = retVal;
+    m_sem.Post(); // task has returned
+}
+/*-------------------------class Future: Definition--------------------------*/
+
 int ThreadPool::Future::Wait()
 {
     m_task->m_sem.Wait();
@@ -131,5 +144,14 @@ int ThreadPool::Future::Wait()
 
 ThreadPool::Future::Future(std::shared_ptr<ThreadPool::Task> task) : m_task(task) {}
 
+
+/*-------------------------class Compare: Definition--------------------------*/
+
+bool ThreadPool::Task::Compare::operator()(const std::shared_ptr<Task> &lhs,
+                                           const std::shared_ptr<Task> &rhs)
+{
+    return (lhs->m_pri < rhs->m_pri);
+}
+/*---------------------------------------------------------------------------*/
 } // namespace rd90
 } // namespace ilrd
