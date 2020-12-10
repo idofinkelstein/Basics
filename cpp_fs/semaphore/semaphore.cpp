@@ -1,8 +1,8 @@
 #include "semaphore.hpp"
 
-Semaphore::Semaphore(int numOfResources)
-: m_resources(numOfResources), 
-  m_maxResources(m_resources) {}
+Semaphore::Semaphore(int initialResources, int maxResources)
+: m_resources(initialResources), 
+  m_maxResources(maxResources) {}
 
 int Semaphore::Get()
 {

@@ -9,7 +9,7 @@ namespace ilrd
 namespace rd90
 {
 
-template<typename T>
+template<typename T, typename U>
 class BTSQueue
 {
 public:
@@ -23,24 +23,26 @@ public:
     size_t Size();
     bool IsEmpty();
 
+
 private:
-    std::priority_queue<T> m_queue;
+    std::priority_queue<T, std::vector<T>, U> m_queue;
     std::mutex m_mtx;
     std::condition_variable m_conVar;
 };
 
-template<typename T>
-BTSQueue<T>::BTSQueue()
+template<typename T, typename U>
+BTSQueue<T, U>::BTSQueue()
 {
 }
 
-template<typename T>
-BTSQueue<T>::~BTSQueue()
+template<typename T, typename U>
+BTSQueue<T, U>::~BTSQueue()
 {
 }
 
-template<typename T> 
-void BTSQueue<T>::Dequeue(T &element)
+
+template<typename T, typename U>
+void BTSQueue<T, U>::Dequeue(T &element)
 {
     std::unique_lock<std::mutex> mlock(m_mtx);
     while (m_queue.empty())
@@ -51,8 +53,9 @@ void BTSQueue<T>::Dequeue(T &element)
     m_queue.pop();
 }
 
-template<typename T>
-void BTSQueue<T>::Enqueue(const T &element)
+
+template<typename T, typename U>
+void BTSQueue<T, U>::Enqueue(const T &element)
 {
     std::unique_lock<std::mutex> mlock(m_mtx);
     m_queue.push(element);
@@ -60,16 +63,16 @@ void BTSQueue<T>::Enqueue(const T &element)
     m_conVar.notify_one();
 }
 
-template<typename T> 
-size_t BTSQueue<T>::Size()
+template<typename T, typename U>
+size_t BTSQueue<T, U>::Size()
 {
     std::unique_lock<std::mutex> mlock(m_mtx);
 
     return m_queue.size();
 }
 
-template<typename T>
-bool BTSQueue<T>::IsEmpty()
+template<typename T, typename U>
+bool BTSQueue<T, U>::IsEmpty()
 {
     std::unique_lock<std::mutex> mlock(m_mtx);
 

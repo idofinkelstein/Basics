@@ -5,19 +5,28 @@
 #include <mutex>
 
 using namespace ilrd::rd90;
+class Compare;
 
-void Producer(BTSQueue<int> *queue);
-void Consumer(BTSQueue<int> *queue);
-void Filler(BTSQueue<int> *queue);
-void GetSize(BTSQueue<int> *queue);
+void Producer(BTSQueue<int, Compare> *queue);
+void Consumer(BTSQueue<int, Compare> *queue);
+void Filler(BTSQueue<int, Compare> *queue);
+void GetSize(BTSQueue<int, Compare> *queue);
 
+class Compare
+{
+public:
+    bool operator()(int a, int b)
+    {
+        return a > b;
+    }
+};
 
 void Task2();
 
 static const int N_THREADS = 5;
 std::mutex mutex;
 
-void Task1(BTSQueue<int> *queue)
+void Task1(BTSQueue<int, Compare> *queue)
 {
     int item;
     for (int i = 0; i < 1000; ++i)
@@ -29,7 +38,7 @@ void Task1(BTSQueue<int> *queue)
 
 int main()
 {
-    BTSQueue<int> queue;
+    BTSQueue<int, Compare> queue;
     std::thread t[10];
 
     for (int i = 0; i < 10000; ++i)
@@ -51,7 +60,7 @@ int main()
 
 void Task2()
 {
-    BTSQueue<int> queue;
+    BTSQueue<int, Compare> queue;
     std::thread consum_thrd[N_THREADS];
     std::thread produc_thrd[N_THREADS];
 
@@ -78,7 +87,7 @@ void Task2()
 
 }
 
-void Producer(BTSQueue<int> *queue)
+void Producer(BTSQueue<int, Compare> *queue)
 {
     int i = 0;
 
@@ -90,7 +99,7 @@ void Producer(BTSQueue<int> *queue)
     }
 }
 
-void Consumer(BTSQueue<int> *queue)
+void Consumer(BTSQueue<int, Compare> *queue)
 {
     while(true)
     {
@@ -102,7 +111,7 @@ void Consumer(BTSQueue<int> *queue)
     }
 }
 
-void Filler(BTSQueue<int> *queue)
+void Filler(BTSQueue<int, Compare> *queue)
 {
     int j = 3;
 
@@ -118,7 +127,7 @@ void Filler(BTSQueue<int> *queue)
     }
 }
 
-void GetSize(BTSQueue<int> *queue)
+void GetSize(BTSQueue<int, Compare> *queue)
 {
     while(true)
     {

@@ -6,7 +6,7 @@
 class Semaphore
 {
 public:
-    explicit Semaphore(int numOfResources);
+    explicit Semaphore(int initialResources, int maxResources);
     Semaphore(const Semaphore &) = delete;
     void operator=(const Semaphore &) = delete;
 
