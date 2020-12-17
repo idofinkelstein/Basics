@@ -31,6 +31,8 @@ int main(void)
 #include "reactor.hpp"      // reactor
 #include "function.hpp"     // function
 #include "monitor.hpp"     // epoll
+#include "distributor.hpp"      // distributer class
+
 
 /*---------------------------------------------------------------------------*/
 
@@ -49,9 +51,9 @@ public:
     // if also registers handler of bio_fd, needs to pass as a paremeter
     explicit RequestDispatcher(Reactor<Epoll> &react, int bio_fd); 
 
-    void RegisterIoT(const std::string& ip_addr); // will also register handler 
-                                                  // in reactor?
-    // void RegisterHandler(int bio_fd);   // if handlers' registration is explicit
+    void RegisterIoT(const std::string& ip_addr); 
+                                                  
+    // void RegisterHandler(int bio_fd);   
 
     RequestDispatcher(const RequestDispatcher&) = delete;
     RequestDispatcher& operator=(const RequestDispatcher&) = delete;
@@ -62,13 +64,11 @@ private:
     void ReplyHandler(int iot_fd);
     int InitIPSocket(const std::string& ip_addr);
 
-    std::vector<int> m_iotFds;
-    Reactor<Epoll>&  m_react;
+    IDistributor *dist;
+    std::vector<int>m_iotFds;
+    Reactor<Epoll>& m_react;
 };
 
-/*************************   Class Implementation    *************************/
-
-/***************************   Public functions    ***************************/
 
 /*---------------------------------------------------------------------------*/
 
