@@ -46,9 +46,10 @@ public:
     void HandleRequest(const Task &task);
     bool HandleReply(int iot_fd); // returns status indicating whether it 
                                   // was the last reply or not
+    uint64_t GetOffset();                              
 
 private:
-    std::set<int> m_bufSlices;
+    std::set<int> m_bufSlices; // indices
     BioRequest *m_bioReq;
     uint32_t m_reqID;
 };
