@@ -27,6 +27,7 @@ int main(void)
 
 #include <vector>           // vector
 #include <string>           // string
+#include <unordered_map>    // umap
 
 #include "reactor.hpp"      // reactor
 #include "function.hpp"     // function
@@ -64,9 +65,11 @@ private:
     void ReplyHandler(int iot_fd);
     int InitIPSocket(const std::string& ip_addr);
 
-    IDistributor *dist;
+    IDistributor *m_dist;
     std::vector<int>m_iotFds;
     Reactor<Epoll>& m_react;
+    static int m_ReqUID;
+    std::unordered_map< uint32_t, std::shared_ptr<ReqSlicer> > m_slicers;
 };
 
 

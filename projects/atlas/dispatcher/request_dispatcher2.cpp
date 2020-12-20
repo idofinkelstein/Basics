@@ -14,6 +14,7 @@
 
 #include "request_dispatcher2.hpp"
 #include "bio_access.h"
+#include "req_slicer.hpp"
 
 static const char *PORT = "29000";
 
@@ -22,15 +23,8 @@ namespace ilrd
 namespace rd90
 {
 
-struct AtlasHeader
-{
-    uint32_t    m_requestUid;   // not to be used by IoT; must be first field
-    uint32_t    m_fragmentNum;  // not to be used by IoT
-    uint32_t    m_alarmUid;     // not to be used by IoT
-    uint32_t    m_iotOffset;
-    uint32_t    m_type;
-    uint32_t    m_len;          // how many bytes to write OR to read
-};
+int RequestDispatcher::m_ReqUID = 0;
+
 
 static void InitHints(struct addrinfo* hints, int family, int socktype, int flags);
 
@@ -46,11 +40,19 @@ void RequestDispatcher::RegisterIoT(const std::string& ip_addr)
     m_react.Add(socket, Bind(&RequestDispatcher::ReplyHandler, this, socket));
     m_iotFds.push_back(socket);
 }
-
+/*---------------------------------------------------------------------------*/
 void RequestDispatcher::RequestHandler(int bio_fd)
 {
-    AtlasHeader requestToIoT;
+    std::shared_ptr<ReqSlicer> slicer(new ReqSlicer(bio_fd, m_ReqUID));
+    m_slicers[m_ReqUID++] = slicer;
+    m_dist->Distribute(slicer);
+
+
+
+
+#if 0
     BioRequest *requestFromNBD = BioRequestRead(bio_fd);
+    AtlasHeader requestToIoT;
 
     /* processes request into atlas header */
     requestToIoT.m_type = requestFromNBD->reqType;
@@ -72,29 +74,24 @@ void RequestDispatcher::RequestHandler(int bio_fd)
 			throw("write to IoT failed");
 		}
 	}
+#endif
 }
-
+/*---------------------------------------------------------------------------*/
 void RequestDispatcher::ReplyHandler(int iot_fd)
 {
-	AtlasHeader ReplayFromIoT;
-	BioRequest *ReplayToNBD = NULL;
+    uint32_t ID = ReqSlicer::GetRequestID(iot_fd);
 
-	read(iot_fd, reinterpret_cast<char *>(&ReplayFromIoT), sizeof(AtlasHeader));
-	ReplayToNBD = *reinterpret_cast<BioRequest**>(&ReplayFromIoT);
+    std::shared_ptr<ReqSlicer> slicer = m_slicers[ID];
 
-	//processes reply
-    ReplayToNBD->dataLen = ReplayFromIoT.m_len;
-    ReplayToNBD->offset = ReplayFromIoT.m_iotOffset;
-    ReplayToNBD->reqType = ReplayFromIoT.m_type;
+    slicer->HandleReply(iot_fd);
 
-	if (ReplayToNBD->reqType == NBD_CMD_READ)
-    {
-        ReadAll(iot_fd, ReplayToNBD->dataBuf, ReplayToNBD->dataLen);
-    }
-   
-	BioRequestDone(ReplayToNBD, 0);
+    m_slicers.erase(ID);
+
+
+
+	
 }
-
+/*---------------------------------------------------------------------------*/
 int RequestDispatcher::InitIPSocket(const std::string& ip_addr)
 {
     struct addrinfo *tcp_server_info;

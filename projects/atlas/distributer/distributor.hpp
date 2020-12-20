@@ -18,7 +18,7 @@ namespace rd90
 
 /*********************   Free Functions declarations    **********************/
 
-class Task;
+struct Task;
 
 /************************   Classes declarations    **************************/
 
@@ -49,10 +49,6 @@ private:
     std::shared_ptr< std::vector<int> > m_fds; // or int numIoTs?
 };
 
-/*************************   Class Implementation    *************************/
-
-
-/***************************   Public functions    ***************************/
 
 
 /*---------------------------------------------------------------------------*/
