@@ -101,13 +101,15 @@ int RequestDispatcher::InitIPSocket(const std::string& ip_addr)
     struct addrinfo tcp_hints;
     int tcp_sockfd = 0;
     static int portNum = atoi(PORT);
-    char curr_port[6] = 
+    char curr_port[6];
+    
+    sprintf(curr_port, "%d", portNum++);
 
 
     /***** TCP socket handling *****/
     InitHints(&tcp_hints, AF_INET, SOCK_STREAM, AI_PASSIVE);
 
-    if (0 != getaddrinfo(ip_addr.data(), PORT, &tcp_hints, &tcp_server_info))
+    if (0 != getaddrinfo(ip_addr.data(), curr_port, &tcp_hints, &tcp_server_info))
     {
         printf("tcp getaddrinfo failed"); 
     }
