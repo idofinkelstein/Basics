@@ -28,7 +28,9 @@ int RequestDispatcher::m_ReqUID = 0;
 
 static void InitHints(struct addrinfo* hints, int family, int socktype, int flags);
 
-RequestDispatcher::RequestDispatcher(Reactor<Epoll>& react, int bio_fd) : m_react(react)
+RequestDispatcher::RequestDispatcher(Reactor<Epoll>& react, int bio_fd, IDistributor *dist) :
+ m_react(react),
+ m_dist(dist)
 {
     m_react.Add(bio_fd, Bind(&RequestDispatcher::RequestHandler, this, bio_fd));
 }

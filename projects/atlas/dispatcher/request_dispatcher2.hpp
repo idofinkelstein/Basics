@@ -50,7 +50,7 @@ class RequestDispatcher
 {
 public:
     // if also registers handler of bio_fd, needs to pass as a paremeter
-    explicit RequestDispatcher(Reactor<Epoll> &react, int bio_fd); 
+    explicit RequestDispatcher(Reactor<Epoll> &react, int bio_fd, IDistributor *dist); 
 
     void RegisterIoT(const std::string& ip_addr); 
                                                   

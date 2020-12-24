@@ -8,7 +8,7 @@
 #include <cstdio> 		/* perror, printf */
 #include <cstdlib> 		
 
-#include "request_dispatcher.hpp"
+#include "request_dispatcher2.hpp"
 #include "bio_access.h"
 #include "reactor.hpp"
 #include "monitor.hpp"
@@ -24,8 +24,9 @@ int main()
     static const char *dev_name = "/dev/nbd2";
     int bio_fd = BioDevOpen(dev_name, storage_size);
 
+    DistModulu dist();
     Reactor<Epoll> reactor(new Epoll(NUM_OF_CONNECTIONS));
-    RequestDispatcher disp(reactor, bio_fd);
+    RequestDispatcher disp(reactor, bio_fd, &dist);
 
     disp.RegisterIoT(SELF_IP);
 

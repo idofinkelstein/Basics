@@ -20,29 +20,61 @@ ReqSlicer::ReqSlicer(int bio_fd, uint32_t reqID)
 
 ReqSlicer::~ReqSlicer()
 {
-
+    BioRequestDone(&(*m_bioReq), 0);
 }
 
 uint32_t ReqSlicer::GetRequestID(int iot_fd)
 {
     uint32_t id;
 
-    read(iot_fd,&id, sizeof(uint32_t)); 
+    if (0 > read(iot_fd,&id, sizeof(uint32_t)))
+    {
+         throw("read\n");
+    } 
 
     return id;
 }
 
-void ReqSlicer::HandleRequest(const ilrd::rd90::Task &task)
+void ReqSlicer::HandleRequest(Task &task)
 {
     while (!task.m_iot_indices.empty())
     {
-        task.m_iot_indices.back()
+        int idx = task.m_iot_indices.back();
+
+        WriteFragment(task.m_iotFd, idx);
+
+        task.m_iot_indices.pop_back();
     }
 }
 
-void ReqSlicer::WriteFragment(int iotFd)
+void ReqSlicer::WriteFragment(int iotFd, int idx)
 {
+    AtlasHeader atlas_header;    
 
+    atlas_header.m_fragmentNum = idx;
+
+
+    atlas_header.m_alarmUid = 0;
+
+    atlas_header.m_type = m_bioReq->reqType;
+
+    atlas_header.m_len = m_bioReq->dataLen;
+
+    atlas_header.m_iotOffset = (m_bioReq->offset + idx * SLICE_SIZE) / iotNum;
+
+    if(-1 == write(iotFd, &atlas_header, sizeof(AtlasHeader)))
+    {
+        throw("write failed");
+    }
+
+    // If write request - send data
+    if(atlas_header.m_type == NBD_CMD_WRITE)
+    {
+        if(-1 == write(iotFd, m_bioReq->dataBuf, m_bioReq->dataLen))
+        {
+            throw("write failed");
+        }
+    }
 }
 
 
@@ -64,7 +96,6 @@ bool ReqSlicer::HandleReply(int iot_fd)
         ReadAll(iot_fd, ReplayToNBD->dataBuf, ReplayToNBD->dataLen);
     }
    
-	BioRequestDone(ReplayToNBD, 0);
 
     m_indices.erase(iot_fd);
 

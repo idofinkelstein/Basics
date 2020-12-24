@@ -52,7 +52,7 @@ public:
     ReqSlicer& operator=(const ReqSlicer& other) = delete;
 
     static uint32_t GetRequestID(int iot_fd);
-    void HandleRequest(const Task &task);
+    void HandleRequest(Task &task);
     bool HandleReply(int iot_fd); // returns status indicating whether it 
                                   // was the last reply or not
     uint64_t GetOffset(); 
@@ -65,7 +65,7 @@ private:
     uint32_t m_reqID;
     int m_bio_fd;
 
-    void WriteFragment(int iotFd);
+    void WriteFragment(int iotFd, int idx);
 };
 
 /*---------------------------------------------------------------------------*/
