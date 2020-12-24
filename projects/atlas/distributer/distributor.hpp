@@ -30,7 +30,7 @@ public:
     IDistributor(const IDistributor&) = delete;
     IDistributor& operator=(const IDistributor&) = delete;
 
-    virtual void Distribute(const std::shared_ptr<ReqSlicer>& slicer) = 0;
+    virtual void Distribute(const std::shared_ptr<ReqSlicer>& slicer, std::vector<int>& m_fds) = 0;
 
 private:
 };
@@ -40,13 +40,13 @@ private:
 class DistModulu : public IDistributor
 {
 public:
-    explicit DistModulu(std::shared_ptr< std::vector<int> > fds); // or int numIoTs?
+    explicit DistModulu(); // or int numIoTs?
     
     virtual ~DistModulu() = default;
-    virtual void Distribute(const std::shared_ptr<ReqSlicer>& slicer); 
+    virtual void Distribute(const std::shared_ptr<ReqSlicer>& slicer, std::vector<int>& m_fds); 
 
 private:
-    std::shared_ptr< std::vector<int> > m_fds; // or int numIoTs?
+    int m_numOfIoTs;
 };
 
 

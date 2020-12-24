@@ -32,7 +32,7 @@ struct AtlasHeader
     uint32_t    m_len;          // how many bytes to write OR to read
 };
 
-
+static const int SLICE_SIZE = 1024;
 /************************   Classes declarations    **************************/
 
 struct Task
@@ -45,7 +45,7 @@ struct Task
 class ReqSlicer
 {
 public:
-    explicit ReqSlicer(int bio_fd, uint32_t reqID);
+    explicit ReqSlicer(int bio_fd, uint32_t reqID, std::vector<int> &fds);
     ~ReqSlicer();
 
     ReqSlicer(const ReqSlicer& other) = delete;
@@ -60,10 +60,11 @@ public:
     uint32_t GetReqType();                            
 
 private:
-    std::set<int> m_indices; // indices
+    std::set<int>               m_indices; 
+    std::vector<int>&           m_fds;
     std::shared_ptr<BioRequest> m_bioReq;
-    uint32_t m_reqID;
-    int m_bio_fd;
+    uint32_t                    m_reqID;
+    int                         m_bio_fd;
 
     void WriteFragment(int iotFd, int idx);
 };

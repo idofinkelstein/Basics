@@ -45,9 +45,10 @@ void RequestDispatcher::RegisterIoT(const std::string& ip_addr)
 /*---------------------------------------------------------------------------*/
 void RequestDispatcher::RequestHandler(int bio_fd)
 {
-    std::shared_ptr<ReqSlicer> slicer(new ReqSlicer(bio_fd, m_ReqUID));
+    std::shared_ptr<ReqSlicer> slicer(new ReqSlicer(bio_fd, m_ReqUID, m_iotFds));
     m_slicers[m_ReqUID++] = slicer;
-    m_dist->Distribute(slicer);
+    m_dist->Distribute(slicer, m_iotFds);
+    
 
 
 
@@ -99,6 +100,9 @@ int RequestDispatcher::InitIPSocket(const std::string& ip_addr)
     struct addrinfo *tcp_server_info;
     struct addrinfo tcp_hints;
     int tcp_sockfd = 0;
+    static int portNum = atoi(PORT);
+    char curr_port[6] = 
+
 
     /***** TCP socket handling *****/
     InitHints(&tcp_hints, AF_INET, SOCK_STREAM, AI_PASSIVE);
@@ -134,6 +138,12 @@ static void InitHints(struct addrinfo* hints, int family, int socktype, int flag
     hints->ai_socktype = socktype; /* TCP stream */
     hints->ai_flags = flags;       /* assign the address of my local host */ 
 }
+
+std::vector<int> &RequestDispatcher::GetFDs()
+{
+    return m_iotFds;
+}
+
 
 } // namespace rd90
 } // namespace ilrd

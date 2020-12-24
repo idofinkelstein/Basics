@@ -8,8 +8,8 @@ namespace ilrd
 namespace rd90
 {
 
-ReqSlicer::ReqSlicer(int bio_fd, uint32_t reqID)
-: m_bio_fd(bio_fd), m_reqID(reqID)
+ReqSlicer::ReqSlicer(int bio_fd, uint32_t reqID, std::vector<int> &fds)
+: m_bio_fd(bio_fd), m_reqID(reqID), m_fds(fds)
 {
     m_bioReq = std::shared_ptr<BioRequest>(BioRequestRead(bio_fd));
     if (NULL == m_bioReq)
@@ -52,15 +52,11 @@ void ReqSlicer::WriteFragment(int iotFd, int idx)
     AtlasHeader atlas_header;    
 
     atlas_header.m_fragmentNum = idx;
-
-
     atlas_header.m_alarmUid = 0;
-
     atlas_header.m_type = m_bioReq->reqType;
-
     atlas_header.m_len = m_bioReq->dataLen;
 
-    atlas_header.m_iotOffset = (m_bioReq->offset + idx * SLICE_SIZE) / iotNum;
+    atlas_header.m_iotOffset = (m_bioReq->offset + idx * SLICE_SIZE) / SLICE_SIZE / m_fds.size();
 
     if(-1 == write(iotFd, &atlas_header, sizeof(AtlasHeader)))
     {
@@ -70,7 +66,7 @@ void ReqSlicer::WriteFragment(int iotFd, int idx)
     // If write request - send data
     if(atlas_header.m_type == NBD_CMD_WRITE)
     {
-        if(-1 == write(iotFd, m_bioReq->dataBuf, m_bioReq->dataLen))
+        if(-1 == write(iotFd, m_bioReq->dataBuf + idx * SLICE_SIZE, SLICE_SIZE))
         {
             throw("write failed");
         }
@@ -97,7 +93,7 @@ bool ReqSlicer::HandleReply(int iot_fd)
     }
    
 
-    m_indices.erase(iot_fd);
+    m_indices.erase(ReplayFromIoT.m_fragmentNum);
 
     if (m_indices.size() == 0)
     {

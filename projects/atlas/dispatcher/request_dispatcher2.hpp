@@ -60,15 +60,17 @@ public:
     RequestDispatcher& operator=(const RequestDispatcher&) = delete;
     ~RequestDispatcher() = default;
 
+    std::vector<int>& GetFDs();
+
 private:
     void RequestHandler(int bio_fd);
     void ReplyHandler(int iot_fd);
     int InitIPSocket(const std::string& ip_addr);
 
-    IDistributor *m_dist;
-    std::vector<int>m_iotFds;
-    Reactor<Epoll>& m_react;
-    static int m_ReqUID;
+    IDistributor*                                              m_dist;
+    std::vector<int>                                           m_iotFds;
+    Reactor<Epoll>&                                            m_react;
+    static int                                                 m_ReqUID;
     std::unordered_map< uint32_t, std::shared_ptr<ReqSlicer> > m_slicers;
 };
 
