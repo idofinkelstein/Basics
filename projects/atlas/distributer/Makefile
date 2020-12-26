@@ -5,9 +5,9 @@
 ROOT_DIR = ../../..
 
 #PROJ_SRCS = $(wildcard *.c)
-PROJ_SRCS =  request_dispatcher.cpp bio_access.c monitor.cpp
+PROJ_SRCS =  distributor.cpp req_slicer.cpp bio_access.c distributor.cpp monitor.cpp
 # list of directories containing header files
-PROJ_INC_DIR = $(ROOT_DIR)/cpp_fs/reactor  $(ROOT_DIR)/cpp_fs/function $(ROOT_DIR)/projects/atlas/bio_access
+PROJ_INC_DIR = $(ROOT_DIR)/cpp_fs/reactor  $(ROOT_DIR)/cpp_fs/function $(ROOT_DIR)/projects/atlas/bio_access #$(ROOT_DIR)/projects/atlas/dispatcher
 
 # the executable file
 PROJ_OUT = distributor.out
@@ -30,6 +30,6 @@ PROJ_LIBS =
 PROJ_LDFLAGS =
 
 # list of projects (makefiles) this project depends on
-PROJ_DEPENDS  = $(ROOT_DIR)/cpp_fs/reactor/Makefile $(ROOT_DIR)/projects/atlas/bio_access/Makefile
+PROJ_DEPENDS  = $(ROOT_DIR)/cpp_fs/reactor/Makefile $(ROOT_DIR)/projects/atlas/bio_access/Makefile #$(ROOT_DIR)/projects/atlas/dispatcher/Makefile
 
 include $(ROOT_DIR)/make/Project.mak

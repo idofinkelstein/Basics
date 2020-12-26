@@ -1,7 +1,3 @@
-/* 
-
-
-*/
 
 #pragma once
 
@@ -15,8 +11,6 @@ namespace ilrd
 {
 namespace rd90
 {
-
-/*********************   Free Functions declarations    **********************/
 
 struct Task;
 
