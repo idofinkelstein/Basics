@@ -32,11 +32,15 @@ RequestDispatcher::RequestDispatcher(Reactor<Epoll>& react, int bio_fd, IDistrib
  m_dist(dist),
  m_react(react)
 {
+    std::cout << "in RequestDispatcher::RequestDispatcher\n";
+
     m_react.Add(bio_fd, Bind(&RequestDispatcher::RequestHandler, this, bio_fd));
 }
 
 void RequestDispatcher::RegisterIoT(const std::string& ip_addr)
 {
+    std::cout << "in RequestDispatcher::RegisterIoT\n";
+
     int socket = InitIPSocket(ip_addr);
 
     m_react.Add(socket, Bind(&RequestDispatcher::ReplyHandler, this, socket));
@@ -45,6 +49,8 @@ void RequestDispatcher::RegisterIoT(const std::string& ip_addr)
 /*---------------------------------------------------------------------------*/
 void RequestDispatcher::RequestHandler(int bio_fd)
 {
+    std::cout << "in RequestDispatcher::RequestHandler\n";
+
     std::shared_ptr<ReqSlicer> slicer(new ReqSlicer(bio_fd, m_ReqUID, m_iotFds));
     m_slicers[m_ReqUID++] = slicer;
     m_dist->Distribute(slicer, m_iotFds);
@@ -82,13 +88,19 @@ void RequestDispatcher::RequestHandler(int bio_fd)
 /*---------------------------------------------------------------------------*/
 void RequestDispatcher::ReplyHandler(int iot_fd)
 {
+    std::cout << "in RequestDispatcher::ReplyHandler\n";
+
     uint32_t ID = ReqSlicer::GetRequestID(iot_fd);
 
     std::shared_ptr<ReqSlicer> slicer = m_slicers[ID];
 
-    slicer->HandleReply(iot_fd);
+    if (slicer->HandleReply(iot_fd))
+    {
+        BioRequestDone(slicer->GetBioRequest(), 0);
+        m_slicers.erase(ID);
+        std::cout << "in RequestDispatcher::ReplyHandler - after BioRequestDone\n";
+    }
 
-    m_slicers.erase(ID);
 
 
 

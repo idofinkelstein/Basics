@@ -57,7 +57,8 @@ public:
                                   // was the last reply or not
     uint64_t GetOffset(); 
     uint32_t GetDataLen();
-    uint32_t GetReqType();                            
+    uint32_t GetReqType();  
+    BioRequest *GetBioRequest();                          
 
 private:
     std::set<int>               m_indices; 

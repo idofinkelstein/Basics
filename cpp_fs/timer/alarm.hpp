@@ -55,10 +55,11 @@ public:
     void RegisterOnEvent(Function<void(void)> func);
 
 private:   
-    Reactor<Epoll>& m_react;
-    int m_timerfd;
-    void OnTimerHandler(); // read + call m_timer_func
-    Function<void(void)> m_timer_func;
+    Reactor<Epoll>&      m_react;
+    int                  m_timerFd;
+    Function<void(void)> m_timerFunc;
+    
+    void OnTimerHandler(int fd); // read + call m_timer_func
 };
 
 /*---------------------------------------------------------------------------*/
@@ -118,17 +119,14 @@ elapsed time: 1.88232s
 
 */
 
-AlarmFd::AlarmFd(Reactor<Epoll> &react): m_react(react), m_timerfd(timerfd_create(CLOCK_REALTIME, TFD_CLOEXEC))
+AlarmFd::AlarmFd(Reactor<Epoll> &react): m_react(react), m_timerFd(timerfd_create(CLOCK_REALTIME, TFD_CLOEXEC))
 {
-    m_react.Add()
-
-    m_react.Add(m_timerfd, Bind(&TimerFd/* <T>? */::OnTimerHandler, this));
-
+    m_react.Add(m_timerFd, Bind(&AlarmFd::OnTimerHandler, this, m_timerFd));
 }
 
 AlarmFd::~AlarmFd()
 {
-
+    m_react.Remove(m_timerFd);
 }
 
 void AlarmFd::Arm(ilrd::rd90::Duration delta)
@@ -136,7 +134,7 @@ void AlarmFd::Arm(ilrd::rd90::Duration delta)
     struct itimerspec ts;
     memset(&ts, 0, sizeof(itimerspec));
 
-    if (-1 == timerfd_settime(m_timerfd, 0, &ts, NULL))
+    if (-1 == timerfd_settime(m_timerFd, 0, &ts, NULL))
     {
         throw ("timerfd_settime");
     }
@@ -144,14 +142,14 @@ void AlarmFd::Arm(ilrd::rd90::Duration delta)
 
 void AlarmFd::RegisterOnEvent(ilrd::rd90::Function<void ()> func)
 {
-    m_timer_func = func;
-    
-
+    m_timerFunc = func;
 }
 
-void AlarmFd::OnTimerHandler()
+void AlarmFd::OnTimerHandler(int fd)
 {
+    read(fd, )
 
+    m_timer_func();
 }
 
 } // namespace rd90

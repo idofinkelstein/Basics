@@ -21,7 +21,7 @@ using namespace ilrd::rd90;
 int main()
 {
     const int storage_size = 1024 * 1024 * 256;
-    static const char *dev_name = "/dev/nbd1";
+    static const char *dev_name = "/dev/nbd8";
     int bio_fd = BioDevOpen(dev_name, storage_size);
 
 	puts("run");
@@ -35,6 +35,7 @@ int main()
     //disp.RegisterIoT(SELF_IP);
     //disp.RegisterIoT(SELF_IP);
 
+    puts("before run in main");
     reactor.Run();
 
     return 0;

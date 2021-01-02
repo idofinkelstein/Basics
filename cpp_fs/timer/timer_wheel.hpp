@@ -12,7 +12,8 @@ class TimerWheel
 {
 public:
     using TimerId = uint32_t;
-    TimerWheel(std::shared_ptr<T> alarm);
+
+    TimerWheel(T *alarm);
     ~TimerWheel();
     
     TimerWheel(const TimerWheel& other) = delete; /* UNCOPYABLE */
@@ -47,7 +48,7 @@ private:
     std::shared_ptr<T>                                  m_alarm;
     std::priority_queue<TaskPtr, 
                         std::vector<TaskPtr>, 
-                        Task::CompareTasks>
+                        typename Task::CompareTasks>
                                                         taskQueue;
     std::unordered_map<TimerId, std::shared_ptr<Task> > tasksMap;
 
@@ -56,7 +57,7 @@ private:
 /*---------------------------------------------------------------------------*/
 
 template<class T> 
-TimerWheel<T>::TimerWheel(std::shared_ptr<T> alarm)
+TimerWheel<T>::TimerWheel(T *alarm)
 : m_alarm(alarm)
 {
     //...
