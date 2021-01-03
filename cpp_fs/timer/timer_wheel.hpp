@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdlib>
+#include <cstdio>
 #include "alarm.hpp"
 
 namespace ilrd
@@ -23,7 +25,7 @@ public:
     TimerWheel(const TimerWheel& other) = delete; /* UNCOPYABLE */
     TimerWheel& operator=(const TimerWheel& other) = delete;
 
-    AlarmId SetAlarm(Duration timeout,
+    AlarmId SetAlarm(std::chrono::nanoseconds timeout,
                      Function<void(void)> func);
     void    CancelAlarm(AlarmId uid);
 
@@ -31,7 +33,7 @@ private:
     class Task
     {
     public:
-        Task(const TimePoint& timeout, const Function<void(void)>& func);
+        Task(const TimePoint& timeout, const Function<void(void)>& func, AlarmId id);
         class CompareTasks
         {
         public:
@@ -70,7 +72,7 @@ template<typename T>
 TimerWheel<T>::TimerWheel(T *alarm)
 : m_alarm(alarm)
 {
-    m_alarm->T::RegisterOnEvent(Bind(TimerWheel::OnTimerEvent, this, 0));
+    m_alarm->T::RegisterOnEvent(Bind(&TimerWheel::OnAlarmEvent, this, 0));
 }
 
 template<typename T> 
@@ -82,7 +84,7 @@ TimerWheel<T>::~TimerWheel()
 
 template<typename T>
 typename
-TimerWheel<T>::AlarmId TimerWheel<T>::SetAlarm(Duration timeout,
+TimerWheel<T>::AlarmId TimerWheel<T>::SetAlarm(std::chrono::nanoseconds timeout,
                                                Function<void(void)> func)
 {
     static AlarmId alarmUID = 0;
@@ -90,12 +92,12 @@ TimerWheel<T>::AlarmId TimerWheel<T>::SetAlarm(Duration timeout,
     TimePoint timeNow = SysClock::now();
     TimePoint absTime = timeout + timeNow;
 
-    std::shared_ptr<Task> task(new Task(absTime, func));
+    TaskPtr task(new Task(absTime, func, alarmUID));
 
     m_tasksMap[alarmUID] = task;
     m_taskQueue.push(task);
 
-    if (m_taskQueue.top()->GetExp == absTime)
+    if (m_taskQueue.top()->GetExp() == absTime)
     {
         auto nextTime = m_taskQueue.top()->GetExp() - timeNow;
         m_alarm->T::Arm(nextTime);
@@ -111,8 +113,8 @@ void TimerWheel<T>::CancelAlarm(TimerWheel<T>::AlarmId uid)
     m_tasksMap[uid]->Cancel();
 }
 
-template<class T> void 
-TimerWheel<T>::OnAlarmEvent(int Void)
+template<class T> 
+void TimerWheel<T>::OnAlarmEvent(int Void)
 {
     (void)Void;
 
@@ -121,11 +123,11 @@ TimerWheel<T>::OnAlarmEvent(int Void)
 
     if (!task->IsCanceled())
     {
-        task->PerformTask()();
-        m_tasksMap.erase(task.GetID());
+        task->PerformTask();
+        m_tasksMap.erase(task->GetID());
     }
 
-    while (task->IsCancelled())
+    while (task->IsCanceled())
     {
         m_taskQueue.pop();
         task = m_taskQueue.top();
@@ -145,9 +147,9 @@ if (!m_taskQueue.empty())
 
 /*---------------------------------------------------------------------------*/
 
-template<class T> 
-TimerWheel<T>::Task::Task(const TimePoint &timeout, const Function<void ()> &func)
-: m_alarmFunc(func), m_expTime(timeout), m_isTaskCancelled(0)
+template<typename T>  
+TimerWheel<T>::Task::Task(const TimePoint &timeout, const Function<void(void)> &func, AlarmId id)
+: m_isTaskCancelled(0), m_alarmFunc(func),m_id(id), m_expTime(timeout)
 {
 
 }

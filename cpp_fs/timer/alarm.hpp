@@ -25,7 +25,7 @@ namespace rd90
 
 using Duration = std::chrono::duration<double>;
 using System_Clock = std::chrono::system_clock;
-using Time_Point = std::chrono::time_point<System_Clock>;
+using TimePoint = std::chrono::time_point<System_Clock>;
 /*
 Questions:
 1. TimerWheel::SetAlarm - what type does it receive?
