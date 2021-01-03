@@ -12,7 +12,7 @@ template <typename T>
 class TimerWheel
 {
 public:
-    using TimerId = uint32_t;
+    using AlarmId = uint32_t;
     using SysClock = std::chrono::system_clock;
     using TimePoint = std::chrono::time_point<SysClock>;
     using Duration = std::chrono::duration<double>;
@@ -23,9 +23,9 @@ public:
     TimerWheel(const TimerWheel& other) = delete; /* UNCOPYABLE */
     TimerWheel& operator=(const TimerWheel& other) = delete;
 
-    TimerId SetAlarm(Duration timeout,
+    AlarmId SetAlarm(Duration timeout,
                      Function<void(void)> func);
-    void    CancelAlarm(TimerId uid);
+    void    CancelAlarm(AlarmId uid);
 
 private:
     class Task
@@ -43,11 +43,13 @@ private:
         TimePoint &GetExp();
         void Cancel();
         bool IsCanceled();
+        void PerformTask();
+        AlarmId GetID();
 
     private:
         bool                 m_isTaskCancelled;
         Function<void(void)> m_alarmFunc;
-        TimerId              m_id;
+        AlarmId              m_id;
         TimePoint            m_expTime;
     };
     using TaskPtr = std::shared_ptr<Task>;
@@ -58,7 +60,7 @@ private:
                         std::vector<TaskPtr>, 
                         typename Task::CompareTasks>
                                                         m_taskQueue;
-    std::unordered_map<TimerId, std::shared_ptr<Task> > m_tasksMap;
+    std::unordered_map<AlarmId, std::shared_ptr<Task> > m_tasksMap;
 
 };
 
@@ -80,10 +82,10 @@ TimerWheel<T>::~TimerWheel()
 
 template<typename T>
 typename
-TimerWheel<T>::TimerId TimerWheel<T>::SetAlarm(Duration timeout,
+TimerWheel<T>::AlarmId TimerWheel<T>::SetAlarm(Duration timeout,
                                                Function<void(void)> func)
 {
-    static TimerId alarmUID = 0;
+    static AlarmId alarmUID = 0;
 
     TimePoint timeNow = SysClock::now();
     TimePoint absTime = timeout + timeNow;
@@ -93,18 +95,18 @@ TimerWheel<T>::TimerId TimerWheel<T>::SetAlarm(Duration timeout,
     m_tasksMap[alarmUID] = task;
     m_taskQueue.push(task);
 
-    alarmUID++;;
-
     if (m_taskQueue.top()->GetExp == absTime)
     {
         auto nextTime = m_taskQueue.top()->GetExp() - timeNow;
         m_alarm->T::Arm(nextTime);
     }
+
+    return (alarmUID++);
 }                 
 
 
 template<typename T>
-void TimerWheel<T>::CancelAlarm(TimerWheel<T>::TimerId uid)
+void TimerWheel<T>::CancelAlarm(TimerWheel<T>::AlarmId uid)
 {
     m_tasksMap[uid]->Cancel();
 }
@@ -119,8 +121,23 @@ TimerWheel<T>::OnAlarmEvent(int Void)
 
     if (!task->IsCanceled())
     {
-        task->operator()();
+        task->PerformTask()();
+        m_tasksMap.erase(task.GetID());
     }
+
+    while (task->IsCancelled())
+    {
+        m_taskQueue.pop();
+        task = m_taskQueue.top();
+    }
+if (!m_taskQueue.empty())
+{
+    // set the timer for next time exp
+    auto nextTime = m_taskQueue.top()->GetExp() - SysClock::now();
+
+    m_alarm->T::Arm(nextTime);
+}
+    
 
 
 }
@@ -160,6 +177,18 @@ template<class T> bool
 TimerWheel<T>::Task::IsCanceled()
 {
     return m_isTaskCancelled;
+}
+
+template<class T> 
+typename TimerWheel<T>::AlarmId TimerWheel<T>::Task::GetID()
+{
+    return m_id;
+}
+
+template<class T> 
+void TimerWheel<T>::Task::PerformTask()
+{
+    m_alarmFunc();
 }
 
 

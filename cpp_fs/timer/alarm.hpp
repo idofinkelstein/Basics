@@ -1,6 +1,6 @@
 /******************************************************************************
 * Project name:					 	timer                ***     *******
-* Developer: 						Inbal Elmalech        *      *
+* Developer: 						Ido Finkelstein        *      *
 * Project Lauch: 					Dec 30, 2020          *      ****
 * Project completion				Jan 03, 2021          *      *
 * Reviewer:                                              ***  *  *******
