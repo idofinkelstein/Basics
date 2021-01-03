@@ -21,9 +21,9 @@ namespace ilrd
 namespace rd90 
 {
 
-using SysClock = std::chrono::system_clock;
-using TimePoint = std::chrono::time_point<SysClock>;
 using Duration = std::chrono::duration<double>;
+using System_Clock = std::chrono::system_clock;
+using Time_Point = std::chrono::time_point<System_Clock>;
 /*
 Questions:
 1. TimerWheel::SetAlarm - what type does it receive?
@@ -35,6 +35,7 @@ class IAlarm
 public:
     virtual void Arm(Duration delta) = 0;
     virtual void RegisterOnEvent(Function<void(void)> func) = 0;
+    virtual ~IAlarm() = default;
 };
 
 /*****************************************************************************/
@@ -127,6 +128,7 @@ AlarmFd::AlarmFd(Reactor<Epoll> &react): m_react(react), m_timerFd(timerfd_creat
 AlarmFd::~AlarmFd()
 {
     m_react.Remove(m_timerFd);
+    close(m_timerFd);
 }
 
 void AlarmFd::Arm(ilrd::rd90::Duration delta)
@@ -147,9 +149,14 @@ void AlarmFd::RegisterOnEvent(ilrd::rd90::Function<void ()> func)
 
 void AlarmFd::OnTimerHandler(int fd)
 {
-    read(fd, )
-
-    m_timer_func();
+    (void)fd;
+    uint64_t numExp = 0;
+    int64_t n = read(fd, &numExp, sizeof(uint64_t));
+    if (n != sizeof(uint64_t))
+    {
+        exit(1);
+    }
+    m_timerFunc();
 }
 
 } // namespace rd90
