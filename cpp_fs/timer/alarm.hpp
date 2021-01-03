@@ -16,6 +16,8 @@
 
 #include "reactor.hpp"
 
+const int G = 1000000000;
+
 namespace ilrd 
 {
 namespace rd90 
@@ -131,15 +133,25 @@ AlarmFd::~AlarmFd()
     close(m_timerFd);
 }
 
-void AlarmFd::Arm(ilrd::rd90::Duration delta)
+void AlarmFd::Arm(Duration delta)
 {
-    struct itimerspec ts;
-    memset(&ts, 0, sizeof(itimerspec));
+    itimerspec ts;
+    auto nanoSec = std::chrono::duration_cast<std::chrono::nanoseconds>(delta).count();
+
+    auto second = nanoSec / ::G;
+    nanoSec %= ::G;
+
+    ts.it_value.tv_sec = second;
+    ts.it_value.tv_nsec = nanoSec;
+    ts.it_interval.tv_sec = 0;
+    ts.it_interval.tv_nsec = 0;
 
     if (-1 == timerfd_settime(m_timerFd, 0, &ts, NULL))
     {
         throw ("timerfd_settime");
     }
+
+
 }
 
 void AlarmFd::RegisterOnEvent(ilrd::rd90::Function<void ()> func)

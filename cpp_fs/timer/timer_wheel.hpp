@@ -39,7 +39,10 @@ private:
                             const std::shared_ptr<Task>& task2);
             // compare expiration times of tasks
         };
+
         TimePoint &GetExp();
+        void Cancel();
+        bool IsCanceled();
 
     private:
         bool                 m_isTaskCancelled;
@@ -48,7 +51,7 @@ private:
         TimePoint            m_expTime;
     };
     using TaskPtr = std::shared_ptr<Task>;
-    void OnTimerEvent();
+    void OnAlarmEvent(int);
     
     std::shared_ptr<T>                                  m_alarm;
     std::priority_queue<TaskPtr, 
@@ -85,22 +88,40 @@ TimerWheel<T>::TimerId TimerWheel<T>::SetAlarm(Duration timeout,
     TimePoint timeNow = SysClock::now();
     TimePoint absTime = timeout + timeNow;
 
-    std::shared_ptr<Task> task(new Task(timeout, func));
+    std::shared_ptr<Task> task(new Task(absTime, func));
 
     m_tasksMap[alarmUID] = task;
     m_taskQueue.push(task);
+
+    alarmUID++;;
+
+    if (m_taskQueue.top()->GetExp == absTime)
+    {
+        auto nextTime = m_taskQueue.top()->GetExp() - timeNow;
+        m_alarm->T::Arm(nextTime);
+    }
 }                 
 
 
 template<typename T>
 void TimerWheel<T>::CancelAlarm(TimerWheel<T>::TimerId uid)
 {
-
+    m_tasksMap[uid]->Cancel();
 }
 
-template<typename T>
-void TimerWheel<T>::OnTimerEvent()
+template<class T> void 
+TimerWheel<T>::OnAlarmEvent(int Void)
 {
+    (void)Void;
+
+    TaskPtr task = m_taskQueue.top();
+    m_taskQueue.pop();
+
+    if (!task->IsCanceled())
+    {
+        task->operator()();
+    }
+
 
 }
 
@@ -129,6 +150,17 @@ const std::shared_ptr<TimerWheel<T>::Task> &task2)
     return task1->GetExp() > task2->GetExp();
 }
 
+template<class T> 
+void TimerWheel<T>::Task::Cancel()
+{
+    m_isTaskCancelled = 1;
+}
+
+template<class T> bool 
+TimerWheel<T>::Task::IsCanceled()
+{
+    return m_isTaskCancelled;
+}
 
 
 } // rd90

@@ -5,7 +5,7 @@
 ROOT_DIR = ../..
 
 #PROJ_SRCS = $(wildcard *.c)
-PROJ_SRCS = timer_test.c monitor.cpp
+PROJ_SRCS = timer_test.cpp monitor.cpp
 
 # list of directories containing header files
 PROJ_INC_DIR = $(ROOT_DIR)/cpp_fs/function $(ROOT_DIR)/cpp_fs/reactor
