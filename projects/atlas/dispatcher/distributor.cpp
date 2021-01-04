@@ -22,6 +22,8 @@ void DistModulu::Distribute(const std::shared_ptr<ReqSlicer> &slicer, std::vecto
     int idxCount = slicer->GetDataLen() / BLOCK_SIZE;
     int nTasks = 0;
 
+    
+
     if (idxCount >= nIoTs)
     {
         nTasks = m_fds.size();
@@ -43,6 +45,12 @@ void DistModulu::Distribute(const std::shared_ptr<ReqSlicer> &slicer, std::vecto
         tArr[i].m_iotFd = m_fds.operator[](i);
         slicer->HandleRequest(tArr[i]);
     }
+
+    std::cout << "num of tasks = " << nTasks << std::endl;
+    std::cout << "num of iots = " << nIoTs << std::endl;
+    std::cout << "firstIoT = " << firstIoT << std::endl;
+    std::cout << "idxCount = " << idxCount << std::endl;
+    //std::cout << "num of tasks = " << nTasks << std::endl;
 
     delete[] tArr;
 }

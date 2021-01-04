@@ -71,6 +71,11 @@ int BioDevOpen(const char* dev_file, uint64_t size)
 		return (DEV_OPN_FAILURE);
 	}
 
+	if (ioctl(nbd, NBD_SET_TIMEOUT, 1))
+	{
+		puts("ioctl NBD_SET_TIMEOUT");
+		return (DEV_OPN_FAILURE);
+	}
 
 	pid_t pid = fork();
 	if (-1 == pid)

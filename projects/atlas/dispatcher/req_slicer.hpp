@@ -77,6 +77,7 @@ private:
 
 
 
-
+/* sudo sh -c "echo 4 > /sys/block/nbd0/queue/max_sectors_kb"
+ */
 
 

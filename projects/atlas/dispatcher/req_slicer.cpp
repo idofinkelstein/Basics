@@ -10,7 +10,7 @@ namespace rd90
 {
 
 ReqSlicer::ReqSlicer(int bio_fd, uint32_t reqID, std::vector<int> &fds)
-: m_bio_fd(bio_fd), m_reqID(reqID), m_fds(fds)
+:  m_fds(fds), m_reqID(reqID), m_bio_fd(bio_fd)
 {
         std::cout << "in ReqSlicer::ReqSlicer\n";
 
@@ -98,27 +98,27 @@ bool ReqSlicer::HandleReply(int iot_fd)
 {
         std::cout << "in ReqSlicer::HandleReply\n";
 
-#if 0
+#if 1
     AtlasHeader ReplayFromIoT;
-	BioRequest *ReplayToNBD = NULL;
 
 	read(iot_fd, reinterpret_cast<char *>(&ReplayFromIoT)+ sizeof(int), sizeof(AtlasHeader)- sizeof(int));
-	ReplayToNBD = *reinterpret_cast<BioRequest**>(&ReplayFromIoT);
 
-	//processes reply
-    ReplayToNBD->dataLen = ReplayFromIoT.m_len;
-    ReplayToNBD->offset = ReplayFromIoT.m_iotOffset;
-    ReplayToNBD->reqType = ReplayFromIoT.m_type;
 
-    std::cout << "ReplayToNBD->dataLen = " << ReplayToNBD->dataLen << std::endl;
-    std::cout << "ReplayToNBD->offset = " << ReplayToNBD->offset << std::endl;
-    std::cout << "ReplayToNBD->reqType = " << ReplayToNBD->reqType << std::endl;
+    std::cout << "m_bioReq->dataLen = " << m_bioReq->dataLen << std::endl;
+    std::cout << "m_bioReq->offset = " << m_bioReq->offset << std::endl;
+    std::cout << "m_bioReq->reqType = " << m_bioReq->reqType << std::endl;
 
-	if (ReplayToNBD->reqType == NBD_CMD_READ)
+    std::cout << "ReplayFromIoT.m_len = " << ReplayFromIoT.m_len << std::endl;
+    std::cout << "ReplayFromIoT.m_iotOffset = " << ReplayFromIoT.m_iotOffset << std::endl;
+    std::cout << "ReplayFromIoT.m_type = " << ReplayFromIoT.m_type << std::endl;
+
+	if (m_bioReq->reqType == NBD_CMD_READ)
     {
-        ReadAll(iot_fd, ReplayToNBD->dataBuf, ReplayToNBD->dataLen);
+        ReadAll(iot_fd, m_bioReq->dataBuf + ReplayFromIoT.m_fragmentNum * SLICE_SIZE, m_bioReq->dataLen);
     }
-#endif
+
+     m_indices.erase(ReplayFromIoT.m_fragmentNum);
+#else
 
     AtlasHeader IOT_return_message;
 
@@ -134,16 +134,17 @@ bool ReqSlicer::HandleReply(int iot_fd)
 
     if (NBD_CMD_READ == IOT_return_message.m_type)
     {
-        if (ReadAll(iot_fd, m_bioReq->dataBuf + (IOT_return_message.m_fragmentNum * SLICE_SIZE), 
-                            IOT_return_message.m_len) < 0)
+        if (ReadAll(iot_fd, m_bioReq->dataBuf + (IOT_return_message.m_fragmentNum *  SLICE_SIZE), IOT_return_message.m_len) < 0)
         {
             throw("failed read \n");
         }  
     }
     std::cout << "third\n";
 
-
     m_indices.erase(IOT_return_message.m_fragmentNum);
+#endif
+
+   
 
     if (m_indices.size() == 0)
     {
