@@ -1,20 +1,20 @@
 /******************************************************************************
-* Project name:					 	timer                ***     *******
-* Developer: 						Ido Finkelstein        *      *
-* Project Lauch: 					Dec 30, 2020          *      ****
-* Project completion				Jan 03, 2021          *      *
-* Reviewer:                                              ***  *  *******
+* Project name:					 	alarm                     
+* Developer: 						Ido Finkelstein        
+* Project Lauch: 					Dec 30, 2020          
+* Project completion				Jan 03, 2021          
+* Reviewer:                                              
 ******************************************************************************/
 #pragma once
-#include <memory> /* shared_ptr */
-#include <queue> /* priority_queue */
-#include <chrono> /* duration, time_point */
-#include <unordered_map> /* unordered_map */
-#include "function.hpp" /* Function */
-#include <sys/timerfd.h>
-#include <cstring>
 
-#include "reactor.hpp"
+#include <memory>           /* shared_ptr */
+#include <queue>            /* priority_queue */
+#include <chrono>           /* duration, time_point */
+#include <unordered_map>    /* unordered_map */
+#include "function.hpp"     /* Function, Bind */
+#include <sys/timerfd.h>    /* timerfd API */
+
+#include "reactor.hpp"      /* reactor */
 
 const int G = 1000000000;
 
@@ -26,11 +26,8 @@ namespace rd90
 using Duration = std::chrono::duration<double>;
 using System_Clock = std::chrono::system_clock;
 using TimePoint = std::chrono::time_point<System_Clock>;
-/*
-Questions:
-1. TimerWheel::SetAlarm - what type does it receive?
-*/
-/******************************   Class Timer   ******************************/
+
+/*********************** Abstract Class Ialarm  *******************************/
 
 class IAlarm
 {
@@ -44,14 +41,12 @@ public:
 
 class AlarmFd : public IAlarm
 {
-/* To calculate the nanosecs required for the itimerspec struct:
-nanoSec = std::chrono::duration_cast<std::chrono::nanoseconds>
-                                    (interval).count()
-*/
 public:
-    AlarmFd(Reactor<Epoll>& react);
+    AlarmFd(Reactor<Epoll> &react);
     ~AlarmFd();
-    AlarmFd(const AlarmFd&) = delete;/* UNCOPYABLE */
+
+    /* UNCOPYABLE */
+    AlarmFd(const AlarmFd&) = delete;
     AlarmFd& operator=(const AlarmFd&) = delete;
 
     void Arm(Duration delta);
@@ -67,33 +62,55 @@ private:
 
 /*---------------------------------------------------------------------------*/
 
-
-/*****************************************************************************/
-
-/*
-int main()
+AlarmFd::AlarmFd(Reactor<Epoll> &react): m_react(react), m_timerFd(timerfd_create(CLOCK_REALTIME, TFD_CLOEXEC))
 {
-    Reactor<Epoll> react;
-    TimerWheel<TimerFd> tw(new TimerFd(react));
+    m_react.Add(m_timerFd, Bind(&AlarmFd::OnTimerHandler, this, m_timerFd));
+}
+/*---------------------------------------------------------------------------*/
+AlarmFd::~AlarmFd()
+{
+    m_react.Remove(m_timerFd);
+    close(m_timerFd);
+}
+/*---------------------------------------------------------------------------*/
+void AlarmFd::Arm(Duration delta)
+{
+    itimerspec ts;
+    auto nanoSec = std::chrono::duration_cast<std::chrono::nanoseconds>(delta).count();
 
-    TimerWheel::TimerId id = tw.SetAlarm(duration, Bind(my_handler));
-    // my_handler will be return void
+    auto second = nanoSec / ::G;
+    nanoSec %= ::G;
 
-    tw.CancelAlarm(id);
+    ts.it_value.tv_sec = second;
+    ts.it_value.tv_nsec = nanoSec;
+    ts.it_interval.tv_sec = 0;
+    ts.it_interval.tv_nsec = 0;
 
-    react.Run();
-    return (0);   
+    if (-1 == timerfd_settime(m_timerFd, 0, &ts, NULL))
+    {
+        throw ("timerfd_settime");
+    }
+}
+/*---------------------------------------------------------------------------*/
+void AlarmFd::RegisterOnEvent(ilrd::rd90::Function<void ()> func)
+{
+    m_timerFunc = func;
+}
+/*---------------------------------------------------------------------------*/
+void AlarmFd::OnTimerHandler(int notUsed)
+{
+    (void)notUsed;
+    uint64_t numExp = 0;
+    int64_t n = read(m_timerFd, &numExp, sizeof(uint64_t));
+    if (n != sizeof(uint64_t))
+    {
+        exit(EXIT_FAILURE);
+    }
+    m_timerFunc();
 }
 
-TimerWheel - has its own hpp file with the implementation
-TimerFd is a separate hpp and cpp file
-std::chrono::system_clock::now(); -> is how we get current time
-This function's return value also can be used with +/- operators
-std::chrono::nanoseconds is the duration paramater
-// nanosec is the type name, the units can be seconds or milliseconds etc.
-std::chrono::time_point<std::chrono::system_clock> -> is the way we keep the time
-
-*/
+} // namespace rd90
+} // namespace ilrd
 
 /*
 -------------------------------------------
@@ -122,58 +139,4 @@ elapsed time: 1.88232s
 
 */
 
-AlarmFd::AlarmFd(Reactor<Epoll> &react): m_react(react), m_timerFd(timerfd_create(CLOCK_REALTIME, TFD_CLOEXEC))
-{
-    m_react.Add(m_timerFd, Bind(&AlarmFd::OnTimerHandler, this, m_timerFd));
-}
-
-AlarmFd::~AlarmFd()
-{
-    m_react.Remove(m_timerFd);
-    close(m_timerFd);
-}
-
-void AlarmFd::Arm(Duration delta)
-{
-    itimerspec ts;
-    auto nanoSec = std::chrono::duration_cast<std::chrono::nanoseconds>(delta).count();
-
-    auto second = nanoSec / ::G;
-    nanoSec %= ::G;
-
-    ts.it_value.tv_sec = second;
-    ts.it_value.tv_nsec = nanoSec;
-    ts.it_interval.tv_sec = 0;
-    ts.it_interval.tv_nsec = 0;
-
-    if (-1 == timerfd_settime(m_timerFd, 0, &ts, NULL))
-    {
-        throw ("timerfd_settime");
-    }
-
-
-}
-
-void AlarmFd::RegisterOnEvent(ilrd::rd90::Function<void ()> func)
-{
-    m_timerFunc = func;
-}
-
-void AlarmFd::OnTimerHandler(int fd)
-{
-    (void)fd;
-    uint64_t numExp = 0;
-    int64_t n = read(fd, &numExp, sizeof(uint64_t));
-    if (n != sizeof(uint64_t))
-    {
-        exit(1);
-    }
-    m_timerFunc();
-}
-
-} // namespace rd90
-} // namespace ilrd
-
 /* auto nanoSec = std::chrono::duration_cast<std::chrono::nanoseconds>(interval).count();  */
-
-/* using TimePoint = std::chrono::time_point<std::chrono::system_clock>;  */
