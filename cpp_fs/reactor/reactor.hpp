@@ -65,6 +65,7 @@ void Reactor<MONITOR_TYPE>::Run()
 			event = m_monitor->GetNextFd();
 			dict[event]();
 		}
+		std::cout << "react - while(1)" << std::endl;
 	}
 
 }

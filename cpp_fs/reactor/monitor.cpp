@@ -1,4 +1,5 @@
 #include <sys/epoll.h>
+#include <iostream>
 #include <cstdio> // debugging perposes
 
 #include "monitor.hpp"
@@ -81,7 +82,7 @@ Epoll::Epoll(int max_events)
 Epoll::~Epoll()
 {
     close(m_events->data.fd);
-
+    std::cout << "Epoll::~Epoll" << std::endl;
     delete [] m_events;
 }
 

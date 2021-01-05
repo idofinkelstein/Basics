@@ -2,15 +2,16 @@
 # make clean/all CONFIG=Debug/Release ARCH=linux64/raspi ECHO=0/1
 
 # the parrent dir of "arch" dir
-ROOT_DIR = ../../..
+ROOT_DIR = ../..
 
 #PROJ_SRCS = $(wildcard *.c)
-PROJ_SRCS =  distributor.cpp req_slicer.cpp bio_access.c distributor.cpp monitor.cpp
+PROJ_SRCS = factory_test.cpp
+
 # list of directories containing header files
-PROJ_INC_DIR = $(ROOT_DIR)/cpp_fs/reactor  $(ROOT_DIR)/cpp_fs/function $(ROOT_DIR)/projects/atlas/bio_access #$(ROOT_DIR)/projects/atlas/dispatcher
+PROJ_INC_DIR = $(ROOT_DIR)/cpp_fs/function
 
 # the executable file
-PROJ_OUT = distributor.out
+PROJ_OUT = factory.out
 
 # list of compiler flags (prepended with "-" sign)
 #PROJ_CFLAGS = -Wunused-but-set-variable
@@ -30,6 +31,6 @@ PROJ_LIBS =
 PROJ_LDFLAGS =
 
 # list of projects (makefiles) this project depends on
-PROJ_DEPENDS  = $(ROOT_DIR)/cpp_fs/reactor/Makefile $(ROOT_DIR)/projects/atlas/bio_access/Makefile #$(ROOT_DIR)/projects/atlas/dispatcher/Makefile
+PROJ_DEPENDS  =
 
 include $(ROOT_DIR)/make/Project.mak

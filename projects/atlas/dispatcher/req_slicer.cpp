@@ -27,8 +27,6 @@ ReqSlicer::ReqSlicer(int bio_fd, uint32_t reqID, std::vector<int> &fds)
         m_indices.insert(i);
         std::cout << i << std::endl;
     }
-
-    
 }
 
 ReqSlicer::~ReqSlicer()
@@ -67,7 +65,6 @@ void ReqSlicer::HandleRequest(Task &task)
 void ReqSlicer::WriteFragment(int iotFd, int idx)
 {
     std::cout << "in WriteFragment\n";
-
 
     AtlasHeader atlas_header;    
 
@@ -110,7 +107,7 @@ bool ReqSlicer::HandleReply(int iot_fd)
 #if 1
     AtlasHeader ReplayFromIoT;
 
-	read(iot_fd, reinterpret_cast<char *>(&ReplayFromIoT)+ sizeof(int), sizeof(AtlasHeader)- sizeof(int));
+	read(iot_fd, reinterpret_cast<char*>(&ReplayFromIoT) + sizeof(int), sizeof(AtlasHeader) - sizeof(int));
 
 
     std::cout << "m_bioReq->dataLen = " << m_bioReq->dataLen << std::endl;
@@ -123,7 +120,7 @@ bool ReqSlicer::HandleReply(int iot_fd)
 
 	if (m_bioReq->reqType == NBD_CMD_READ)
     {
-        ReadAll(iot_fd, m_bioReq->dataBuf + ReplayFromIoT.m_fragmentNum * SLICE_SIZE, m_bioReq->dataLen);
+        ReadAll(iot_fd, m_bioReq->dataBuf + ReplayFromIoT.m_fragmentNum * SLICE_SIZE, /* m_bioReq->dataLen */ReplayFromIoT.m_len);
     }
 
      m_indices.erase(ReplayFromIoT.m_fragmentNum);
@@ -152,8 +149,6 @@ bool ReqSlicer::HandleReply(int iot_fd)
 
     m_indices.erase(IOT_return_message.m_fragmentNum);
 #endif
-
-   
 
     if (m_indices.size() == 0)
     {

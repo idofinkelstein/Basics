@@ -56,7 +56,7 @@ void RequestDispatcher::RequestHandler(int bio_fd)
     m_dist->Distribute(slicer, m_iotFds);
     
 
-
+    std::cout << "in RequestDispatcher::RequestHandler - end\n";
 
 
 #if 0
@@ -96,13 +96,13 @@ void RequestDispatcher::ReplyHandler(int iot_fd)
 
     if (slicer->HandleReply(iot_fd))
     {
-        m_slicers.erase(ID);
+        //m_slicers.erase(ID);
         BioRequestDone(slicer->GetBioRequest(), 0);
         std::cout << "in RequestDispatcher::ReplyHandler - after BioRequestDone\n";
     }
 
 
-
+    std::cout << "in RequestDispatcher::ReplyHandler - end\n";
 
 	
 }
