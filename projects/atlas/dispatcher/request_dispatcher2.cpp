@@ -96,8 +96,8 @@ void RequestDispatcher::ReplyHandler(int iot_fd)
 
     if (slicer->HandleReply(iot_fd))
     {
-        BioRequestDone(slicer->GetBioRequest(), 0);
         m_slicers.erase(ID);
+        BioRequestDone(slicer->GetBioRequest(), 0);
         std::cout << "in RequestDispatcher::ReplyHandler - after BioRequestDone\n";
     }
 

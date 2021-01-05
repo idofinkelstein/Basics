@@ -20,6 +20,15 @@ ReqSlicer::ReqSlicer(int bio_fd, uint32_t reqID, std::vector<int> &fds)
     {
         throw("BioRequestRead");
     }
+
+    std::cout << "m_bioReq->dataLen = " << m_bioReq->dataLen << std::endl;
+    for(size_t i = 0; i < m_bioReq->dataLen / SLICE_SIZE; ++i)
+    {
+        m_indices.insert(i);
+        std::cout << i << std::endl;
+    }
+
+    
 }
 
 ReqSlicer::~ReqSlicer()

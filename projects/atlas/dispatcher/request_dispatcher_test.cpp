@@ -21,13 +21,14 @@ using namespace ilrd::rd90;
 int main()
 {
     const int storage_size = 1024 * 1024 * 256;
-    static const char *dev_name = "/dev/nbd8";
+    static const char *dev_name = "/dev/nbd0";
     int bio_fd = BioDevOpen(dev_name, storage_size);
 
 	puts("run");
 
     DistModulu dist;
     Reactor<Epoll> reactor(new Epoll(NUM_OF_CONNECTIONS));
+    //Reactor<Select> reactor(new Select(NUM_OF_CONNECTIONS));
     RequestDispatcher disp(reactor, bio_fd, &dist);
 
     disp.RegisterIoT(SELF_IP);
