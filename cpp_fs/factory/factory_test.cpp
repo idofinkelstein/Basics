@@ -14,6 +14,7 @@ public:
 class Derived1 : public Base
 {
 public:
+    explicit Derived1(int a){std::cout << "a = " << a << std::endl;}
     void Foo()
     {
         std::cout << "Derived1::Foo" << std::endl;
@@ -23,6 +24,7 @@ public:
 class Derived2 : public Base
 {
 public:
+    explicit Derived2(int a = 5){std::cout << "a = " << a << std::endl;}
     void Foo()
     {
         std::cout << "Derived2::Foo" << std::endl;
@@ -31,12 +33,12 @@ public:
 
 int main()
 {
-    Factory<Base, int> factory;
+    Factory<Base, int, int> factory;
 
     factory.Register<Derived1>(1);
     factory.Register<Derived2>(2);
 
-    Base *d1 = factory.Create(1);
+    Base *d1 = factory.Create(1, 20);
     Base *d2 = factory.Create(2);
 
     std::shared_ptr<Base> sd1(factory.Create(1));
