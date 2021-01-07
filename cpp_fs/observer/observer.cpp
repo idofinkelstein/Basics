@@ -13,7 +13,7 @@ void Dispatcher::Subscribe(CallBack *cb)
     cb->RegisterDispacher(this);
 }
 
-void Dispatcher::Unsubscribe(ilrd::rd90::CallBack *cb)
+void Dispatcher::UnSubscribe(CallBack *cb)
 {
     m_callbacks.erase(cb);
 }
@@ -24,7 +24,7 @@ CallBack::CallBack(const Function<void ()> &on_update_func) : m_on_update_func(o
 
 CallBack::~CallBack()
 {
-    m_disp->Unsubscribe(this);
+    m_disp->UnSubscribe(this);
 }
 
 void CallBack::operator()()

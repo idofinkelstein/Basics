@@ -20,7 +20,7 @@ class Dispatcher
 {
 public:
     void Subscribe(CallBack*);
-    void Unsubscribe(CallBack*);
+    void UnSubscribe(CallBack*);
     
 
     void Notify();

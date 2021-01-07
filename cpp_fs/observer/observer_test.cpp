@@ -15,6 +15,12 @@ public:
     {
         m_disp.Subscribe(cb);
     }
+
+    void UnSubscribe(CallBack *cb)
+    {
+        m_disp.UnSubscribe(cb);
+    }
+
     void NotifyAll()
     {
         m_disp.Notify();
@@ -30,10 +36,12 @@ public:
      : m_meteo(meteo), 
        m_cb(Bind(&NewsApp::Update,this, 0)), 
        m_isNotified(false){}
-       
+
     void Update(int temp){m_isNotified = true;}
 
     void Subscribe(MeteorlogicStation& ms);
+    void UnSubscribe(MeteorlogicStation& ms);
+
     
     void BroadcastWheather()
     {
@@ -54,6 +62,10 @@ void NewsApp::Subscribe(MeteorlogicStation &ms)
     ms.Subscribe(&m_cb);
 }
 
+void NewsApp::UnSubscribe(MeteorlogicStation &ms)
+{
+    ms.UnSubscribe(&m_cb);
+}
 
 int main()
 {
@@ -65,12 +77,15 @@ int main()
 
     MS.NotifyAll();
 
-    while(true)
+    int i = 0;
+    while(i++ < 5)
     {
         MS.NotifyAll();
         sleep(1);
         NA.BroadcastWheather();
     }
+
+    NA.UnSubscribe(MS);
 
     return 0;
 }
