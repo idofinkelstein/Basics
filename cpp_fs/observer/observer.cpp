@@ -9,19 +9,18 @@ namespace rd90
 
 void Dispatcher::Subscribe(CallBack *cb)
 {
-    m_callbacks.insert(size_t(cb));
+    m_callbacks.insert(cb);
+    cb->RegisterDispacher(this);
 }
 
 void Dispatcher::Unsubscribe(ilrd::rd90::CallBack *cb)
 {
-    m_callbacks.erase(size_t(cb));
+    m_callbacks.erase(cb);
 }
 
 /*************************** Class CallBack ***********************************/
 CallBack::CallBack(const Function<void ()> &on_update_func) : m_on_update_func(on_update_func)
-{
-     
-}
+{}
 
 CallBack::~CallBack()
 {
@@ -36,17 +35,21 @@ void CallBack::operator()()
 
 void Dispatcher::Notify()
 {
-    std::set<size_t>::iterator it = m_callbacks.begin();
-    CallBack *cb;
+    std::set<CallBack*>::iterator it = m_callbacks.begin();
 
     for(;it != m_callbacks.end(); it++)
     {
-        cb = reinterpret_cast<CallBack*>(*it);
-        cb->operator();
+        (*it)->operator()();
     }
 }
 
 /*---------------------------------------------------------------------------*/
+
+void CallBack::RegisterDispacher(Dispatcher *disp)
+{
+    m_disp = disp;
+}
+
 
 
 }// rd90
