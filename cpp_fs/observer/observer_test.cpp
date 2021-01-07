@@ -51,22 +51,24 @@ public:
             m_isNotified = false;
         }
     }
+
 private:
     MeteorlogicStation *m_meteo;
     CallBack m_cb;
     bool m_isNotified;
 };
 
+/*----------------------------------------------------------------------------*/
 void NewsApp::Subscribe(MeteorlogicStation &ms)
 {
     ms.Subscribe(&m_cb);
 }
-
+/*----------------------------------------------------------------------------*/
 void NewsApp::UnSubscribe(MeteorlogicStation &ms)
 {
     ms.UnSubscribe(&m_cb);
 }
-
+/*----------------------------------------------------------------------------*/
 int main()
 {
     MeteorlogicStation MS;
