@@ -13,7 +13,7 @@
 #include "reactor.hpp"
 #include "monitor.hpp"
 
-static const int NUM_OF_CONNECTIONS = 5;
+static const int NUM_OF_CONNECTIONS = 10;
 static const std::string SELF_IP("127.0.0.1");
 
 using namespace ilrd::rd90;
@@ -32,7 +32,7 @@ int main()
     RequestDispatcher disp(reactor, bio_fd, &dist);
 
     disp.RegisterIoT(SELF_IP);
-    //disp.RegisterIoT(SELF_IP);
+    disp.RegisterIoT(SELF_IP);
     //disp.RegisterIoT(SELF_IP);
     //disp.RegisterIoT(SELF_IP);
 

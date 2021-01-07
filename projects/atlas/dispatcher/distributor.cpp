@@ -44,7 +44,7 @@ void DistModulu::Distribute(const std::shared_ptr<ReqSlicer> &slicer, std::vecto
     
     for (int i = 0; i < nTasks; ++i)
     {
-        tArr[i].m_iotFd = m_fds.operator[](i);
+        tArr[i].m_iotFd = m_fds.operator[]((firstIoT + i) % nIoTs);
         std::cout << "tArr[i].m_iotFd = " << tArr[i].m_iotFd << std::endl;
         slicer->HandleRequest(tArr[i]);
     }

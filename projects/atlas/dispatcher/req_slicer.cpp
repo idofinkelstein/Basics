@@ -15,7 +15,7 @@ ReqSlicer::ReqSlicer(int bio_fd, uint32_t reqID, std::vector<int> &fds)
         std::cout << "in ReqSlicer::ReqSlicer\n";
 
 
-    m_bioReq = std::shared_ptr<BioRequest>(BioRequestRead(bio_fd));
+    m_bioReq = BioRequestRead(bio_fd);
     if (NULL == m_bioReq)
     {
         throw("BioRequestRead");
@@ -31,7 +31,8 @@ ReqSlicer::ReqSlicer(int bio_fd, uint32_t reqID, std::vector<int> &fds)
 
 ReqSlicer::~ReqSlicer()
 {
-   std::cout << "in ReqSlicer::~ReqSlicer\n";
+    std::cout << "in ReqSlicer::~ReqSlicer\n";
+    BioRequestDone(m_bioReq, 0);
 }
 
 uint32_t ReqSlicer::GetRequestID(int iot_fd)
@@ -40,10 +41,12 @@ uint32_t ReqSlicer::GetRequestID(int iot_fd)
 
     uint32_t id;
 
-    if (0 > read(iot_fd,&id, sizeof(uint32_t)))
+    if (0 > read(iot_fd, &id, sizeof(uint32_t)))
     {
          throw("read\n");
     } 
+
+    std::cout << "in GetRequestID slicer, ID = " << id << std::endl;
 
     return id;
 }
@@ -107,7 +110,7 @@ bool ReqSlicer::HandleReply(int iot_fd)
 #if 1
     AtlasHeader ReplayFromIoT;
 
-	read(iot_fd, reinterpret_cast<char*>(&ReplayFromIoT) + sizeof(int), sizeof(AtlasHeader) - sizeof(int));
+	read(iot_fd, reinterpret_cast<char*>(&ReplayFromIoT) + sizeof(uint32_t), sizeof(AtlasHeader) - sizeof(uint32_t));
 
 
     std::cout << "m_bioReq->dataLen = " << m_bioReq->dataLen << std::endl;
@@ -175,7 +178,7 @@ uint32_t ilrd::rd90::ReqSlicer::GetReqType()
 
 BioRequest *ReqSlicer::GetBioRequest()
 {
-    return &(*m_bioReq);
+    return m_bioReq;
 }
 
 } // namespace rd90

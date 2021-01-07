@@ -43,6 +43,8 @@ void RequestDispatcher::RegisterIoT(const std::string& ip_addr)
 
     int socket = InitIPSocket(ip_addr);
 
+    std::cout << "socket = " << socket << std::endl;   
+
     m_react.Add(socket, Bind(&RequestDispatcher::ReplyHandler, this, socket));
     m_iotFds.push_back(socket);
 }
@@ -57,33 +59,6 @@ void RequestDispatcher::RequestHandler(int bio_fd)
     
 
     std::cout << "in RequestDispatcher::RequestHandler - end\n";
-
-
-#if 0
-    BioRequest *requestFromNBD = BioRequestRead(bio_fd);
-    AtlasHeader requestToIoT;
-
-    /* processes request into atlas header */
-    requestToIoT.m_type = requestFromNBD->reqType;
-    requestToIoT.m_len = requestFromNBD->dataLen;
-    requestToIoT.m_iotOffset = requestFromNBD->offset;
-	*reinterpret_cast<BioRequest**>(&requestToIoT) = requestFromNBD;
-
-	if (-1 == write(m_iotFds[0], reinterpret_cast<char *>(&requestToIoT), sizeof(AtlasHeader)))
-	{
-		puts("RequestHandler: write header");
-		throw("write to IoT failed");
-	}
-
-	if (requestFromNBD->reqType == NBD_CMD_WRITE)
-	{
-		if (-1 == (write(m_iotFds[0], requestFromNBD->dataBuf, requestFromNBD->dataLen)))
-		{
-			puts("RequestHandler: write data");
-			throw("write to IoT failed");
-		}
-	}
-#endif
 }
 /*---------------------------------------------------------------------------*/
 void RequestDispatcher::ReplyHandler(int iot_fd)
@@ -96,8 +71,8 @@ void RequestDispatcher::ReplyHandler(int iot_fd)
 
     if (slicer->HandleReply(iot_fd))
     {
-        //m_slicers.erase(ID);
-        BioRequestDone(slicer->GetBioRequest(), 0);
+        m_slicers.erase(ID);
+        //BioRequestDone(slicer->GetBioRequest(), 0);
         std::cout << "in RequestDispatcher::ReplyHandler - after BioRequestDone\n";
     }
 
@@ -161,3 +136,30 @@ std::vector<int> &RequestDispatcher::GetFDs()
 
 } // namespace rd90
 } // namespace ilrd
+
+
+#if 0
+    BioRequest *requestFromNBD = BioRequestRead(bio_fd);
+    AtlasHeader requestToIoT;
+
+    /* processes request into atlas header */
+    requestToIoT.m_type = requestFromNBD->reqType;
+    requestToIoT.m_len = requestFromNBD->dataLen;
+    requestToIoT.m_iotOffset = requestFromNBD->offset;
+	*reinterpret_cast<BioRequest**>(&requestToIoT) = requestFromNBD;
+
+	if (-1 == write(m_iotFds[0], reinterpret_cast<char *>(&requestToIoT), sizeof(AtlasHeader)))
+	{
+		puts("RequestHandler: write header");
+		throw("write to IoT failed");
+	}
+
+	if (requestFromNBD->reqType == NBD_CMD_WRITE)
+	{
+		if (-1 == (write(m_iotFds[0], requestFromNBD->dataBuf, requestFromNBD->dataLen)))
+		{
+			puts("RequestHandler: write data");
+			throw("write to IoT failed");
+		}
+	}
+#endif

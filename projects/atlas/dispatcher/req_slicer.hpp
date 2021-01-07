@@ -38,6 +38,7 @@ static const int SLICE_SIZE = 1024;
 struct Task
 {
     int m_iotFd;
+    int iot;
     std::vector<uint32_t> m_iot_indices;
 };
 
@@ -63,7 +64,7 @@ public:
 private:
     std::set<int>               m_indices; 
     std::vector<int>&           m_fds;
-    std::shared_ptr<BioRequest> m_bioReq;
+    BioRequest*                 m_bioReq;
     uint32_t                    m_reqID;
     int                         m_bio_fd;
 
