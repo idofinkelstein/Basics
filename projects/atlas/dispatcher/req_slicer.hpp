@@ -37,9 +37,8 @@ static const int SLICE_SIZE = 1024;
 
 struct Task
 {
-    int m_iotFd;
-    int iot;
-    std::vector<uint32_t> m_iot_indices;
+    int m_iot;
+    std::vector<uint32_t> m_iotIndices;
 };
 
 
@@ -53,7 +52,7 @@ public:
     ReqSlicer& operator=(const ReqSlicer& other) = delete;
 
     static uint32_t GetRequestID(int iot_fd);
-    void HandleRequest(Task &task);
+    void HandleRequest(std::shared_ptr<Task>& task);
     bool HandleReply(int iot_fd); // returns status indicating whether it 
                                   // was the last reply or not
     uint64_t GetOffset(); 

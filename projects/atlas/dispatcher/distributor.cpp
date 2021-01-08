@@ -8,15 +8,13 @@ namespace rd90
 
 const int BLOCK_SIZE = 1024;
 
-DistModulu::DistModulu()
-{    std::cout << "in DistModulu::DistModulu\n";
-}
+DistModulu::DistModulu() {}    
 
 void DistModulu::Distribute(const std::shared_ptr<ReqSlicer> &slicer, std::vector<int>& m_fds)
 {
     std::cout << "in DistModulu::Distribute\n";
 
-#if 1
+#if 0
 
     uint64_t offset = slicer->GetOffset();
     int nIoTs = m_fds.size();
@@ -35,19 +33,29 @@ void DistModulu::Distribute(const std::shared_ptr<ReqSlicer> &slicer, std::vecto
         nTasks = idxCount;
     }
 
-    Task *tArr = new Task[nTasks];
+    Task *tArr = new Task[nTasks + firstIoT];
 
-    for (int i = 0; i < idxCount; ++i)
+     //for (int i = 0; i < nTasks; ++i)
+     //   tArr[i].m_iot_indices.reserve(nTasks);
+
+    for (int i = 0; i < idxCount + firstIoT; ++i)
     {
+        //tArr[i].m_iot_indices.push_back((firstIoT + i) % nIoTs);
+        
         tArr[(firstIoT + i) % nIoTs].m_iot_indices.push_back(i);
+        std::cout << "tArr[" << (firstIoT + i) % nIoTs << "].m_iot_indices[" << i << "] = " << tArr[(firstIoT + i) % nIoTs].m_iot_indices[i] << std::endl;
     }
     
-    for (int i = 0; i < nTasks; ++i)
+    for (int i = 0; i < nTasks + firstIoT; ++i)
     {
         tArr[i].m_iotFd = m_fds.operator[]((firstIoT + i) % nIoTs);
-        std::cout << "tArr[i].m_iotFd = " << tArr[i].m_iotFd << std::endl;
+        std::cout << "tArr["<<i<<"].m_iotFd = " << tArr[i].m_iotFd << std::endl;
+        
         slicer->HandleRequest(tArr[i]);
     }
+
+    for (int i = 0; i < nTasks; ++i)
+    //    slicer->HandleRequest(tArr[i]);
 
     std::cout << "num of tasks = " << nTasks << std::endl;
     std::cout << "num of iots = " << nIoTs << std::endl;
@@ -55,42 +63,30 @@ void DistModulu::Distribute(const std::shared_ptr<ReqSlicer> &slicer, std::vecto
     std::cout << "idxCount = " << idxCount << std::endl;
     //std::cout << "num of tasks = " << nTasks << std::endl;
 
-    delete[] tArr;
+    //delete[] tArr;
 
 #else
 
-    int num_of_slices = slicer->GetDataLen() / SLICE_SIZE;
-    int i = 0;
-    int j = 0;
-    int global_offset = slicer->GetOffset();
-    int slices_given = 0;
-    //int slices_per_curr_iot = num_of_slices / m_num_iot;
-    // int slices_per_curr_iot = 1;
+    int numOfSlices = slicer->GetDataLen() / SLICE_SIZE;
+    int globalOffset = slicer->GetOffset();
+    int nIoTs = m_fds.size();
+    int readySlices = 0;
+    int firstIot = (globalOffset / SLICE_SIZE) % nIoTs;
 
-    // std::cout << "slices_per_curr_iot \n" << slices_per_curr_iot << "\n";
-    std::cout << "num_of_slices \n" << num_of_slices<< "\n";
-    std::cout << "m_num_iot \n" << m_fds.size() << "\n";
-    int first_iot = (global_offset / SLICE_SIZE) % m_fds.size();
-
-    for (i = 0; i < m_fds.size() && slices_given < num_of_slices; ++i)
+    for (int i = 0; i < nIoTs && readySlices < numOfSlices; ++i)
     {
-        std::shared_ptr<Task> t(new Task);
-        // Task t;     // to be changed to Factory
-        std::cout << "i: " << i << std::endl;
+        std::shared_ptr<Task> task(new Task);
 
-        t->iot = (first_iot + i) % m_fds.size();
-        t->num_of_iot = m_num_iot;
-        for (j = i; j < num_of_slices; j += m_num_iot)
+        task->m_iot = (firstIot + i) % nIoTs;
+
+        for (int j = i; j < numOfSlices; j += nIoTs)
         {
-            std::cout << "j: " << j << std::endl;
-            t->dataBuf_indexes.push_back(j);
-            ++slices_given;
+            task->m_iotIndices.push_back(j);
+            ++readySlices;
         }
 
-        std::cout << "slices_given: " << slices_given << std::endl; 
-
-        slicer->HandleRequest(t,iotFds);
-
+        slicer->HandleRequest(task);
+    }
 #endif
 
 }

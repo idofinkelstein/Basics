@@ -20,23 +20,19 @@ using namespace ilrd::rd90;
 
 int main()
 {
-    const int storage_size = 1024 * 1024 * 256;
-    static const char *dev_name = "/dev/nbd0";
-    int bio_fd = BioDevOpen(dev_name, storage_size);
-
-	puts("run");
+    const int storageSize = 1024 * 1024 * 256;
+    static const char *deviceName = "/dev/nbd0";
+    int bioFd = BioDevOpen(deviceName, storageSize);
 
     DistModulu dist;
     Reactor<Epoll> reactor(new Epoll(NUM_OF_CONNECTIONS));
-    //Reactor<Select> reactor(new Select(NUM_OF_CONNECTIONS));
-    RequestDispatcher disp(reactor, bio_fd, &dist);
+    RequestDispatcher disp(reactor, bioFd, &dist);
 
     disp.RegisterIoT(SELF_IP);
     disp.RegisterIoT(SELF_IP);
-    //disp.RegisterIoT(SELF_IP);
-    //disp.RegisterIoT(SELF_IP);
+    disp.RegisterIoT(SELF_IP);
+    disp.RegisterIoT(SELF_IP);
 
-    puts("before run in main");
     reactor.Run();
 
     return 0;

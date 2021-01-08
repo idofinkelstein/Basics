@@ -8,7 +8,7 @@ ROOT_DIR = ../../..
 PROJ_SRCS = request_dispatcher_test.cpp request_dispatcher2.cpp  monitor.cpp bio_access.c distributor.cpp req_slicer.cpp 
 
 # list of directories containing header files
-PROJ_INC_DIR = $(ROOT_DIR)/cpp_fs/reactor  $(ROOT_DIR)/cpp_fs/function $(ROOT_DIR)/projects/atlas/bio_access $(ROOT_DIR)/projects/atlas/distributer 
+PROJ_INC_DIR = $(ROOT_DIR)/cpp_fs/reactor  $(ROOT_DIR)/cpp_fs/function $(ROOT_DIR)/projects/atlas/bio_access 
 
 # the executable file
 PROJ_OUT = dispatcher.out
