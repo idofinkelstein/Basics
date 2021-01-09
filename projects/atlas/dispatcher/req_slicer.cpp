@@ -1,5 +1,8 @@
 #include <iostream>
 #include <unistd.h>
+#include <sys/types.h>  // sendmsg
+#include <sys/socket.h> // sendmsg
+#include <cstring>      // memset
 
 #include "distributor.hpp"
 #include "req_slicer.hpp"
@@ -60,7 +63,10 @@ void ReqSlicer::WriteFragment(int iot, int idx)
 {
     int iotFd = m_fds[iot];
 
-    AtlasHeader atlas_header;    
+    AtlasHeader atlas_header;   
+    struct msghdr message;
+
+    memset(&message, 0, sizeof(message));
 
     atlas_header.m_requestUid = m_reqID;
     atlas_header.m_fragmentNum = idx;
@@ -70,25 +76,31 @@ void ReqSlicer::WriteFragment(int iot, int idx)
 
     atlas_header.m_iotOffset = (m_bioReq->offset + idx * SLICE_SIZE) / m_fds.size();
     
-    std::cout << "iotFd = " << iotFd << std::endl;
+    /* std::cout << "iotFd = " << iotFd << std::endl;
     std::cout << "atlas_header.m_requestUid = " << atlas_header.m_requestUid << std::endl;
     std::cout << "atlas_header.m_fragmentNum = " << atlas_header.m_fragmentNum << std::endl;
-    std::cout << "atlas_header->m_iotOffset = " << atlas_header.m_iotOffset << std::endl;
+    std::cout << "atlas_header->m_iotOffset = " << atlas_header.m_iotOffset << std::endl; */
 
+    // Assigns 2 buffers if it's WRITE request or 1 for READ.
+    message.msg_iovlen = ((atlas_header.m_type == NBD_CMD_WRITE) ? 2 : 1);
 
-    if(-1 == write(iotFd, &atlas_header, sizeof(AtlasHeader)))
+    message.msg_iov = new struct iovec[message.msg_iovlen];
+
+    message.msg_iov[0].iov_base = &atlas_header;
+    message.msg_iov[0].iov_len = sizeof(atlas_header);
+
+    if (atlas_header.m_type == NBD_CMD_WRITE)
     {
-        throw("write failed");
+        message.msg_iov[1].iov_base = m_bioReq->dataBuf + idx * SLICE_SIZE;
+        message.msg_iov[1].iov_len = SLICE_SIZE;
+    }
+   
+    if (-1 == (sendmsg(iotFd, &message, 0)))
+    {
+        throw("sendmsg() failed");
     }
 
-    // If write request - send data
-    if(atlas_header.m_type == NBD_CMD_WRITE)
-    {
-        if(-1 == write(iotFd, m_bioReq->dataBuf + idx * SLICE_SIZE, SLICE_SIZE))
-        {
-            throw("write failed");
-        }
-    }
+    delete[] message.msg_iov;
 }
 
 

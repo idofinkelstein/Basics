@@ -12,10 +12,6 @@ namespace ilrd
 namespace rd90
 {
 
-struct Task;
-
-/************************   Classes declarations    **************************/
-
 class IDistributor
 {
 public:  
@@ -24,10 +20,8 @@ public:
     IDistributor(const IDistributor&) = delete;
     IDistributor& operator=(const IDistributor&) = delete;
 
+    /* Interface */
     virtual void Distribute(const std::shared_ptr<ReqSlicer>& slicer, std::vector<int>& m_fds) = 0;
-
-
-private:
 };
 
 /*---------------------------------------------------------------------------*/
@@ -35,18 +29,10 @@ private:
 class DistModulu : public IDistributor
 {
 public:
-    explicit DistModulu(); // or int numIoTs?
-    
     virtual ~DistModulu() = default;
     virtual void Distribute(const std::shared_ptr<ReqSlicer>& slicer, std::vector<int>& m_fds); 
-
-private:
-    int m_numOfIoTs;
 };
 
-
-
-/*---------------------------------------------------------------------------*/
 
 } // namespace rd90
 } // namespace ilrd
