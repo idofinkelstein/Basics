@@ -8,7 +8,7 @@ ROOT_DIR = ../..
 PROJ_SRCS =  threadpool_test.cpp threadpool.cpp semaphore.cpp
 
 # list of directories containing header files
-PROJ_INC_DIR = $(ROOT_DIR)/cpp_fs/BTSqueue/ $(ROOT_DIR)/cpp_fs/function $(ROOT_DIR)/cpp_fs/semaphore/
+PROJ_INC_DIR = $(ROOT_DIR)/cpp_fs/BTSqueue $(ROOT_DIR)/cpp_fs/function $(ROOT_DIR)/cpp_fs/semaphore/
 
 # the executable file
 PROJ_OUT = tp.out

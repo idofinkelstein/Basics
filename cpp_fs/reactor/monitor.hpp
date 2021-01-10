@@ -37,6 +37,11 @@ private:
     int m_max_fd;
 
     int UpdateMax();
+
+    static int Max(int a, int b)
+    {
+        return ((a) > (b) ? (a) : (b));
+    }
 };
 
 class Epoll : public IMonitor
@@ -55,16 +60,10 @@ private:
     int m_curr_event;
     // TODO: vector instead of array
     struct epoll_event *m_events;
-    
+
 };
 
 
-
-
-inline int Max(int a, int b)
-{
-    return ((a) > (b) ? (a) : (b));
-}
 
 } // rd90
 } // ilrd

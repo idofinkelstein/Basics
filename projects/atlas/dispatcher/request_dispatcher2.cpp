@@ -30,11 +30,12 @@ static void InitHints(struct addrinfo* hints, int family, int socktype, int flag
 
 RequestDispatcher::RequestDispatcher(Reactor<Epoll>& react, int bio_fd, IDistributor *dist) :
  m_dist(dist),
- m_react(react)
+ m_react(react),
+ m_threadPool(4)
 {
     m_react.Add(bio_fd, Bind(&RequestDispatcher::RequestHandler, this, bio_fd));
 }
-
+/*---------------------------------------------------------------------------*/
 void RequestDispatcher::RegisterIoT(const std::string& ip_addr)
 {
     int socket = InitIPSocket(ip_addr);
@@ -73,8 +74,8 @@ int RequestDispatcher::InitIPSocket(const std::string& ip_addr)
     static int portNum = atoi(PORT);
     char curr_port[6];
     
+    // updates string of next available port number
     sprintf(curr_port, "%d", portNum++);
-
 
     /***** TCP socket handling *****/
     InitHints(&tcp_hints, AF_INET, SOCK_STREAM, AI_PASSIVE);
@@ -100,7 +101,7 @@ int RequestDispatcher::InitIPSocket(const std::string& ip_addr)
 
     return (tcp_sockfd);
 }
-
+/*---------------------------------------------------------------------------*/
 /* inits the hints struct */
 static void InitHints(struct addrinfo* hints, int family, int socktype, int flags)
 {
@@ -110,12 +111,7 @@ static void InitHints(struct addrinfo* hints, int family, int socktype, int flag
     hints->ai_socktype = socktype; /* TCP stream */
     hints->ai_flags = flags;       /* assign the address of my local host */ 
 }
-
-std::vector<int> &RequestDispatcher::GetFDs()
-{
-    return m_iotFds;
-}
-
+/*---------------------------------------------------------------------------*/
 
 } // namespace rd90
 } // namespace ilrd

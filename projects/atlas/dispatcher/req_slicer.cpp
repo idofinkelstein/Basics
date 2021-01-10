@@ -29,12 +29,12 @@ ReqSlicer::ReqSlicer(int bio_fd, uint32_t reqID, std::vector<int> &fds)
         m_indices.insert(i);
     }
 }
-
+/*---------------------------------------------------------------------------*/
 ReqSlicer::~ReqSlicer()
 {
     BioRequestDone(m_bioReq, 0);
 }
-
+/*---------------------------------------------------------------------------*/
 uint32_t ReqSlicer::GetRequestID(int iot_fd)
 {
     uint32_t id;
@@ -46,7 +46,7 @@ uint32_t ReqSlicer::GetRequestID(int iot_fd)
 
     return id;
 }
-
+/*---------------------------------------------------------------------------*/
 void ReqSlicer::HandleRequest(std::shared_ptr<Task> &task)
 {
     while (!task->m_iotIndices.empty())
@@ -58,13 +58,12 @@ void ReqSlicer::HandleRequest(std::shared_ptr<Task> &task)
         task->m_iotIndices.pop_back();
     }
 }
-
+/*---------------------------------------------------------------------------*/
 void ReqSlicer::WriteFragment(int iot, int idx)
 {
     int iotFd = m_fds[iot];
-
     AtlasHeader atlas_header;   
-    struct msghdr message;
+    msghdr message;
 
     memset(&message, 0, sizeof(message));
 
@@ -102,15 +101,13 @@ void ReqSlicer::WriteFragment(int iot, int idx)
 
     delete[] message.msg_iov;
 }
-
+/*---------------------------------------------------------------------------*/
 
 bool ReqSlicer::HandleReply(int iot_fd)
 {
-#if 1
     AtlasHeader ReplayFromIoT;
 
 	read(iot_fd, reinterpret_cast<char*>(&ReplayFromIoT) + sizeof(uint32_t), sizeof(AtlasHeader) - sizeof(uint32_t));
-
 
     std::cout << "m_bioReq->dataLen = " << m_bioReq->dataLen << std::endl;
     std::cout << "m_bioReq->offset = " << m_bioReq->offset << std::endl;
@@ -122,32 +119,7 @@ bool ReqSlicer::HandleReply(int iot_fd)
         ReadAll(iot_fd, m_bioReq->dataBuf + ReplayFromIoT.m_fragmentNum * SLICE_SIZE, ReplayFromIoT.m_len);
     }
 
-     m_indices.erase(ReplayFromIoT.m_fragmentNum);
-#else
-
-    AtlasHeader IOT_return_message;
-
-    IOT_return_message.m_requestUid = m_reqID;
-    std::cout << "first\n";
-    
-    if (ReadAll(iot_fd, reinterpret_cast<char*>(&IOT_return_message) + sizeof(int), 
-                                                       sizeof(AtlasHeader) - sizeof(int)) < 0)
-    {
-        throw("failed read \n");
-    }
-    std::cout << "second\n";
-
-    if (NBD_CMD_READ == IOT_return_message.m_type)
-    {
-        if (ReadAll(iot_fd, m_bioReq->dataBuf + (IOT_return_message.m_fragmentNum *  SLICE_SIZE), IOT_return_message.m_len) < 0)
-        {
-            throw("failed read \n");
-        }  
-    }
-    std::cout << "third\n";
-
-    m_indices.erase(IOT_return_message.m_fragmentNum);
-#endif
+    m_indices.erase(ReplayFromIoT.m_fragmentNum);
 
     if (m_indices.size() == 0)
     {
@@ -156,26 +128,22 @@ bool ReqSlicer::HandleReply(int iot_fd)
 
     return false;
 }
-
+/*---------------------------------------------------------------------------*/
 uint64_t ReqSlicer::GetOffset()
 {
     return m_bioReq->offset;
 }
-
+/*---------------------------------------------------------------------------*/
 uint32_t ilrd::rd90::ReqSlicer::GetDataLen()
 {
     return m_bioReq->dataLen;
 }
-
+/*---------------------------------------------------------------------------*/
 uint32_t ilrd::rd90::ReqSlicer::GetReqType()
 {
     return m_bioReq->reqType;
 }
-
-BioRequest *ReqSlicer::GetBioRequest()
-{
-    return m_bioReq;
-}
+/*---------------------------------------------------------------------------*/
 
 } // namespace rd90
 } // namespace ilrd

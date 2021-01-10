@@ -24,7 +24,7 @@ int main()
     static const char *deviceName = "/dev/nbd0";
     int bioFd = BioDevOpen(deviceName, storageSize);
 
-    DistModulu dist;
+    DistModulu dist(4);
     Reactor<Epoll> reactor(new Epoll(NUM_OF_CONNECTIONS));
     RequestDispatcher disp(reactor, bioFd, &dist);
 

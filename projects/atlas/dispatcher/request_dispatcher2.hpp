@@ -33,6 +33,7 @@ int main(void)
 #include "function.hpp"     // function
 #include "monitor.hpp"     // epoll
 #include "distributor.hpp"      // distributer class
+#include "threadpool.hpp"
 
 
 /*---------------------------------------------------------------------------*/
@@ -60,8 +61,6 @@ public:
     RequestDispatcher& operator=(const RequestDispatcher&) = delete;
     ~RequestDispatcher() = default;
 
-    std::vector<int>& GetFDs();
-
 private:
     void RequestHandler(int bio_fd);
     void ReplyHandler(int iot_fd);
@@ -72,6 +71,7 @@ private:
     Reactor<Epoll>&                                            m_react;
     static int                                                 m_ReqUID;
     std::unordered_map< uint32_t, std::shared_ptr<ReqSlicer> > m_slicers;
+    ThreadPool                                                 m_threadPool;
 };
 
 

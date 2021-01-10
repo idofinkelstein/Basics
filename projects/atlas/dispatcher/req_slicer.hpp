@@ -58,7 +58,6 @@ public:
     uint64_t GetOffset(); 
     uint32_t GetDataLen();
     uint32_t GetReqType();  
-    BioRequest *GetBioRequest();                          
 
 private:
     std::set<int>               m_indices; 
