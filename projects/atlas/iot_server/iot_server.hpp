@@ -11,7 +11,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
-const char *defaultPort = "29000;";
+static const char *defaultPort = "29000;";
 
 namespace ilrd
 {
@@ -30,9 +30,13 @@ public:
     void Run();
 
 private:
-    int m_sockFd;
-    int m_communicationFd;
-    static int globalPort;
+    int              m_sockFd;
+    int              m_communicationFd;
+    addrinfo         m_hints;
+    addrinfo*        m_servinfo;
+    sockaddr_storage m_clientAddr;
+    socklen_t        m_addr_size;
+    static int       globalPort;
 
 
 };
