@@ -22,23 +22,21 @@ void DistModulu::Distribute(const std::shared_ptr<ReqSlicer> &slicer,
 
     for (int i = 0; i < nIoTs && readySlices < numOfSlices; ++i)
     {
-        std::shared_ptr<Task> task(new Task);
+        //TODO: use shared pointer
+        //std::shared_ptr<Task> task(new Task);
+        Task task;
 
-        task->m_iot = (firstIot + i) % nIoTs;
+        //task->m_iot = (firstIot + i) % nIoTs;
+        task.m_iot  = (firstIot + i) % nIoTs;
 
         for (int j = i; j < numOfSlices; j += nIoTs)
         {
-            task->m_iotIndices.push_back(j);
+            //task->m_iotIndices.push_back(j);
+            task.m_iotIndices.push_back(j);
             ++readySlices;
         }
-        std::vector<int> v;
-        ReqSlicer sf(5,5,v);
-        Task t;
-        Bind(&ReqSlicer::HandleRequest, &sf,  task);
-        //auto f = Bind(&ReqSlicer::HandleRequest, slicer.get(), /* std::cref(task) */ task);
-        //m_threadPool.Async(Bind(&ReqSlicer::HandleRequest, &(*slicer), task), ThreadPool::MID);
-
-        //slicer->HandleRequest(task);
+        
+        m_threadPool.Async(Bind(&ReqSlicer::HandleRequest, slicer.get(), task), ThreadPool::Priority::MID);
     }
 }
 

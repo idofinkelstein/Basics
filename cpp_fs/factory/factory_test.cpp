@@ -24,7 +24,7 @@ public:
 class Derived2 : public Base
 {
 public:
-    explicit Derived2(int a = 5){std::cout << "a = " << a << std::endl;}
+    explicit Derived2(int a){std::cout << "a = " << a << std::endl;}
     void Foo()
     {
         std::cout << "Derived2::Foo" << std::endl;
@@ -38,19 +38,14 @@ int main()
     factory.Register<Derived1>(1);
     factory.Register<Derived2>(2);
 
-    Base *d1 = factory.Create(1, 20);
-    Base *d2 = factory.Create(2);
+    // Base *d1 = factory.Create(1, 20); // compile time error
+    // Base *d2 = factory.Create(2, 14); // compile time error
 
-    std::shared_ptr<Base> sd1(factory.Create(1));
-    std::shared_ptr<Base> sd2(factory.Create(2));
+    std::shared_ptr<Base> sd1(factory.Create(1, 7));
+    std::shared_ptr<Base> sd2(factory.Create(2, 8));
 
-    d1->Foo();
-    d2->Foo();
 
     sd1->Foo();
     sd2->Foo();
-
-    delete d1;
-    delete d2;
 
 }

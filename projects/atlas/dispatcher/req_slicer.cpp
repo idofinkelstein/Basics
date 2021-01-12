@@ -47,7 +47,7 @@ uint32_t ReqSlicer::GetRequestID(int iot_fd)
     return id;
 }
 /*---------------------------------------------------------------------------*/
-void ReqSlicer::HandleRequest(std::shared_ptr<Task> &task)
+/* void ReqSlicer::HandleRequest(std::shared_ptr<Task> &task)
 {
     while (!task->m_iotIndices.empty())
     {
@@ -57,7 +57,21 @@ void ReqSlicer::HandleRequest(std::shared_ptr<Task> &task)
 
         task->m_iotIndices.pop_back();
     }
+} */
+int ReqSlicer::HandleRequest(Task task)
+{
+    while (!task.m_iotIndices.empty())
+    {
+        int idx = task.m_iotIndices.back();
+
+        WriteFragment(task.m_iot, idx);
+
+        task.m_iotIndices.pop_back();
+    }    
+
+    return 0;
 }
+
 /*---------------------------------------------------------------------------*/
 void ReqSlicer::WriteFragment(int iot, int idx)
 {

@@ -52,7 +52,8 @@ public:
     ReqSlicer& operator=(const ReqSlicer& other) = delete;
 
     static uint32_t GetRequestID(int iot_fd);
-    void HandleRequest(std::shared_ptr<Task>& task);
+    //void HandleRequest(std::shared_ptr<Task>& task);
+    int HandleRequest(Task task);
     bool HandleReply(int iot_fd); // returns status indicating whether it 
                                   // was the last reply or not
     uint64_t GetOffset(); 
