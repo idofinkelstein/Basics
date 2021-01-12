@@ -10,9 +10,9 @@ ARCH      = linux64
 CONFIG    = Debug
 
 ifeq ($(ARCH), linux64)
-TOOLS_PATH =
+TOOLS_PATH = 
 else
-TOOLS_PATH = /rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf-
+TOOLS_PATH = ~/rpi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/bin/arm-linux-gnueabihf-
 endif
 
 MAKE = make
