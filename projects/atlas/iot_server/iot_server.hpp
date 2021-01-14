@@ -11,31 +11,35 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
-static const char *defaultPort = "29000;";
-
 namespace ilrd
 {
 namespace rd90
 {
+static const char *defaultPort = "29000;";
 
-class Server
+class IServer
+{
+    //TODO
+public:
+    virtual int Accept(){return 0;}
+};
+
+class TCPServer : public IServer
 {
 public:
-    explicit Server();
+    explicit TCPServer(std::string port = defaultPort);
 
-    Server(const Server& other) = delete;
-    void operator=(const Server& other) = delete;
+    TCPServer(const TCPServer& other) = delete;
+    void operator=(const TCPServer& other) = delete;
 
-    void EstablishConnection(std::string port = defaultPort);
-    void Run();
+    int Accept();
 
 private:
-    int              m_sockFd;
-    int              m_communicationFd;
     addrinfo         m_hints;
-    addrinfo*        m_servinfo;
     sockaddr_storage m_clientAddr;
+    addrinfo*        m_servinfo;
     socklen_t        m_addr_size;
+    int              m_sockFd;
     static int       globalPort;
 
 

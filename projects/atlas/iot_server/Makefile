@@ -5,10 +5,10 @@
 ROOT_DIR = ../../..
 
 #PROJ_SRCS = $(wildcard *.c)
-PROJ_SRCS = storage.cpp iot_server.cpp iot_server_test.cpp
+PROJ_SRCS = storage.cpp iot_server.cpp iot_server_test.cpp iot.cpp
 
 # list of directories containing header files
-PROJ_INC_DIR =
+PROJ_INC_DIR = ../dispatcher
 
 # the executable file
 PROJ_OUT = server.out

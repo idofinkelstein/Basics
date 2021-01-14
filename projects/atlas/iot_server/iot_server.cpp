@@ -1,20 +1,24 @@
+#include <linux/nbd.h>
+#include <iostream>
+
 #include "iot_server.hpp"
+#include "atlas.hpp"
+
 
 namespace ilrd
 {
 namespace rd90
 {
 
-Server::Server()
+int TCPServer::globalPort = atoi(defaultPort);
+/*----------------------------------------------------------------------------*/
+TCPServer::TCPServer(std::string port)
 {
     memset(&m_hints, 0, sizeof(m_hints));
     m_hints.ai_family = AF_INET;
     m_hints.ai_socktype = SOCK_STREAM;
     m_hints.ai_flags = AI_PASSIVE;
-}
 
-void Server::EstablishConnection(std::string port)
-{
     if (getaddrinfo("127.0.0.1", port.data(), &m_hints, &m_servinfo) != 0)
     {
         throw("getaddrinfo()");
@@ -35,14 +39,21 @@ void Server::EstablishConnection(std::string port)
     {
         throw("listen()");
     }
-
 }
-
-void Server::Run()
+/*----------------------------------------------------------------------------*/
+int TCPServer::Accept()
 {
+    int fd;
+    m_addr_size = sizeof(sockaddr_storage);// initial size of address before returning from accept();
 
+    if (-1 == (fd = accept(m_sockFd, reinterpret_cast<sockaddr*>(&m_clientAddr), &m_addr_size)))
+    {
+        puts("recv");
+        throw("accept()");
+    }
+
+    return fd;
 }
-
 
 }
 }
