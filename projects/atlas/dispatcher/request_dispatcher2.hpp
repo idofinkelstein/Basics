@@ -71,7 +71,6 @@ private:
     Reactor<Epoll>&                                            m_react;
     static int                                                 m_ReqUID;
     std::unordered_map< uint32_t, std::shared_ptr<ReqSlicer> > m_slicers;
-    ThreadPool                                                 m_threadPool;
 };
 
 

@@ -12,6 +12,7 @@
 
 #include "distributor.hpp"      // distributer class
 #include "bio_access.h"         // bio_request
+#include "atlas.hpp"            // struct AtlasHeader
 
 
 /*---------------------------------------------------------------------------*/
@@ -21,16 +22,6 @@ namespace ilrd
 namespace rd90
 {
 
-/*********************   Free Functions declarations    **********************/
-struct AtlasHeader
-{
-    uint32_t    m_requestUid;   // not to be used by IoT; must be first field
-    uint32_t    m_fragmentNum;  // not to be used by IoT
-    uint32_t    m_alarmUid;     // not to be used by IoT
-    uint32_t    m_iotOffset;
-    uint32_t    m_type;
-    uint32_t    m_len;          // how many bytes to write OR to read
-};
 
 static const int SLICE_SIZE = 1024;
 /************************   Classes declarations    **************************/
@@ -77,7 +68,8 @@ private:
 
 
 
-/* sudo sh -c "echo 4 > /sys/block/nbd0/queue/max_sectors_kb"
+/* 
+sudo sh -c "echo 4 > /sys/block/nbd0/queue/max_sectors_kb"
  */
 
 

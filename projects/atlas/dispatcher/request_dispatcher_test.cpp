@@ -29,9 +29,9 @@ int main()
     RequestDispatcher disp(reactor, bioFd, &dist);
 
     disp.RegisterIoT(SELF_IP);
-    disp.RegisterIoT(SELF_IP);
-    disp.RegisterIoT(SELF_IP);
-    disp.RegisterIoT(SELF_IP);
+    //disp.RegisterIoT(SELF_IP);
+    //disp.RegisterIoT(SELF_IP);
+    //disp.RegisterIoT(SELF_IP);
 
     reactor.Run();
 
