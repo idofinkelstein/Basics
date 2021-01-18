@@ -13,9 +13,6 @@
 #include "distributor.hpp"      // distributer class
 #include "bio_access.h"         // bio_request
 #include "atlas.hpp"            // struct AtlasHeader
-#include "command.hpp"
-#include "factory.hpp"
-
 
 
 /*---------------------------------------------------------------------------*/
@@ -26,7 +23,7 @@ namespace rd90
 {
 
 
-
+static const int SLICE_SIZE = 1024;
 /************************   Classes declarations    **************************/
 
 struct Task
@@ -52,16 +49,16 @@ public:
                                   // was the last reply or not
     uint64_t GetOffset(); 
     uint32_t GetDataLen();
-    uint32_t GetReqType();  
+    uint32_t GetReqType();
+
 
 
 private:
-    std::set<int>                m_indices; 
-    std::vector<int>&            m_fds;
-    BioRequest*                  m_bioReq;
-    uint32_t                     m_reqID;
-    int                          m_bio_fd;
-    Factory<ICommand, int, int>  m_fact;
+    std::set<int>               m_indices; 
+    std::vector<int>&           m_fds;
+    BioRequest*                 m_bioReq;
+    uint32_t                    m_reqID;
+    int                         m_bio_fd;
 
     void WriteFragment(int iotFd, int idx);
 };

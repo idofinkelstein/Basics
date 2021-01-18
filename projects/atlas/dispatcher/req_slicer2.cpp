@@ -28,9 +28,6 @@ ReqSlicer::ReqSlicer(int bio_fd, uint32_t reqID, std::vector<int> &fds)
     {
         m_indices.insert(i);
     }
-
-    m_fact.Register<Read>(NBD_CMD_READ);
-    m_fact.Register<Write>(NBD_CMD_WRITE);
 }
 /*---------------------------------------------------------------------------*/
 ReqSlicer::~ReqSlicer()
@@ -98,12 +95,7 @@ void ReqSlicer::WriteFragment(int iot, int idx)
     std::cout << "atlas_header->m_iotOffset = " << atlas_header.m_iotOffset << std::endl; */
 
     // Assigns 2 buffers if it's WRITE request or 1 for READ.
-
-    std::shared_ptr<ICommand> command(m_fact.Create(m_bioReq->reqType, 0));
-
-    command->ExecuteRequest(atlas_header, m_bioReq, iotFd, idx);
-
-   /*  message.msg_iovlen = ((atlas_header.m_type == NBD_CMD_WRITE) ? 2 : 1);
+    message.msg_iovlen = ((atlas_header.m_type == NBD_CMD_WRITE) ? 2 : 1);
 
     message.msg_iov = new struct iovec[message.msg_iovlen];
 
@@ -121,7 +113,7 @@ void ReqSlicer::WriteFragment(int iot, int idx)
         throw("sendmsg() failed");
     }
 
-    delete[] message.msg_iov; */
+    delete[] message.msg_iov;
 }
 /*---------------------------------------------------------------------------*/
 
@@ -136,14 +128,10 @@ bool ReqSlicer::HandleReply(int iot_fd)
 
     std::cout << "ReplayFromIoT.m_iotOffset = " << ReplayFromIoT.m_iotOffset << std::endl;
 
-    std::shared_ptr<ICommand> command(m_fact.Create(m_bioReq->reqType, 0));
-
-    command->ExecuteReplay(ReplayFromIoT, m_bioReq, iot_fd);
-
-	/* if (m_bioReq->reqType == NBD_CMD_READ)
+	if (m_bioReq->reqType == NBD_CMD_READ)
     {
         ReadAll(iot_fd, m_bioReq->dataBuf + ReplayFromIoT.m_fragmentNum * SLICE_SIZE, ReplayFromIoT.m_len);
-    } */
+    }
 
     m_indices.erase(ReplayFromIoT.m_fragmentNum);
 

@@ -7,6 +7,8 @@ namespace ilrd
 namespace rd90
 {
 
+static const int SLICE_SIZE = 1024;
+
 struct AtlasHeader
 {
     uint32_t    m_requestUid;   // not to be used by IoT; must be first field
