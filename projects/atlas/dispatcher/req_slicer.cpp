@@ -12,6 +12,8 @@ namespace ilrd
 namespace rd90
 {
 
+static Factory<ICommand, int, CommandData*> fact = ReqSlicer::InitFactory();
+
 ReqSlicer::ReqSlicer(int bio_fd, uint32_t reqID, std::vector<int> &fds)
 :  m_fds(fds), m_reqID(reqID), m_bio_fd(bio_fd)
 {
@@ -29,8 +31,6 @@ ReqSlicer::ReqSlicer(int bio_fd, uint32_t reqID, std::vector<int> &fds)
         m_indices.insert(i);
     }
 
-    m_fact.Register<Read>(NBD_CMD_READ);
-    m_fact.Register<Write>(NBD_CMD_WRITE);
 }
 /*---------------------------------------------------------------------------*/
 ReqSlicer::~ReqSlicer()
@@ -61,6 +61,7 @@ uint32_t ReqSlicer::GetRequestID(int iot_fd)
         task->m_iotIndices.pop_back();
     }
 } */
+/*---------------------------------------------------------------------------*/
 int ReqSlicer::HandleRequest(Task task)
 {
     while (!task.m_iotIndices.empty())
@@ -89,39 +90,14 @@ void ReqSlicer::WriteFragment(int iot, int idx)
     atlas_header.m_alarmUid = 0;
     atlas_header.m_type = m_bioReq->reqType;
     atlas_header.m_len = SLICE_SIZE;
-
     atlas_header.m_iotOffset = (m_bioReq->offset + idx * SLICE_SIZE) / m_fds.size();
     
-    /* std::cout << "iotFd = " << iotFd << std::endl;
-    std::cout << "atlas_header.m_requestUid = " << atlas_header.m_requestUid << std::endl;
-    std::cout << "atlas_header.m_fragmentNum = " << atlas_header.m_fragmentNum << std::endl;
-    std::cout << "atlas_header->m_iotOffset = " << atlas_header.m_iotOffset << std::endl; */
+    CommandData data(atlas_header, m_bioReq, iotFd, idx);
+ 
+    std::shared_ptr<ICommand> command(fact.Create(m_bioReq->reqType, &data));
 
-    // Assigns 2 buffers if it's WRITE request or 1 for READ.
+    command->ExecuteRequest();
 
-    std::shared_ptr<ICommand> command(m_fact.Create(m_bioReq->reqType, 0));
-
-    command->ExecuteRequest(atlas_header, m_bioReq, iotFd, idx);
-
-   /*  message.msg_iovlen = ((atlas_header.m_type == NBD_CMD_WRITE) ? 2 : 1);
-
-    message.msg_iov = new struct iovec[message.msg_iovlen];
-
-    message.msg_iov[0].iov_base = &atlas_header;
-    message.msg_iov[0].iov_len = sizeof(atlas_header);
-
-    if (atlas_header.m_type == NBD_CMD_WRITE)
-    {
-        message.msg_iov[1].iov_base = m_bioReq->dataBuf + idx * SLICE_SIZE;
-        message.msg_iov[1].iov_len = SLICE_SIZE;
-    }
-   
-    if (-1 == (sendmsg(iotFd, &message, 0)))
-    {
-        throw("sendmsg() failed");
-    }
-
-    delete[] message.msg_iov; */
 }
 /*---------------------------------------------------------------------------*/
 
@@ -136,14 +112,12 @@ bool ReqSlicer::HandleReply(int iot_fd)
 
     std::cout << "ReplayFromIoT.m_iotOffset = " << ReplayFromIoT.m_iotOffset << std::endl;
 
-    std::shared_ptr<ICommand> command(m_fact.Create(m_bioReq->reqType, 0));
 
-    command->ExecuteReplay(ReplayFromIoT, m_bioReq, iot_fd);
+    CommandData data(ReplayFromIoT, m_bioReq, iot_fd, 0);
 
-	/* if (m_bioReq->reqType == NBD_CMD_READ)
-    {
-        ReadAll(iot_fd, m_bioReq->dataBuf + ReplayFromIoT.m_fragmentNum * SLICE_SIZE, ReplayFromIoT.m_len);
-    } */
+    std::shared_ptr<ICommand> command(fact.Create(m_bioReq->reqType, &data));
+
+    command->ExecuteReplay();
 
     m_indices.erase(ReplayFromIoT.m_fragmentNum);
 
@@ -160,16 +134,26 @@ uint64_t ReqSlicer::GetOffset()
     return m_bioReq->offset;
 }
 /*---------------------------------------------------------------------------*/
-uint32_t ilrd::rd90::ReqSlicer::GetDataLen()
+uint32_t ReqSlicer::GetDataLen()
 {
     return m_bioReq->dataLen;
 }
 /*---------------------------------------------------------------------------*/
-uint32_t ilrd::rd90::ReqSlicer::GetReqType()
+uint32_t ReqSlicer::GetReqType()
 {
     return m_bioReq->reqType;
 }
 /*---------------------------------------------------------------------------*/
+Factory<ICommand, int, CommandData*> ReqSlicer::InitFactory()
+{
+    Factory<ICommand, int, CommandData*> fact;
+
+    fact.Register<Read>(NBD_CMD_READ);
+    fact.Register<Write>(NBD_CMD_WRITE);
+
+    return fact;
+}
+
 
 } // namespace rd90
 } // namespace ilrd
