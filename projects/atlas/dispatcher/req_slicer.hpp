@@ -52,8 +52,10 @@ public:
                                   // was the last reply or not
     uint64_t GetOffset(); 
     uint32_t GetDataLen();
-    uint32_t GetReqType();  
+    uint32_t GetReqType();
 
+    //initializes static global factory
+    static Factory<ICommand, int, CommandData*> InitFactory();
 
 private:
     std::set<int>                m_indices; 
@@ -61,7 +63,6 @@ private:
     BioRequest*                  m_bioReq;
     uint32_t                     m_reqID;
     int                          m_bio_fd;
-    Factory<ICommand, int, int>  m_fact;
 
     void WriteFragment(int iotFd, int idx);
 };

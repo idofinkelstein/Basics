@@ -12,36 +12,63 @@ namespace ilrd
 namespace rd90
 {
 
+struct CommandData;
+
+
 class ICommand
 {
 public:
-    virtual void ExecuteRequest(AtlasHeader& header, BioRequest *bio, int iotFd, int idx) = 0;
-    virtual void ExecuteReplay(const AtlasHeader& header, BioRequest *bio, int iotFd) = 0;
+    virtual void ExecuteRequest() = 0;
+    virtual void ExecuteReplay() = 0;
 
     virtual ~ICommand() = default;
-
+protected:
+    virtual void InitMsg(msghdr &message, AtlasHeader &header, int numOfFields);
 };
 
 class Read : public ICommand
 {
 public:
-    explicit Read(int a){(void)a;}
-    void ExecuteRequest( AtlasHeader& header, BioRequest *bio, int iotFd, int idx);
-    void ExecuteReplay(const AtlasHeader& header, BioRequest *bio, int iotFd);
+    explicit Read(CommandData* data);
+    void ExecuteRequest();
+    void ExecuteReplay();
 
     Read(const Read&) = delete;
     void operator=(const Read&) = delete;
+private:
+    AtlasHeader& m_header;
+    BioRequest*  m_bio;
+    int          m_iotFd;
+    int          m_idx;
 };
 
 class Write : public ICommand
 {
 public:
-    explicit Write(int a){(void)a;}
-    void ExecuteRequest( AtlasHeader& header, BioRequest *bio, int iotFd, int idx);
-    void ExecuteReplay(const AtlasHeader& header, BioRequest *bio, int iotFd);
+    explicit Write(CommandData* data);
+    void ExecuteRequest();
+    void ExecuteReplay();
 
     Write(const Write&) = delete;
     void operator=(const Write&) = delete;
+private:
+    AtlasHeader& m_header;
+    BioRequest*  m_bio;
+    int          m_iotFd;
+    int          m_idx;
+};
+
+struct CommandData
+{
+    explicit CommandData(AtlasHeader& header,
+                         BioRequest*  bio,
+                         int          iotFd,
+                         int          idx);
+
+    AtlasHeader& m_header;
+    BioRequest*  m_bio;
+    int          m_iotFd;
+    int          m_idx;
 };
 
 }// rd90
