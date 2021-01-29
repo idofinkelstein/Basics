@@ -9,6 +9,10 @@ int main()
 
 	x += 3;
 
+	/* v1.2 */
+
+	x += x;
+
 	return 0;
 }
 
