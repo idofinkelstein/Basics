@@ -2,6 +2,17 @@
 
 #include <stdio.h>
 
+/* version 1.3 */
+void OutputString(int color, const char* str)
+{
+	volatile char* video = (volatile char*)0XB80000000;
+	while (*str != 0)
+	{
+		*video++ = *str++;
+		*video++ = color;
+	}
+}
+
 int main()
 {
 	/* v1.1 */
@@ -12,6 +23,8 @@ int main()
 	/* v1.2 */
 
 	x += x;
+	
+	OutputString(9, "hello world");
 
 	return 0;
 }
