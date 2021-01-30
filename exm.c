@@ -5,7 +5,7 @@
 /* version 1.3 */
 void OutputString(int color, const char* str)
 {
-	volatile char* video = (volatile char*)0XB80000000;
+	volatile char* video = (volatile char*)0XB8000;
 	while (*str != 0)
 	{
 		*video++ = *str++;
@@ -24,7 +24,7 @@ int main()
 
 	x += x;
 	
-	OutputString(9, "hello world");
+	OutputString(9, "hello world"); /* has some bugs */
 
 	return 0;
 }
